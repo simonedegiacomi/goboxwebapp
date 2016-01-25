@@ -1,0 +1,17 @@
+{
+  "name": "gobox-webapp",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "^1.4.0",
+    "angular-animate": "^1.4.0",
+    "angular-cookies": "^1.4.0",
+    "angular-sanitize": "~1.4.9",
+    "angular-ui-router": "~0.2.16",
+    "angular-material": "master"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.4.0"
+  },
+  "appPath": "app",
+  "moduleName": "goboxWebapp"
+}

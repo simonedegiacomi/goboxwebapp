@@ -1,0 +1,78 @@
+<md-container class="login-container" layout-fill layout="row" layout-align="center center">
+    <md-card ng-if="state == 'welcome'" class="login-card">
+        <md-toolbar>
+            <md-title>
+                <div class="md-toolbar-tools">
+                    <h2><span>Welcome!</span></h2>
+                </div>
+            </md-title>
+        </md-toolbar>
+        <md-card-content layout="column">
+            <md-input-container>
+                <label>Username</label>
+                <input type="text" ng-disabled="form.loading" ng-model="form.username.str" />
+            </md-input-container>
+            <div class="my-spinner-box">
+                <md-progress-circular ng-show="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
+            </div>
+            <md-button class="md-raised md-primary" ng-click="show('login')">Login</md-button>
+            <md-button class="md-primary" ng-click="show('register')">Register</md-button>
+        </md-card-content>
+    </md-card>
+
+    <md-card ng-if="state == 'login'" class="login-card">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <md-button class="md-icon-button" ng-click="reset()" aria-label="Back">
+                  <md-icon>arrow_back</md-icon>
+                </md-button>
+                <h2><span>Login - {{form.username.str}}</span></h2>
+            </div>
+        </md-toolbar>
+        <md-card-content layout="column">
+            <md-input-container>
+                <label>Password</label>
+                <input type="password" ng-model="form.password.str" />
+                <!--<div ng-message="form.password.$error">Emh... Wrong password</div>-->
+            </md-input-container>
+            <md-input-container>
+                <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
+                    <span>Keep Logged</span></br>
+            </md-input-container>
+            <div class="my-spinner-box">
+                <md-progress-circular ng-if="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
+            </div>
+            <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+        </md-card-content>
+    </md-card>
+
+    <md-card ng-if="state == 'register'" class="login-card">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <md-button class="md-icon-button" ng-click="reset()" aria-label="Back">
+                  <md-icon>arrow_back</md-icon>
+                </md-button>
+                <h2><span>Register - {{form.username.str}}</span></h2>
+            </div>
+        </md-toolbar>
+        <md-card-content layout="column">
+            <md-input-container>
+                <label>Password</label>
+                <input type="password" ng-model="form.password.str" />
+            </md-input-container>
+            <md-input-container>
+                <label>Email</label>
+                <input type="text" ng-model="form.email.str" />
+            </md-input-container>
+            <md-input-container>
+                <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
+                    <span>Keep Logged</span></br>
+            </md-input-container>
+            <div class="my-spinner-box">
+                <md-progress-circular ng-if="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
+            </div>
+            <md-button ng-click="register()" class="md-primary md-raised">Login</md-button>
+        </md-card-content>
+    </md-card>
+    <md-progress-circular ng-if="state == 'loading'" class="md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+</md-container>
