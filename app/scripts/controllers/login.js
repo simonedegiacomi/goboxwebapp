@@ -31,9 +31,9 @@ angular.module('goboxWebapp')
             else {
 
                 // If is still valid configure the API Client
-                GoBoxClient.setAuth(auth);
+                GoBoxClient.init(auth);
 
-                // and redirect to the home
+                // And redirect to the home
                 $state.go('home');
             }
         });
@@ -54,7 +54,7 @@ angular.module('goboxWebapp')
         form.loading = true;
 
         // Check if the user exist or not
-        GoBoxAuth.existUser(form.username.str).then(function(exist) {
+        GoBoxAuth.existUser(form.username).then(function(exist) {
             
             //Stop the spinner
             form.loading = false;
@@ -84,8 +84,8 @@ angular.module('goboxWebapp')
         form.loading = true;
 
         // Prepare the auth object
-        auth.setUsername(form.username.str);
-        auth.setPassword(form.password.str);
+        auth.setUsername(form.username);
+        auth.setPassword(form.password);
 
         // Login using the API
         auth.login().then(function(logged) {
@@ -96,6 +96,8 @@ angular.module('goboxWebapp')
             if(form.keepLogged)
                 auth.saveToCookie();
             
+            GoBoxClient.init(auth);
+            
             // Ok, logged.
             $state.go('home');
         }, function(error) {
@@ -104,7 +106,7 @@ angular.module('goboxWebapp')
             form.loading = false;
             
             // And the error
-            $mdToast.showSimple("Sorry, wrong password");
+            $mdToast.showSimple("Sorry, wrong Username or Password");
         });
     };
 
@@ -117,9 +119,9 @@ angular.module('goboxWebapp')
         $scope.loading = true;
         
         // Prepare auth object
-        auth.setUsername(form.username.str);
-        auth.setPassword(form.password.str);
-        auth.setEmail(form.email.str);
+        auth.setUsername(form.username);
+        auth.setPassword(form.password);
+        auth.setEmail(form.email);
         
         var self = this;
         

@@ -24,17 +24,13 @@ angular
             url: '/login',
             templateUrl: 'views/login.html',
             controller: 'LoginCtrl',
-            data: {
-                logged: false
-            }
+            logged: false
         })
         .state('home', {
             url: '/',
             templateUrl: 'views/filelist.html',
             controller: 'FileListCtrl',
-            data: {
-                logged: true
-            }
+            logged: true
         });
         
         $urlRouterProvider.otherwise("/login");
@@ -44,10 +40,17 @@ angular
 .run(function($rootScope, GoBoxClient, $state) {
     
     $rootScope.$on('$stateChangeStart', function (event, toState, toStateParams) {
-        if (toState.data.logged == GoBoxClient.isLogged())
+        
+        console.log("Event", event);
+        console.log("toState", toState);
+        console.log("toStateParams", toStateParams);
+        console.log("Logged", GoBoxClient.isLogged());
+        
+        if (toState.logged == GoBoxClient.isLogged())
             return ;
+        event.preventDefault();
         if(GoBoxClient.isLogged())
-            $state.go('home');
+            $state.go('home', toStateParams);
         else
             $state.go('login');
     });

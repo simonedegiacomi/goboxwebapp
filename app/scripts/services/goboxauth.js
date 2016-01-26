@@ -10,6 +10,7 @@ angular.module('goboxWebapp')
 
     var GoBoxAuth = function() {
         // constructor
+        this._valid = false;
     };
 
     GoBoxAuth.prototype.setUsername = function(username) {
@@ -37,11 +38,14 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Set the token and update the authorization http header
+     * Set the token and update the authorization http header.
+     * If the old token was saved in a cookie, update it
      */
     GoBoxAuth.prototype.setToken = function(token) {
         this._token = token;
         setAuthHeader(token);
+        if($cookies.get('gobox_keepLogged'))
+            $cookies.put('gobox_token', token);
     };
 
     GoBoxAuth.prototype.getToken = function() {
@@ -55,8 +59,9 @@ angular.module('goboxWebapp')
         
         // Save the token
         $cookies.put('gobox_token', this._token);
-        // And the username
-        $cookies.put('gobox_username', this._username)
+        $cookies.put('gobox_username', this._username);
+        // And a flag to save that the user want to stay logged
+        $cookies.put('gobox_keepLogged', true);
     };
 
     /**
@@ -67,7 +72,7 @@ angular.module('goboxWebapp')
         
         // Crate a new GoBoxAuth
         var auth = new GoBoxAuth();
-
+        
         // Load informations from the cookie
         auth._token = $cookies.get('gobox_token');
         auth._username = $cookies.get('gobox_username');
@@ -101,12 +106,15 @@ angular.module('goboxWebapp')
         $http.post(Env.base + 'api/user/login', request).then(function(response) {
             if (response.data.result == 'logged in') {
                 self.setToken(response.data.token);
+                self._valid = true;
                 future.resolve(true);
             }
             else {
+                self._valid = false;
                 future.reject(response.data.result);
             }
         }, function(error) {
+            self._valid = false;
             future.reject(error.data);
         });
         
@@ -175,10 +183,12 @@ angular.module('goboxWebapp')
         var self = this;
             
         $http(request).then(function(response) {
+            self._valid = true;
             self.setToken(response.data.newOne);
+            future.resolve(true);
         }, function (error) {
-            delete this._token;
-            future.reject();
+            future.resolve(false);
+            future.resolve(false);
         });
 
         return future.promise;
@@ -193,8 +203,9 @@ angular.module('goboxWebapp')
                 username: username
             }  
         };
-            
+
         $http.get(Env.base + 'api/user/exist', config).then(function (response) {
+            
             future.resolve(true);
         }, function (response) {
             future.resolve(false);
@@ -202,6 +213,10 @@ angular.module('goboxWebapp')
         
         return future.promise;
     }
+    
+    GoBoxAuth.prototype.isValid = function () {
+        return this._valid;
+    };
         
     function setAuthHeader (token) {
         // TODO: set the header only for the APIs

@@ -10,40 +10,20 @@
         <md-card-content layout="column">
             <md-input-container>
                 <label>Username</label>
-                <input type="text" ng-disabled="form.loading" ng-model="form.username.str" />
+                <input type="text" ng-disabled="form.loading" ng-model="form.username" />
             </md-input-container>
-            <div class="my-spinner-box">
-                <md-progress-circular ng-show="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
-            </div>
-            <md-button class="md-raised md-primary" ng-click="show('login')">Login</md-button>
-            <md-button class="md-primary" ng-click="show('register')">Register</md-button>
-        </md-card-content>
-    </md-card>
-
-    <md-card ng-if="state == 'login'" class="login-card">
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <md-button class="md-icon-button" ng-click="reset()" aria-label="Back">
-                  <md-icon>arrow_back</md-icon>
-                </md-button>
-                <h2><span>Login - {{form.username.str}}</span></h2>
-            </div>
-        </md-toolbar>
-        <md-card-content layout="column">
             <md-input-container>
                 <label>Password</label>
-                <input type="password" ng-model="form.password.str" />
-                <!--<div ng-message="form.password.$error">Emh... Wrong password</div>-->
+                <input type="password" ng-disabled="form.loading" ng-model="form.password" />
             </md-input-container>
             <md-input-container>
                 <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
                     <span>Keep Logged</span></br>
             </md-input-container>
-            <div class="my-spinner-box">
-                <md-progress-circular ng-if="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
-            </div>
             <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+            <md-button class="md-primary" ng-click="show('register')">Register</md-button>
         </md-card-content>
+        <md-progress-linear ng-show="form.loading" md-mode="indeterminate"></md-progress-linear>
     </md-card>
 
     <md-card ng-if="state == 'register'" class="login-card">
@@ -52,27 +32,25 @@
                 <md-button class="md-icon-button" ng-click="reset()" aria-label="Back">
                   <md-icon>arrow_back</md-icon>
                 </md-button>
-                <h2><span>Register - {{form.username.str}}</span></h2>
+                <h2><span>Register - {{form.username}}</span></h2>
             </div>
         </md-toolbar>
         <md-card-content layout="column">
             <md-input-container>
                 <label>Password</label>
-                <input type="password" ng-model="form.password.str" />
+                <input type="password" ng-model="form.password" />
             </md-input-container>
             <md-input-container>
                 <label>Email</label>
-                <input type="text" ng-model="form.email.str" />
+                <input type="text" ng-model="form.email" />
             </md-input-container>
             <md-input-container>
                 <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
                     <span>Keep Logged</span></br>
             </md-input-container>
-            <div class="my-spinner-box">
-                <md-progress-circular ng-if="form.loading" class="md-primary" md-mode="indeterminate" md-diameter="48"></md-progress-circular>
-            </div>
             <md-button ng-click="register()" class="md-primary md-raised">Login</md-button>
         </md-card-content>
+        <md-progress-linear ng-show="form.loading" md-mode="indeterminate"></md-progress-linear>
     </md-card>
     <md-progress-circular ng-if="state == 'loading'" class="md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
 </md-container>

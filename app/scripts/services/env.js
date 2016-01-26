@@ -7,5 +7,6 @@
 angular.module('goboxWebapp')
 
 .constant('Env', {
-    base: 'https://goboxserver-simonedegiacomi.c9users.io/'
+    base: 'https://goboxserver-simonedegiacomi.c9users.io/',
+    ws: 'wss://goboxserver-simonedegiacomi.c9users.io/ws/client'
 });

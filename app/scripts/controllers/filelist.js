@@ -9,6 +9,10 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FilelistCtrl', function(GoBoxClient) {
-    console.log(GoBoxClient);
-    });
+.controller('FileListCtrl', function($scope, GoBoxClient, GoBoxPath) {
+    var path = $scope.path = new GoBoxPath(GoBoxClient);
+    
+    $scope.files = path.ls().getChildren();
+    
+    $scope.position = path.ls()
+});
