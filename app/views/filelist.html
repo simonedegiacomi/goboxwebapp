@@ -1,7 +1,121 @@
-<p>This is the filelist view.</p>
-<p>Position:</p>
-<p>{{position}}</p>
-<p>Files:</p>
-<ul>
-    <li ng-repeat="file in files">{{file}}</li>
-</ul>
+<style type="text/css">
+    .sidenav-username {
+        bottom: 10px;
+        position: absolute;
+    }
+    
+    .sidenav-more {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+    }
+    
+    .selected {
+        background-color: #ddd;
+    }
+</style>
+
+<md-content layout="row" layout-fill flex>
+
+
+
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-is-locked-open="$mdMedia('gt-sm')" flex>
+        <md-toolbar class="md-toolbar-tools md-tall">
+            <img src="">
+
+            <md-title class="sidenav-username">{{sidenav.username}}</md-title>
+            <span flex></span>
+
+
+            <md-menu>
+                <md-button class="sidenav-more md-icon-button" ng-click="$mdOpenMenu($event)">
+                    <md-icon md-menu-origin>more_vert</md-icon>
+                </md-button>
+                <md-menu-content width="3">
+                    <md-menu-item>
+                        <md-button>
+                            <md-icon>info</md-icon>
+                            Connection Info
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button>
+                            <md-icon>settings</md-icon>
+                            Settings
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="logout()">
+                            <md-icon>exit_to_app</md-icon>
+                            Logout
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+
+        </md-toolbar>
+        <md-content>
+            <md-list>
+                <md-list-item ng-repeat="element in sidenav.elements" ng-click="console.log('ok');" ng-class="{'selected': (element.selected)}">
+                    <md-icon>{{element.icon}}</md-icon>
+                    <p>{{element.name}}</p>
+                    <md-divider ng-if="element.divider"></md-divider>
+                </md-list-item>
+            </md-list>
+        </md-content>
+
+    </md-sidenav>
+
+
+    <md-content class="main-content" layout="column" flex>
+        <md-toolbar class="md-toolbar-tools">
+            <md-title><a href="">Root</a> > Cartella</md-title>
+            <span flex></span>
+
+            <md-button ng-if="selection.active" ng-repeat="tool in tools" class="md-icon-button">
+                <md-tooltip>{{tool.tooltip}}</md-tooltip>
+                <md-icon>{{tool.icon}}</md-icon>
+            </md-button>
+
+            <md-button class="md-icon-button">
+                <md-tooltip>Search</md-tooltip>
+                <md-icon>search</md-icon>
+            </md-button>
+
+        </md-toolbar>
+
+        <md-content>
+            <file-list files="mocks" selection="selection"></file-list>
+        </md-content>
+        <!-- fab -->
+        <div class="fab-box">
+            <md-fab-speed-dial class="add-fab" md-open="test" md-direction="left" ng-class="md-scale">
+                <md-fab-trigger>
+                    <md-button aria-label="menu" class="md-fab md-primary">
+                        <md-icon>add</md-icon>
+                    </md-button>
+                </md-fab-trigger>
+                <md-fab-actions>
+                    <md-button aria-label="New Folder" class="md-fab md-raised md-mini">
+                        <md-icon aria-label="New Folder">create_new_folder</md-icon>
+                    </md-button>
+                    <md-button aria-label="Upload File" class="md-fab md-raised md-mini">
+                        <md-icon aria-label="Upload File">file_upload</md-icon>
+                    </md-button>
+                </md-fab-actions>
+            </md-fab-speed-dial>
+
+            <md-fab-speed-dial ng-if="selection.active" class="paste-fab" md-direction="left" ng-class="md-scale">
+                <md-fab-trigger>
+                    <md-button aria-label="paste" class="md-fab md-warn">
+                        <md-icon>content_paste</md-icon>
+                    </md-button>
+                </md-fab-trigger>
+            </md-fab-speed-dial>
+        </div>
+
+    </md-content>
+
+
+
+</md-content>

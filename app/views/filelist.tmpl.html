@@ -1,0 +1,20 @@
+<style>
+
+.no-padding {
+    padding: 0px !important;
+}
+
+</style>
+
+<md-subheader class="md-primary"  style="background-color: #eee;">
+    <div layout="row">
+        <div flex="10"></div>
+        <div flex>Name</div>
+        <div flex="15" hide show-gt-sm>Size</div>
+        <div flex="15" hide show-gt-md>Date</div>
+    </div>
+</md-subheader>
+
+<md-list layout-padding>
+    <file-list-item ng-repeat="file in files" file="file" ng-click="selection.toggle()" class="no-padding"></file-list-item>
+</md-list>

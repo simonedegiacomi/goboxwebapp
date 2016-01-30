@@ -12,12 +12,16 @@ angular.module('goboxWebapp')
 .factory('GoBoxPath', function($q, GoBoxFile) {
 
     /**
-     * Returna  new GoBoxPath in the root position
+     * Return a new GoBoxPath in the root position
      */
     var GoBoxPath = function(client) {
         
         this._client = client;
-        this._history = [];
+        
+        var root = new GoBoxFile('Root');
+        root.setId(0);
+        
+        this._history = [ root ];
 
         this._history.last = function() {
             if (this.length > 0)
@@ -29,12 +33,38 @@ angular.module('goboxWebapp')
 
     /**
      * Change the folder passing the id of the next folder.
-     * This method doesn't return anything and doesn't make any query to the server
+     * If the next directory is not a son of this directory, the 'reach' method
+     * will be called. When the directory is changed the event histsory changed
+     * will be fired
      */
     GoBoxPath.prototype.cd = function(folder) {
-
-        this._history.push(folder);
-        this._historyChanged();
+        if(this._history.length > 0 && this._history.last().hasChild(folder)) {
+            this._history.push(folder);
+            this._historyChanged();
+            return ;
+        }
+        
+        this.reach(folder).then(function () {
+            this._historyChanged();
+        });
+    };
+    
+    /**
+     * Change the position without firing the history change event.
+     * You should call this method when the directory you want to enter
+     * is not a direct son of this directory, otherwise just call the 'cd'
+     * method to have better performance
+     */
+    GoBoxPath.prototype.reach = function (folder) {
+        var future = $q.defer();
+        var self = this;
+        this._client.getAbsolutePath(folder).then(function(filesArray){
+            self._history = filesArray;
+            future.resolve();
+        }, function () {
+            future.reject();
+        });
+        return future.promise;
     };
 
     /**
@@ -52,7 +82,7 @@ angular.module('goboxWebapp')
             future.resolve(history.last());
         } else {
 
-            this._client.listFile(history.last().getId()).then(function(dir) {
+            this._client.listFile(history.last()).then(function(dir) {
                 history[history.length - 1] = dir;
                 
                 future.resolve(dir);
@@ -78,6 +108,10 @@ angular.module('goboxWebapp')
         this._historyChanged();
     };
 
+    /**
+     * This method calls the listeners of the path
+     * 
+     */
     GoBoxPath.prototype._historyChanged = function() {
         for (var i in this._listeners)
             this._listeners[i]();
@@ -86,31 +120,55 @@ angular.module('goboxWebapp')
     GoBoxPath.prototype.addListener = function(newListener) {
         this._listeners.push(newListener);
     }
-
-    GoBoxPath.prototype.rename = function() {
+    
+    /**
+     * Remove a file or a directory
+     */
+    GoBoxPath.prototype.rm = function(file) {
         var future = $q.defer();
+        
+        this._client.remove(file).then(function(){
+            future.resolve();
+        }, function() {
+            future.reject();
+        });
 
         return future.promise;
     };
 
-    GoBoxPath.prototype.rm = function() {
-        var future = $q.defer();
-
-        return future.promise;
+    /**
+     * Create a new empty directory
+     */
+    GoBoxPath.prototype.mkDir = function(name) {
+        var file = new GoBoxFile(name);
+        file.isDirectory = true;
+        return this._createFile(file);
     };
-
-    GoBoxPath.prototype.mkDir = function() {
-        var future = $q.defer();
-
-        return future.promise;
+    
+    /**
+     * Create a new empty file
+     */
+    GoBoxPath.prototype.touch = function(name) {
+        var file = new GoBoxFile(name);
+        file.isDirectory = false;
+        return this._createFile(file);
     };
-
-    GoBoxPath.prototype.touch = function() {
+    
+    /**
+     * Tell the storage to create a new file. The argument
+     * need to be a GoBoxFile.
+     */
+    GoBoxPath.prototype._createFile = function (file) {
         var future = $q.defer();
+        
+        this._client.createFile(file).then(function(filledFile) {
+            future.resolve(filledFile);
+        }, function () {
+            future.reject();
+        });
 
         return future.promise;
     };
 
     return GoBoxPath;
-
 });

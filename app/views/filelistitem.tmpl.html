@@ -1,0 +1,12 @@
+
+<md-list-item layout="row" class="md-1-line" g-click="console.log('ok')">
+
+    <div flex="10">
+        <md-icon>{{file | iconFilter}}</md-icon>
+    </div>
+    <div flex>{{file.getName()}}</div>
+    <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
+    <div flex flex="15" hide show-gt-md>{{file.getLastUpdate()}}</div>
+    
+</md-list-item>
+<md-divider></md-divider>

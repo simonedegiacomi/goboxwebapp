@@ -12,7 +12,6 @@ angular
 .module('goboxWebapp', [
     'ngAnimate',
     'ngCookies',
-    'ngSanitize',
     'ui.router',
     'ngMaterial',
     'ngMessages'
@@ -24,15 +23,20 @@ angular
             url: '/login',
             templateUrl: 'views/login.html',
             controller: 'LoginCtrl',
-            logged: false
+            restricted: false
         })
         .state('home', {
             url: '/',
             templateUrl: 'views/filelist.html',
             controller: 'FileListCtrl',
-            logged: true
+            restricted: true
+        })
+        .state('settings', {
+            url: '/settings',
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl',
+            restricted: true
         });
-        
         $urlRouterProvider.otherwise("/login");
 
 })
@@ -40,13 +44,7 @@ angular
 .run(function($rootScope, GoBoxClient, $state) {
     
     $rootScope.$on('$stateChangeStart', function (event, toState, toStateParams) {
-        
-        console.log("Event", event);
-        console.log("toState", toState);
-        console.log("toStateParams", toStateParams);
-        console.log("Logged", GoBoxClient.isLogged());
-        
-        if (toState.logged == GoBoxClient.isLogged())
+        if (toState.restricted == GoBoxClient.isLogged())
             return ;
         event.preventDefault();
         if(GoBoxClient.isLogged())
