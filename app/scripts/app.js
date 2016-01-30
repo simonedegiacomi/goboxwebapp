@@ -9,13 +9,13 @@
  * Main module of the application.
  */
 angular
-.module('goboxWebapp', [
-    'ngAnimate',
-    'ngCookies',
-    'ui.router',
-    'ngMaterial',
-    'ngMessages'
-])
+    .module('goboxWebapp', [
+        'ngAnimate',
+        'ngCookies',
+        'ui.router',
+        'ngMaterial',
+        'ngMessages'
+    ])
 
 .config(function($stateProvider, $urlRouterProvider) {
 
@@ -26,29 +26,48 @@ angular
             restricted: false
         })
         .state('home', {
+            abstract: true,
+            views: {
+                '@': {
+                    templateUrl: 'views/home.html',
+                    controller: 'HomeCtrl'
+                }
+            }
+        })
+        .state('filelist', {
+            parent: 'home',
             url: '/',
-            templateUrl: 'views/filelist.html',
-            controller: 'FileListCtrl',
-            restricted: true
+            restricted: true,
+            views: {
+                'main@home': {
+                    templateUrl: 'views/filelist.html',
+                    controller: 'FileListCtrl'
+                }
+            }
         })
         .state('settings', {
+            parent: 'home',
             url: '/settings',
-            templateUrl: 'views/settings.html',
-            controller: 'SettingsCtrl',
+            views: {
+                'main@home': {
+                    templateUrl: 'views/settings.html',
+                    controller: 'SettingsCtrl'
+                }
+            },
             restricted: true
         });
-        $urlRouterProvider.otherwise("/login");
+        
+    $urlRouterProvider.otherwise("/login");
 
 })
 
 .run(function($rootScope, GoBoxClient, $state) {
-    
-    $rootScope.$on('$stateChangeStart', function (event, toState, toStateParams) {
+    $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
         if (toState.restricted == GoBoxClient.isLogged())
-            return ;
+            return;
         event.preventDefault();
-        if(GoBoxClient.isLogged())
-            $state.go('home', toStateParams);
+        if (GoBoxClient.isLogged())
+            $state.go('filelist', toStateParams);
         else
             $state.go('login');
     });

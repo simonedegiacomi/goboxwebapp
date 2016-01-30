@@ -1,0 +1,49 @@
+<style>
+    .center {
+        margin: 0 auto;
+    }
+</style>
+
+<md-content layout="row" layout-fill flex>
+    <!-- Sidenav -->
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-is-locked-open="$mdMedia('gt-sm')" flex layout-fill>
+        <md-toolbar class="md-toolbar-tools md-tall">
+            <img src="">
+            <md-title class="sidenav-username">{{sidenav.username}}</md-title>
+            <span flex></span>
+            <md-menu>
+                <md-button class="sidenav-more md-icon-button" ng-click="$mdOpenMenu($event)">
+                    <md-icon md-menu-origin>more_vert</md-icon>
+                </md-button>
+                <md-menu-content width="3">
+                    <md-menu-item ng-repeat="item in sidenav.menuItems">
+                        <md-button>
+                            <md-icon>{{item.icon}}</md-icon>
+                            {{item.name}}
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+        </md-toolbar>
+        <md-content>
+            <md-list>
+                <md-list-item ng-repeat="element in sidenav.elements" ng-click="console.log('ok');" ng-class="{'selected': (element.selected)}">
+                    <md-icon>{{element.icon}}</md-icon>
+                    <p>{{element.name}}</p>
+                    <md-divider ng-if="element.divider"></md-divider>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </md-sidenav>
+
+
+    <!-- Loading spinner -->
+    <md-content ng-if="connection.state == 'pending'" flex>
+        <md-progress-circular flex class="center md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+    </md-content>
+
+    <!-- Connection error or no storage -->
+
+    <!-- Main content -->
+    <md-content ng-if="connection.state == 'ok'" ui-view="main" flex></md-content>
+</md-content>

@@ -22,37 +22,6 @@ angular.module('goboxWebapp')
     }
 
 
-    $scope.sidenav = {
-        username: GoBoxClient.getAuth().getUsername(),
-        elements: [
-            {
-                name: 'My Files',
-                icon: 'cloud',
-                selected: true
-            }, {
-                name: 'Shared',
-                icon: 'share',
-                divider: true
-            },{
-                name: 'Music',
-                icon: 'library_music'
-            }, {
-                name: 'Images',
-                icon: 'photo_library'
-            }, {
-                name: 'Documents',
-                icon: 'picture_as_pdf'
-            }, {
-                name: 'Videos',
-                icon: 'video_library',
-                divider: true
-            }, {
-                name: 'Settings',
-                icon: 'settings'
-            }
-        ]
-    };
-    
     $scope.tools = [
         {
             tooltip: 'Copy',
@@ -85,4 +54,10 @@ angular.module('goboxWebapp')
             
         }
     });
+    
+    $scope.gui = {
+        fabNew: {
+            open: false
+        }  
+    };
 });

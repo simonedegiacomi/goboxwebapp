@@ -34,7 +34,7 @@ angular.module('goboxWebapp')
                 GoBoxClient.init(auth);
 
                 // And redirect to the home
-                $state.go('home');
+                $state.go('filelist');
             }
         });
 
@@ -99,7 +99,7 @@ angular.module('goboxWebapp')
             GoBoxClient.init(auth);
             
             // Ok, logged.
-            $state.go('home');
+            $state.go('filelist');
         }, function(error) {
             
             // Mmm an error
