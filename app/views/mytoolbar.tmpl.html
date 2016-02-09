@@ -1,0 +1,26 @@
+<!-- Toolbar -->
+<md-toolbar class="md-toolbar-tools">
+    
+    <!-- Title -->
+    <md-title ng-switch="config.title.mode" flex>
+        <path-pwd ng-switch-when="pwd" path="config.title.path"></path-pwd>
+        <span ng-switch-when="title">{{config.title.str}}</span>
+        <span ng-switch-when="search">
+            <input ng-model="config.search">
+        </span>
+    </md-title>
+    
+
+    <md-button ng-if="config.showTools" ng-repeat="tool in config.tools" ng-click="tool.action()" class="md-icon-button">
+        <md-tooltip>{{tool.tooltip}}</md-tooltip>
+        <md-icon>{{tool.icon}}</md-icon>
+    </md-button>
+
+    <!-- Search button link -->
+    <a ui-sref="home.filter" ng-if="config.showSearchLink">
+        <md-button class="md-icon-button">
+            <md-tooltip>Search</md-tooltip>
+            <md-icon>search</md-icon>
+        </md-button>
+    </a>
+</md-toolbar>

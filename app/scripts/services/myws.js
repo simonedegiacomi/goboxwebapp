@@ -4,7 +4,7 @@
  * This is a wrapper around the WebSocket object and introduce the concept of
  * events (like the socket.io library) and queries, events with a answers.
  * 
- * Created by Degiacomi Simone on 26/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
 
@@ -13,7 +13,7 @@ angular.module('goboxWebapp')
     // Constructor
     var MyWS = function (server) {
         
-        var events = this._eventisteners = { };
+        var events = this._eventListeners = { };
         var queries = this._queryListeners = { };
         var queue = this._queue = [];
         
@@ -28,15 +28,17 @@ angular.module('goboxWebapp')
         };
         
         ws.onmessage = function (incoming) {
-            var json = JSON.parse(incoming);
+            var json = JSON.parse(incoming.data);
             executeEvent(json.event, json.data, json._queryId);
         };
         
         ws.onclose = function () {
+            console.log('Socket Closed!');
             executeEvent('close', { });  
         };
         
-        ws.onerro = function () {
+        ws.onerror = function () {
+            console.log('Socket Error!');
             executeEvent('error', { });
         };
         
@@ -55,14 +57,15 @@ angular.module('goboxWebapp')
     };
     
     MyWS.prototype.on = function (event, listener) {
-        this._eventisteners[event] = listener;  
+        this._eventListeners[event] = listener;  
     };
     
-    MyWS.prototype.send = function (event, data) {
+    MyWS.prototype.send = function (event, data, forServer, queryId) {
+        var objToSend = { event: event, data: data , forServer: forServer, _queryId: queryId };
         try {
-            this._ws.send(JSON.stringify({ event: event, data: data }));
+            this._ws.send(JSON.stringify(objToSend));
         } catch (e) {
-            this._queue.push({ event: event, data: data });
+            this._queue.push(objToSend);
         }
     };
     
@@ -71,7 +74,7 @@ angular.module('goboxWebapp')
         
         var id = '' + (new Date().getTime());
         this._queryListeners[id] = future;
-        this.send(event, { 'data': data, '_queryId': id, 'forServer': false});
+        this.send(query, data, false, id);
         
         return future.promise;
     };

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @ngdoc function
+ * @author Degiacomi Simone
  * @name goboxWebapp.controller:SettingsCtrl
  * @description
  * # SettingsCtrl

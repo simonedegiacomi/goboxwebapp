@@ -1,0 +1,48 @@
+<style>
+    .fab-box {
+        position: fixed;
+        right: 25px;
+        bottom: 225px;
+    }
+    
+    .add-fab {
+        float: right;
+    }
+</style>
+
+<md-content layout="column" layout-fill>
+
+    <!-- Toolbar -->
+    <my-toolbar config="toolbar"></my-toolbar>
+
+    <!-- Main content of the view -->
+    <md-content>
+        <file-list files="dir.children" selection="selection"></file-list>
+    </md-content>
+
+    <!-- Fab -->
+    <div class="fab-box">
+        <md-fab-speed-dial md-direction="up" md-open="fab.add.open" class="md-scale md-fab-top-right" ng-mouseenter="fab.add.open=true" ng-mouseleave="fab.add.open=false">
+            <md-fab-trigger>
+                <md-button aria-label="menu" class="md-fab md-warn">
+                    <md-tooltip md-direction="left">Add</md-tooltip>
+                    <md-icon>add</md-icon>
+                </md-button>
+            </md-fab-trigger>
+
+            <md-fab-actions>
+                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ng-click="newFolder($event)">
+                    <md-tooltip md-direction="left">New Folder</md-tooltip>
+
+                    <md-icon>create_new_folder</md-icon>
+                </md-button>
+                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ng-click="newFolder($event)">
+                    <md-tooltip>Upload File</md-tooltip>
+
+                    <md-icon>file_upload</md-icon>
+                </md-button>
+            </md-fab-actions>
+        </md-fab-speed-dial>
+    </div>
+
+</md-content>

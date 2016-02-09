@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * 
- * Created by Degiacomi Simone on 25/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
     
@@ -154,10 +153,10 @@ angular.module('goboxWebapp')
         };
             
         // Make the request
-        $http.post(Env.base + 'api/user/singup', request).then(function(response) {
+        $http.post(Env.base + 'api/user/signup', request).then(function(response) {
             future.resolve(true);
         }, function(error) {
-            future.reject(response.data);
+            future.reject(error.data);
         });
         
         // Return the promise

@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * 
- * Created by Degiacomi Simone on 27/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
 
@@ -10,24 +9,38 @@ angular.module('goboxWebapp')
 
     var GoBoxFile = function (name) {
         this.name = name;
-        this._dummy = true;
     };
     
     GoBoxFile.wrap = function (json) {
-        json.prototype = GoBoxFile.prototype;
-        return json;
-    };
-    
-    GoBoxFile.prototype.isDummy = function () {
-        return this._dummy;
+        // Create a new GoBoxFile
+        var file = new GoBoxFile();
+        
+        // Copy every key
+        for(var key in json)
+            file[key] = json[key];
+            
+        // Finally wrap also his children
+        if(json.children)
+            for(var i in json.children)
+                file.children[i] = GoBoxFile.wrap(json.children[i]);
+                
+        return file;
     };
     
     GoBoxFile.prototype.getId = function () {
-        return this.id;
+        return this.ID;
     };
     
     GoBoxFile.prototype.setId = function (id) {
-        this._id = id;
+        this.ID = id;
+    };
+    
+    GoBoxFile.prototype.getFatherId = function () {
+        return this.fatherID;
+    };
+    
+    GoBoxFile.prototype.setFatherId = function (id) {
+        this.fatherID = id;
     };
     
     GoBoxFile.prototype.getName = function () {
@@ -58,7 +71,7 @@ angular.module('goboxWebapp')
     
     GoBoxFile.prototype.hasChild = function (child) {
         for(var i in this.children)
-            if(this.children[i].id == child.id)
+            if(this.children[i].ID == child.ID)
                 return true;
         return false
     };

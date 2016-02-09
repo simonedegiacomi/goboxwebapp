@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * 
- * Created by Degiacomi Simone on 25/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
 
@@ -31,10 +30,10 @@ angular.module('goboxWebapp')
             else {
 
                 // If is still valid configure the API Client
-                GoBoxClient.init(auth);
+                GoBoxClient.setAuth(auth);
 
                 // And redirect to the home
-                $state.go('filelist');
+                $state.go('home.files', { id: 1 });
             }
         });
 
@@ -96,10 +95,10 @@ angular.module('goboxWebapp')
             if(form.keepLogged)
                 auth.saveToCookie();
             
-            GoBoxClient.init(auth);
+            GoBoxClient.setAuth(auth);
             
             // Ok, logged.
-            $state.go('filelist');
+            $state.go('home.files', { id: 1});
         }, function(error) {
             
             // Mmm an error

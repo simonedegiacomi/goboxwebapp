@@ -5,7 +5,7 @@
  * expones simple method and the concept of 'history path' to manage easily
  * the storage structure.
  * 
- * Created by Degiacomi Simone in 26/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
 
@@ -15,119 +15,103 @@ angular.module('goboxWebapp')
      * Return a new GoBoxPath in the root position
      */
     var GoBoxPath = function(client) {
-        
-        this._client = client;
-        
-        var root = new GoBoxFile('Root');
-        root.setId(0);
-        
-        this._history = [ root ];
 
-        this._history.last = function() {
-            if (this.length > 0)
-                return this[this.length - 1];
+        this._client = client;
+
+        var pwd = this.pwd = [];
+
+        pwd.last = function() {
+            return this[this.length > 0 ? (this.length - 1) : 0];
+        };
+        
+        pwd.clear = function () {
+            this.length = 0;
         };
 
         this._listeners = [];
-    };
 
-    /**
-     * Change the folder passing the id of the next folder.
-     * If the next directory is not a son of this directory, the 'reach' method
-     * will be called. When the directory is changed the event histsory changed
-     * will be fired
-     */
-    GoBoxPath.prototype.cd = function(folder) {
-        if(this._history.length > 0 && this._history.last().hasChild(folder)) {
-            this._history.push(folder);
-            this._historyChanged();
-            return ;
-        }
-        
-        this.reach(folder).then(function () {
-            this._historyChanged();
+        var self = this;
+
+        client.addSyncListener(function(changedFile, syncType) {
+            for (var i = 0; i < pwd.length; i++)
+                if (changedFile.getFatherId() == pwd[i].getId()) {
+                    switch (syncType) {
+                        case 'NEW_FILE':
+                            pwd[i].getChildren().push(changedFile);
+                            break;
+                        case 'REMOVE_FILE':
+
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (i == pwd.length - 1)
+                        self._notifyChange();
+                    return;
+                }
         });
     };
     
-    /**
-     * Change the position without firing the history change event.
-     * You should call this method when the directory you want to enter
-     * is not a direct son of this directory, otherwise just call the 'cd'
-     * method to have better performance
-     */
-    GoBoxPath.prototype.reach = function (folder) {
-        var future = $q.defer();
-        var self = this;
-        this._client.getAbsolutePath(folder).then(function(filesArray){
-            self._history = filesArray;
-            future.resolve();
-        }, function () {
-            future.reject();
-        });
-        return future.promise;
+    GoBoxPath.prototype._notifyChange = function () {
+        var changedDir = this.pwd.last();
+        for (var i in this._listeners)
+            this._listeners[i](changedDir);
+    };
+
+    GoBoxPath.prototype.addChangeListener = function(listener) {
+        this._listeners.push(listener);
     };
 
     /**
-     * Return a new promise that will be resolved with the GoBoxFile[]
-     * of this folder. The children of this folder are on the resolved file.
-     * If the method was called before, a cached value will be returned.
+     * 
+     */
+    GoBoxPath.prototype.cd = function(folder) {
+        
+        if (this.pwd.last() == folder) {
+            this._notifyChange();
+        } else {
+            var knowPath = this.pwd.length > 0 && this.pwd.last().hasChild(folder);
+            var self = this;
+            this._client.getInfo(folder, !knowPath, true).then(function(detailedFolder){
+                self.pwd.push(detailedFolder);
+                self._notifyChange();
+            })
+        }
+    };
+
+    /**
+     * 
      */
     GoBoxPath.prototype.ls = function() {
-        var future = $q.defer();
-
-        var history = this._history;
-        
-        if (!history.last().isDummy()) {
-            
-            future.resolve(history.last());
-        } else {
-
-            this._client.listFile(history.last()).then(function(dir) {
-                history[history.length - 1] = dir;
-                
-                future.resolve(dir);
-                
-            }, function (error) {
-                future.resolve([]);
-            });
-        }
-
-        return future.promise;
+        return this.pwd.last().children;
     };
 
     /**
      * This function go one step back in the history. If this directory is the root
      * anything appen. This method doesn't return anything.
-     */ 
+     */
     GoBoxPath.prototype.back = function() {
 
-        if (this._history.length <= 0)
+        if (this.pwd.length <= 0)
             return;
-        
-        this._history.pop();
-        this._historyChanged();
+
+        this.pwd.pop();
+        this._notifyChange();
     };
 
-    /**
-     * This method calls the listeners of the path
-     * 
-     */
-    GoBoxPath.prototype._historyChanged = function() {
-        for (var i in this._listeners)
-            this._listeners[i]();
-    };
 
     GoBoxPath.prototype.addListener = function(newListener) {
         this._listeners.push(newListener);
     }
-    
+
     /**
      * Remove a file or a directory
      */
     GoBoxPath.prototype.rm = function(file) {
         var future = $q.defer();
-        
-        this._client.remove(file).then(function(){
+
+        this._client.remove(file).then(function() {
             future.resolve();
         }, function() {
             future.reject();
@@ -139,12 +123,14 @@ angular.module('goboxWebapp')
     /**
      * Create a new empty directory
      */
-    GoBoxPath.prototype.mkDir = function(name) {
+    GoBoxPath.prototype.mkdir = function(name) {
         var file = new GoBoxFile(name);
-        file.isDirectory = true;
+        console.log("father", this.pwd.last());
+        file.setFatherId(this.pwd.last().getId());
+        file.setIsDirectory(true);
         return this._createFile(file);
     };
-    
+
     /**
      * Create a new empty file
      */
@@ -153,17 +139,17 @@ angular.module('goboxWebapp')
         file.isDirectory = false;
         return this._createFile(file);
     };
-    
+
     /**
      * Tell the storage to create a new file. The argument
      * need to be a GoBoxFile.
      */
-    GoBoxPath.prototype._createFile = function (file) {
+    GoBoxPath.prototype._createFile = function(file) {
         var future = $q.defer();
-        
+
         this._client.createFile(file).then(function(filledFile) {
             future.resolve(filledFile);
-        }, function () {
+        }, function() {
             future.reject();
         });
 

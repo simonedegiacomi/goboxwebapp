@@ -26,17 +26,6 @@
     
     <div layout-fill ui-view></div>
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <script>
-       !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
-       (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
-       r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
-       }(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script>
-
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/angular/angular.js"></script>
@@ -47,9 +36,9 @@
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-messages/angular-messages.js"></script>
     <script src="bower_components/angular-material/angular-material.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
-
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
         <script src="scripts/services/goboxclient.js"></script>
@@ -61,15 +50,17 @@
         <script src="scripts/services/goboxpath.js"></script>
         <script src="scripts/services/goboxfile.js"></script>
         <script src="scripts/controllers/settings.js"></script>
-        <script src="scripts/directives/file-list.js"></script>
-        <script src="scripts/directives/path-tree.js"></script>
         <script src="scripts/directives/path-pwd.js"></script>
-        <script src="scripts/directives/file-list-item.js"></script>
-        <script src="scripts/directives/filelistitem.js"></script>
         <script src="scripts/directives/filelist.js"></script>
         <script src="scripts/filters/iconfilter.js"></script>
-        <script src="scripts/directives/uploadbox.js"></script>
         <script src="scripts/controllers/home.js"></script>
+        <script src="scripts/controllers/filter.js"></script>
+        <script src="scripts/controllers/shared.js"></script>
+        <script src="scripts/services/selection.js"></script>
+        <script src="scripts/filters/downloadurl.js"></script>
+        <script src="scripts/directives/mytoolbar.js"></script>
+        <script src="scripts/controllers/error.js"></script>
+        <script src="scripts/directives/mysidenav.js"></script>
         <!-- endbuild -->
 </body>
 </html>

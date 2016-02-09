@@ -8,7 +8,7 @@
 
 <md-subheader class="md-primary"  style="background-color: #eee;">
     <div layout="row">
-        <div flex="10"></div>
+        <div flex="10">Icon</div>
         <div flex>Name</div>
         <div flex="15" hide show-gt-sm>Size</div>
         <div flex="15" hide show-gt-md>Date</div>
@@ -16,5 +16,17 @@
 </md-subheader>
 
 <md-list layout-padding>
-    <file-list-item ng-repeat="file in files" file="file" ng-click="selection.toggle()" class="no-padding"></file-list-item>
+    <md-list-item ng-repeat="file in files" file="file" ng-click="click(file)" class="no-padding">
+    
+        <!-- Icon -->
+        <div flex="10">
+            <md-icon>{{file | iconFilter}}</md-icon>
+        </div>
+        <!-- File name -->
+        <div flex>{{file.getName()}}</div>
+        <!-- File size -->
+        <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
+        <!-- Last update date -->
+        <div flex flex="15" hide show-gt-md>{{file.getLastUpdate()}}</div>
+    </md-list-item>
 </md-list>

@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * 
- * Created by Degiacomi Simone
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
   .filter('iconFilter', function () {

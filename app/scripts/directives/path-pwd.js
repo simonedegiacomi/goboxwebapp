@@ -1,18 +1,24 @@
 'use strict';
 
 /**
- * @ngdoc directive
- * @name goboxWebapp.directive:pathPwd
- * @description
- * # pathPwd
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
-  .directive('pathPwd', function () {
-    return {
-      template: '<div></div>',
-      restrict: 'E',
-      link: function postLink(scope, element, attrs) {
-        element.text('this is the pathPwd directive');
-      }
+
+.directive('pathPwd', function($state) {
+    
+    var ctrl = function ($scope) {
+        $scope.getLink = function (file) {
+            return $state.href('home.files', { id: file.getId() });
+        };
     };
-  });
+    
+    return {
+        templateUrl: 'views/pathpwd.tmpl.html',
+        restrict: 'E',
+        scope: {
+            path: '=path'
+        },
+        controller: ctrl
+    };
+});

@@ -1,12 +1,11 @@
 'use strict';
 
 /**
- * 
- * Created by Degiacomi Simone on 25/01/2016
+ * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
 
 .constant('Env', {
-    base: 'https://goboxserver-simonedegiacomi.c9users.io/',
-    ws: 'wss://goboxserver-simonedegiacomi.c9users.io/api/ws/client'
+    base: 'https://gobox-simonedegiacomi.c9users.io/',
+    ws: 'wss://gobox-simonedegiacomi.c9users.io/api/ws/client'
 });
