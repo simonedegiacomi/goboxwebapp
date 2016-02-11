@@ -127,6 +127,8 @@ angular.module('goboxWebapp')
         // Register
         auth.register().then(function(registered) {
             
+            // TODO: implement captcha
+            
             // Registered, now login
             self.login();
             

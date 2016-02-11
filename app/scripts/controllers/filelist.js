@@ -5,53 +5,41 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FileListCtrl', function($scope, $stateParams, $timeout, $mdToast, $state, $mdDialog, GoBoxClient, GoBoxPath, GoBoxFile, Selection, Env) {
+.controller('FileListCtrl', function($scope, $stateParams, $timeout, $mdToast, $state, $mdDialog, GoBoxClient, GoBoxFile, Env, Upload) {
 
-    // Create a new Path
-    var path = $scope.path = new GoBoxPath(GoBoxClient);
-
-    // Add the listener for the path changes
-    path.addListener(function onPathChange(newDir) {
-        // When the path change update the scope
-        $timeout(function() {
-            $scope.dir = newDir;
-            // update the url
-            
-        });
+    var dir = new GoBoxFile();
+    dir.setId($stateParams.id);
+    GoBoxClient.getInfo(dir).then(function(detailedDir) {
+        $scope.dir = detailedDir;
     });
-
-    // Enter in the folder of the url
-    var folder = new GoBoxFile();
-    folder.setId($stateParams.id);
-    path.cd(folder);
-
 
     /**
      * Configure the toolbar
      */
     $scope.toolbar = {
         title: {
-            mode: 'pwd',
-            path: path,
-            str: "titolo"
+            mode: 'pwd'
         },
         showSearchLink: true,
-        showTools: true,
         tools: [{
             tooltip: 'Copy',
             icon: 'content_copy',
+            show: isFilesSecelted,
             action: copyFile
         }, {
             tooltip: 'Cut',
             icon: 'content_cut',
+            show: isFilesSecelted,
             action: cutFile
         }, {
             tooltip: 'Delete',
             icon: 'delete',
+            show: isFilesSecelted,
             action: deleteFile
         }, {
             tooltip: 'Share',
             icon: 'share',
+            show: isSingleFileSelected,
             action: shareFile
         }]
     };
@@ -66,15 +54,6 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Configure the selection
-     */
-    var selection = $scope.selection = new Selection(path);
-
-    selection.setOpenFunction(function(file) {
-        $state.go('home.files', { id: file.getId() })
-    });
-
-    /**
      * Functions of the buttons
      */
 
@@ -85,7 +64,11 @@ angular.module('goboxWebapp')
                     $mdDialog.hide();
                 };
                 $scope.create = function() {
-                    path.mkdir($scope.input.name).then(function() {
+                    var newFolder = new GoBoxFile($scope.input.name);
+                    newFolder.setIsDirectory(true);
+                    newFolder.setFatherId(dir.getId());
+
+                    GoBoxClient.createFolder(newFolder).then(function() {
                         $mdToast.showSimple("Directory " + $scope.input.name + " Created");
                     }, function() {
                         $mdToast.showSimple("Sorry, can't create the folder");
@@ -100,37 +83,55 @@ angular.module('goboxWebapp')
         });
     };
 
-    $scope.uploadFiles = function(files, errFiles) {
-        angular.forEach(files, function(file) {
-            console.log(file);
-            var gbfile = new GoBoxFile(file.name);
-            file.upload = Upload.upload({
-                // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
-                url: Env.base + '/api/transfer/toStorage/?json=' + encodeURI(JSON.stringify(file)),
-                headers: {
-                    'Content-Type': file.type
-                },
-                data: file
-            });
+    var uploads = $scope.uploads;
 
-            file.upload.then(function(response) {
+    $scope.uploadFiles = function(files, errFiles) {
+
+        angular.forEach(files, function(file) {
+
+            var gbFile = new GoBoxFile(file.name);
+            gbFile.setFatherId(dir.getId());
+            var upload = {
+                file: gbFile,
+                state: 'queue'
+            };
+            uploads.push(upload);
+
+            Upload.http({
+                // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
+                url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
+                data: file
+            }).then(function(response) {
                 $timeout(function() {
-                    file.result = response.data;
+                    upload.state = 'complete';
                 });
             }, function(response) {
-                console.log(response);
+                $timeout(function() {
+                    upload.state = 'failed';
+                });
             }, function(evt) {
-                console.log(evt);
+                $timeout(function() {
+                    var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
+                    upload.state = percentage + '%';
+                });
             });
         });
     };
 
-    function copyFile() {
+    function isSingleFileSelected() {
+        return $scope.clipboard.getSelectedFiles().length == 1;
+    }
 
+    function isFilesSecelted() {
+        return $scope.clipboard.getSelectedFiles().length > 0;
+    }
+
+    function copyFile() {
+        $scope.clipboard.holdState('copy');
     }
 
     function cutFile() {
-
+        $scope.clipboard.holdState('c');
     }
 
     function deleteFile() {

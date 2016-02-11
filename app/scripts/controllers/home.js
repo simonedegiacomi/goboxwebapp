@@ -9,7 +9,7 @@
  */
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($scope, $state, $timeout, GoBoxClient) {
+.controller('HomeCtrl', function($scope, $state, $stateParams, $timeout, GoBoxClient, Clipboard) {
 
     $scope.connection = {
         state: 'pending'
@@ -37,11 +37,22 @@ angular.module('goboxWebapp')
                 $scope.connection.state = 'error';
                 $state.go('home.error');
                 break;
+            case 'unauthorized':
+                GoBoxClient.getAuth().removeCookie();
+                $state.go('login');
+                break;
         }
     }
 
     // Active the listener
     GoBoxClient.onStateChange(onStateChange);
+    
+    function onEventSync(changedFile) {
+        if(changedFile.getId() == $stateParams.id)
+            $state.go('home.files', { id: $stateParams.id });
+    }
+
+    GoBoxClient.addSyncListener(onEventSync);
 
     /**
      * Sidenav
@@ -52,7 +63,7 @@ angular.module('goboxWebapp')
             name: 'My Files',
             icon: 'cloud',
             link: $state.href('home.files', {
-                id: 1
+                id: 1 // Link to the root folder
             }),
             selected: true
         }, {
@@ -92,13 +103,41 @@ angular.module('goboxWebapp')
         
         menuItems: [{
             name: 'Connection Info',
-            icon: 'info'
+            icon: 'info',
+            action: function () {
+                
+            }
         }, {
             name: 'Settings',
-            icon: 'settings'
+            icon: 'settings',
+            action: function () {
+                
+            }
         }, {
             name: 'Logout',
-            icon: 'exit_to_app'
+            icon: 'exit_to_app',
+            action: function () {
+                
+            }
         }]
     };
+    
+    /**
+     * Create a new clipboard
+     */
+     var clipboard = $scope.clipboard = new Clipboard();
+     
+     clipboard.setOpenAction(function (file) {
+        if(file.isDirectory)
+            $state.go('home.files', { id: file.getId() });
+        else {
+            
+        }
+     });
+     
+     /**
+      * Uploads
+      */
+     $scope.uploads = [];
 });
+

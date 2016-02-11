@@ -12,6 +12,7 @@ angular.module('goboxWebapp')
         restrict: 'E',
         scope: {
             config: '=config',
+            file: '=file'
         }
     };
 });

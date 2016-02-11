@@ -3,7 +3,7 @@
     
     <!-- Title -->
     <md-title ng-switch="config.title.mode" flex>
-        <path-pwd ng-switch-when="pwd" path="config.title.path"></path-pwd>
+        <path-pwd ng-switch-when="pwd" path="file.getPath()"></path-pwd>
         <span ng-switch-when="title">{{config.title.str}}</span>
         <span ng-switch-when="search">
             <input ng-model="config.search">
@@ -11,7 +11,7 @@
     </md-title>
     
 
-    <md-button ng-if="config.showTools" ng-repeat="tool in config.tools" ng-click="tool.action()" class="md-icon-button">
+    <md-button ng-repeat="tool in config.tools" ng-if="tool.show()" ng-click="tool.action()" class="md-icon-button">
         <md-tooltip>{{tool.tooltip}}</md-tooltip>
         <md-icon>{{tool.icon}}</md-icon>
     </md-button>

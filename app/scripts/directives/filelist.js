@@ -8,16 +8,18 @@ angular.module('goboxWebapp')
 .directive('fileList', function() {
 
     var ctrl = function($scope) {
-        var selection = $scope.selection;
+        var clipboard = $scope.clipboard;
         
-        var lastClik = 0;
+        var lastClick = 0;
+        var lastClickedFile;
         
         $scope.click = function(file) {
-            if(selection.getSelectedFile() == file && Date.now() - lastClik <= 300) {
-                selection.open(file);
+            if(lastClickedFile == file && Date.now() - lastClick <= 300) {
+                // Double click
+                clipboard.doubleClick(file);
             } else {
-                selection.select(file);
-                lastClik = Date.now();
+                lastClick = Date.now();
+                lastClickedFile = file;
             }
         };
     };
@@ -27,7 +29,7 @@ angular.module('goboxWebapp')
         restrict: 'E',
         scope: {
             files: '=files',
-            selection: '=selection'
+            clipboard: '=clipboard'
         },
         controller: ctrl
     };

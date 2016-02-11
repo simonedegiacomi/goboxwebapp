@@ -5,7 +5,7 @@
 </style>
 
 
-<span ng-repeat="node in path.pwd">
-    <a ng-href="{{getLink(node)}}" ng-class="{'dir-active': $last}"> {{node.getName()}} </a>
+<span ng-repeat="node in path">
+    <a ng-href="{{getLink(node)}}" ng-class="{'dir-active': $last}"> {{node.name}} </a>
     <span ng-if="!$last">&#10095;</span>
 </span>

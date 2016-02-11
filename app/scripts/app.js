@@ -15,7 +15,8 @@ angular
         'ui.router',
         'ngMaterial',
         'ngMessages',
-        'ngFileUpload'
+        'ngFileUpload',
+        'vcRecaptcha'
     ])
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -62,6 +63,11 @@ angular
                 templateUrl: 'views/home.filter.html',
                 controller: 'FilterCtrl'
             }
+        },
+        resolve: {
+            results: function() {
+                return [];
+            }
         }
     })
 
@@ -89,21 +95,29 @@ angular
                 controller: 'ErrorCtrl'
             }
         }
-    })
+    });
 
     $urlRouterProvider.otherwise("/login");
-
 })
 
 .run(function($rootScope, GoBoxClient, $state) {
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
-        
+
+        // Check if the user is authorized to access the next state
         if (toState.restricted == GoBoxClient.isLogged())
             return;
+        // If is not authorized, prevent the next state
         event.preventDefault();
-        if (GoBoxClient.isLogged())
-            $state.go('home.files', toStateParams);
-        else
+        if (GoBoxClient.isLogged()) {
+            // If the user is logged and it was going to the 'login' router,
+            // redirect him to the home and show the root folder
+            $state.go('home.files', {
+                id: 1
+            });
+        }
+        else {
+            // If it wasn't logged, redirect to the login page
             $state.go('login');
+        }
     });
 });

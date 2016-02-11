@@ -19,6 +19,11 @@ angular.module('goboxWebapp')
         for(var key in json)
             file[key] = json[key];
             
+        // Wrap the path
+        if(json.path)
+            for(var i in json.path)
+                file.path[i] = GoBoxFile.wrap(json.path[i]);
+            
         // Finally wrap also his children
         if(json.children)
             for(var i in json.children)
@@ -33,6 +38,18 @@ angular.module('goboxWebapp')
     
     GoBoxFile.prototype.setId = function (id) {
         this.ID = id;
+    };
+    
+    GoBoxFile.prototype.getPath = function () {
+        
+        if(this._cachedPath == undefined) {
+            // Angular loop reason
+            // TODO: Document this
+            var temp = this._cachedPath = [];
+            Array.prototype.push.apply(temp, this.path);
+            temp.push(this);
+        }
+        return this._cachedPath;
     };
     
     GoBoxFile.prototype.getFatherId = function () {

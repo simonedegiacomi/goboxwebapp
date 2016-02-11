@@ -9,7 +9,15 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FilterCtrl', function($scope) {
+.controller('FilterCtrl', function($scope, $stateParams, GoBoxClient) {
+    
+    var kind = $stateParams.kind;
+    var keyword = $stateParams.keyword;
+    
+    GoBoxClient.search(kind, keyword).then(function(detailedDir) {
+        $scope.dir = detailedDir;
+    });
+    
     /**
      * Configure the toolbar
      */

@@ -13,11 +13,11 @@
 <md-content layout="column" layout-fill>
 
     <!-- Toolbar -->
-    <my-toolbar config="toolbar"></my-toolbar>
-
+    <my-toolbar config="toolbar" file="dir"></my-toolbar>
+    
     <!-- Main content of the view -->
     <md-content>
-        <file-list files="dir.children" selection="selection"></file-list>
+        <file-list files="dir.children" clipboard="clipboard"></file-list>
     </md-content>
 
     <!-- Fab -->
@@ -36,7 +36,7 @@
 
                     <md-icon>create_new_folder</md-icon>
                 </md-button>
-                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ng-click="newFolder($event)">
+                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ngf-select="uploadFiles($files, $invalidFiles)" multiple>
                     <md-tooltip>Upload File</md-tooltip>
 
                     <md-icon>file_upload</md-icon>

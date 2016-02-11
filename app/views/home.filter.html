@@ -2,4 +2,11 @@
 
     <!-- Toolbar -->
     <my-toolbar config="toolbar"></my-toolbar>
+    
+    <md-content ng-if="res.length > 0">
+        <file-list files="res" clipboard="clipboard"></file-list>
+    </md-content>
+    <md-content ng-if="res.length <= 0">
+        Nessun risultato
+    </md-content>
 </md-content>

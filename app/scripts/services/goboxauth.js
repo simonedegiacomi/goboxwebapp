@@ -62,6 +62,11 @@ angular.module('goboxWebapp')
         // And a flag to save that the user want to stay logged
         $cookies.put('gobox_keepLogged', true);
     };
+    
+    GoBoxAuth.prototype.deleteCookie = function () {
+        $cookies.remove('gobox_username');
+        $cookies.remove('gobox_token');
+    }
 
     /**
      * Load an existring session from the cookies and return a new
