@@ -45,12 +45,15 @@ angular
     .state('home.files', {
         url: '/files/:id',
         restricted: true,
-        views: {
-            'main': {
-                templateUrl: 'views/home.files.html',
-                controller: 'FileListCtrl'
-            }
-        }
+        templateUrl: 'views/home.files.html',
+        controller: 'FileListCtrl'
+    })
+    
+    .state('home.share', {
+        url: '/share',
+        restricted: true,
+        templateUrl: 'views/home.share.html',
+        controller: 'ShareCtrl'
     })
 
     // This state show the files. In the sidenav you'll see the pwd. When the user
@@ -58,29 +61,16 @@ angular
     .state('home.filter', {
         url: '/search/:kind/:keyword',
         restricted: true,
-        views: {
-            'main': {
-                templateUrl: 'views/home.filter.html',
-                controller: 'FilterCtrl'
-            }
-        },
-        resolve: {
-            results: function() {
-                return [];
-            }
-        }
+        templateUrl: 'views/home.filter.html',
+        controller: 'FilterCtrl'
     })
 
     // This state is an alternative to 'home.files'
     .state('home.settings', {
         url: '/settings',
         restricted: true,
-        views: {
-            'main': {
-                templateUrl: 'views/home.settings.html',
-                controller: 'SettingsCtrl'
-            }
-        }
+        templateUrl: 'views/home.settings.html',
+        controller: 'SettingsCtrl'
     })
 
     // This show the error message relative to the conneciton. Not sure
@@ -88,19 +78,14 @@ angular
     .state('home.error', {
         url: '/error',
         restricted: true,
-        views: {
-            'main': {
-                templateUrl: 'views/home.error.html',
-                reload: true,
-                controller: 'ErrorCtrl'
-            }
-        }
+        templateUrl: 'views/home.error.html',
+        controller: 'ErrorCtrl'
     });
 
     $urlRouterProvider.otherwise("/login");
 })
 
-.run(function($rootScope, GoBoxClient, $state) {
+.run(function($rootScope, GoBoxClient, GoBoxAuth, $state) {
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
 
         // Check if the user is authorized to access the next state
@@ -109,15 +94,42 @@ angular
         // If is not authorized, prevent the next state
         event.preventDefault();
         if (GoBoxClient.isLogged()) {
+            console.log("Redirect because the user is logger");
             // If the user is logged and it was going to the 'login' router,
             // redirect him to the home and show the root folder
             $state.go('home.files', {
                 id: 1
             });
+            return;
         }
-        else {
-            // If it wasn't logged, redirect to the login page
-            $state.go('login');
+
+        /**
+         * Check if there is an old session in the cookie
+         */
+        // TODO: Move this code to a service
+
+        // Load an hypotetical old session
+        var auth = GoBoxAuth.loadFromCookie();
+        // If there is an old session...
+        if (auth.hasToken()) {
+
+            // Check if is still valid
+            auth.check().then(function(valid) {
+
+                if (!valid) {
+                    console.log("Redirect to login because the user is not logger");
+                    // Redirect to the login
+                    $state.go('login');
+                    return;
+                }
+
+                // If is still valid configure the API Client
+                GoBoxClient.setAuth(auth);
+
+                // And redirect to the home
+                $state.go(toState, toStateParams);
+            });
+
         }
     });
 });

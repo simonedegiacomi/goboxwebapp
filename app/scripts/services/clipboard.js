@@ -13,12 +13,14 @@ angular.module('goboxWebapp')
     
     var Clipboard = function() {
         this._files = [];
+        this._holdFiles = [];
     };
 
     Clipboard.prototype.singleClick = function(file, ctrl) {
         if (!ctrl)
-            this._files = [];
+            this.clear();
         this._files.push(file);
+        file.selected = true;
     };
 
     Clipboard.prototype.doubleClick = function(file) {
@@ -34,7 +36,31 @@ angular.module('goboxWebapp')
     };
     
     Clipboard.prototype.clear = function () {
-        this._files = [];  
+        var self = this;
+        for(var i in self._files)
+            self._files[i].selected = false;
+        self._files = [];  
+    };
+    
+    Clipboard.prototype.holdState = function (state) {
+        this._state = state;
+        for(var i in this._files)
+            this._files[i].selected = false;
+        this._holdFiles = this._files;
+        this._files = [];
+    };
+    
+    Clipboard.prototype.getState = function () {
+        return this._state;
+    };
+    
+    Clipboard.prototype.clearState = function () {
+        this._holdFiles = [];
+        this._state = null;
+    };
+    
+    Clipboard.prototype.getHoldFiles = function () {
+        return this._holdFiles;
     };
 
     return Clipboard;

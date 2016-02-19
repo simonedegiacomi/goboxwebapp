@@ -1,12 +1,9 @@
 <style>
     .fab-box {
-        position: fixed;
+        position: absolute;
         right: 25px;
-        bottom: 225px;
-    }
-    
-    .add-fab {
-        float: right;
+        bottom: 15px;
+        list-style-type: none;
     }
 </style>
 
@@ -14,35 +11,38 @@
 
     <!-- Toolbar -->
     <my-toolbar config="toolbar" file="dir"></my-toolbar>
-    
+
     <!-- Main content of the view -->
     <md-content>
         <file-list files="dir.children" clipboard="clipboard"></file-list>
     </md-content>
 
-    <!-- Fab -->
-    <div class="fab-box">
-        <md-fab-speed-dial md-direction="up" md-open="fab.add.open" class="md-scale md-fab-top-right" ng-mouseenter="fab.add.open=true" ng-mouseleave="fab.add.open=false">
-            <md-fab-trigger>
-                <md-button aria-label="menu" class="md-fab md-warn">
-                    <md-tooltip md-direction="left">Add</md-tooltip>
-                    <md-icon>add</md-icon>
-                </md-button>
-            </md-fab-trigger>
-
-            <md-fab-actions>
-                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ng-click="newFolder($event)">
-                    <md-tooltip md-direction="left">New Folder</md-tooltip>
-
-                    <md-icon>create_new_folder</md-icon>
-                </md-button>
-                <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ngf-select="uploadFiles($files, $invalidFiles)" multiple>
-                    <md-tooltip>Upload File</md-tooltip>
-
-                    <md-icon>file_upload</md-icon>
-                </md-button>
-            </md-fab-actions>
-        </md-fab-speed-dial>
-    </div>
-
+    <!-- Fabs -->
+    <ul class="fab-box">
+        <!-- Paste -->
+        <li ng-if="clipboard.getHoldFiles().length > 0">
+            <md-button ng-click="paste()" aria-label="menu" class="md-fab md-warn">
+                <md-tooltip md-direction="left">Paste</md-tooltip>
+                <md-icon>content_paste</md-icon>
+            </md-button>
+        </li>
+        <li>
+            <!-- New Folder -->
+            <md-button aria-label="menu" class="md-fab md-warn" ng-click="newFolder($event)">
+                <md-tooltip md-direction="down">Create New Folder</md-tooltip>
+                <md-icon>create_new_folder</md-icon>
+            </md-button>
+        </li>
+        </li>
 </md-content>
+
+<!--
+<md-button aria-label="New Folder" class="md-fab md-raised md-mini" ng-click="newFolder($event)">
+                        <md-tooltip md-direction="down">New Folder</md-tooltip>
+                        <md-icon>create_new_folder</md-icon>
+                    </md-button>
+                    <md-button aria-label="New Folder" class="md-fab md-raised md-mini" ngf-select="uploadFiles($files, $invalidFiles)" multiple>
+                        <md-tooltip md-direction="down">Upload File</md-tooltip>
+                        <md-icon>file_upload</md-icon>
+                    </md-button>
+                    -->

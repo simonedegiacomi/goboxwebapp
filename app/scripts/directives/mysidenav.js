@@ -15,7 +15,7 @@ angular.module('goboxWebapp')
         transclude: true,
         scope: {
             config: '=config',
-            uploads: '=uploads'
+            upload: '=upload'
         }
     };
 

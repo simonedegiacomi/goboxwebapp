@@ -7,10 +7,32 @@ angular.module('goboxWebapp')
 
 .controller('FileListCtrl', function($scope, $stateParams, $timeout, $mdToast, $state, $mdDialog, GoBoxClient, GoBoxFile, Env, Upload) {
 
+    console.log("FileListCtrl");
+
+    var currentState = GoBoxClient.getState();
+    if(currentState == 'error' || currentState == 'noStorage')
+        $state.go('home.error');
+
     var dir = new GoBoxFile();
     dir.setId($stateParams.id);
-    GoBoxClient.getInfo(dir).then(function(detailedDir) {
-        $scope.dir = detailedDir;
+
+    function loadDir() {
+        console.log("load dir called");
+        GoBoxClient.getInfo(dir).then(function(detailedDir) {
+            console.log(detailedDir);
+            $timeout(function() {
+                $scope.dir = detailedDir;
+            });
+        });
+    }
+
+    loadDir();
+
+    /**
+     * Sync Event listener
+     */
+    GoBoxClient.setSyncListener(function() {
+        loadDir();
     });
 
     /**
@@ -21,6 +43,7 @@ angular.module('goboxWebapp')
             mode: 'pwd'
         },
         showSearchLink: true,
+        downloadUrl: null,
         tools: [{
             tooltip: 'Copy',
             icon: 'content_copy',
@@ -43,18 +66,13 @@ angular.module('goboxWebapp')
             action: shareFile
         }]
     };
+    
+    $scope.$watch(isSingleFileSelected, function (single) {
+        $scope.toolbar.downloadUrl =  single ? generateDownloadLink() : null;
+    });
 
     /**
-     * Configure the fab
-     */
-    $scope.fab = {
-        add: {
-            open: false
-        }
-    };
-
-    /**
-     * Functions of the buttons
+     * Functions of the fab buttons
      */
 
     $scope.newFolder = function(evt) {
@@ -80,6 +98,18 @@ angular.module('goboxWebapp')
             targetEvent: evt,
             parent: angular.element(document.body),
             clickOutsideToClose: true
+        });
+    };
+
+    $scope.paste = function() {
+        var cut = clipboard.getState() == 'cut';
+        var files = clipboard.getHoldFiles();
+        angular.forEach(files, function(file) {
+            GoBoxClient.copyOrCut(file, dir, cut).then(function() {
+                $mdToast.showSimple("File " + file.getName() + " moved");
+            }, function() {
+                $mdToast.showSimple("Sorry, there was an error with " + file.getName());
+            });
         });
     };
 
@@ -118,24 +148,42 @@ angular.module('goboxWebapp')
         });
     };
 
+    var clipboard = $scope.clipboard;
+
     function isSingleFileSelected() {
-        return $scope.clipboard.getSelectedFiles().length == 1;
+        return clipboard.getSelectedFiles().length == 1;
     }
 
     function isFilesSecelted() {
-        return $scope.clipboard.getSelectedFiles().length > 0;
+        return clipboard.getSelectedFiles().length > 0;
     }
-
+    
+    function generateDownloadLink () {
+        var fileToDownload = clipboard.getSelectedFiles()[0];
+        if(!angular.isDefined(fileToDownload))
+            return "";
+        return Env.base + "api/transfer/fromStorage?ID=" + fileToDownload.getId() + "&jwt=" + GoBoxClient.getAuth().getToken();
+    }
+    
     function copyFile() {
-        $scope.clipboard.holdState('copy');
+        clipboard.holdState('copy');
+        $mdToast.showSimple("Copied to clipboard");
     }
 
     function cutFile() {
-        $scope.clipboard.holdState('c');
+        clipboard.holdState('cut');
+        $mdToast.showSimple("Hold in clipboard");
     }
 
     function deleteFile() {
-
+        // TODO show dialog
+        var files = clipboard.getSelectedFiles();
+        for (var i in files)
+            GoBoxClient.remove(files[i]).then(function() {
+                $mdToast.showSimple("File " + files[i].getName() + " deleted!");
+            }, function() {
+                $mdToast.showSimple("Sorry, can't delete " + files[i].getName());
+            });
     }
 
     function shareFile() {

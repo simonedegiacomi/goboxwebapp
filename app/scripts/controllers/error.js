@@ -10,6 +10,12 @@
 angular.module('goboxWebapp')
 
 .controller('ErrorCtrl', function($state, GoBoxClient) {
-    if(GoBoxClient.getState() == 'ready')
-        $state.go('home.files');
+    switch(GoBoxClient.getState()) {
+        case 'ready':
+            $state.go('home.files', { id: 1 }, { reload: true });
+            break;
+        default:
+            break;
+    }
+        
 });

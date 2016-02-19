@@ -4,6 +4,11 @@
     padding: 0px !important;
 }
 
+.selected-file {
+    border-color: yellow;
+    border-style: dashed;
+}
+
 </style>
 
 <md-subheader class="md-primary"  style="background-color: #eee;">
@@ -16,7 +21,7 @@
 </md-subheader>
 
 <md-list layout-padding>
-    <md-list-item ng-repeat="file in files" file="file" ng-click="click(file)" class="no-padding">
+    <md-list-item ng-repeat="file in files" file="file" ng-click="click(file)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
     
         <!-- Icon -->
         <div flex="10">

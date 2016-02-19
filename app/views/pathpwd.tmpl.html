@@ -4,8 +4,12 @@
     }
 </style>
 
+<span>
+    <a ng-href="#/files/1" ng-class="{'dir-active': path.length <= 0}">Storage</a>
+    <span ng-if="path.length > 0">&gt;</span>
+</span>
 
 <span ng-repeat="node in path">
     <a ng-href="{{getLink(node)}}" ng-class="{'dir-active': $last}"> {{node.name}} </a>
-    <span ng-if="!$last">&#10095;</span>
+    <span ng-if="!$last">&gt;</span>
 </span>

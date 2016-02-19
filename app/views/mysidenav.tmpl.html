@@ -1,8 +1,18 @@
-<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-is-locked-open="$mdMedia('gt-sm')" layoutlayout-fill flex style="width: 400px">
-    <md-toolbar class="md-toolbar-tools md-tall">
-        <img src="">
-        <md-title class="sidenav-username">{{config.user.getUsername()}}</md-title>
-        <span flex></span>
+<style type="text/css">
+    .my-sidenav {
+        background-image: url('images/sidenav-background.png');
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+</style>
+<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="sidenav" md-is-locked-open="$mdMedia('gt-sm')" layoutlayout-fill flex>
+    <md-toolbar class="md-toolbar-tools md-tall my-sidenav">
+        <div layout="column">
+            <img ng-src="{{ '/api/user/image/' + config.user.getUsername() }}" width="64px" height="64px">
+            <div layout="row">
+                <p>Ciao</p>
+            </div>
+        </div>
         <md-menu>
             <md-button class="sidenav-more md-icon-button" ng-click="$mdOpenMenu($event)">
                 <md-icon md-menu-origin>more_vert</md-icon>
@@ -27,5 +37,6 @@
         </md-list>
     </md-content>
     <span flex layout-fill></span>
-    <upload-box uploads="uploads"
+    <md-divider></md-divider>
+    <upload-box config="upload"></upload-box>
 </md-sidenav>

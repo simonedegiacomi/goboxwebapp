@@ -47,7 +47,8 @@ angular.module('goboxWebapp')
             // TODO: Document this
             var temp = this._cachedPath = [];
             Array.prototype.push.apply(temp, this.path);
-            temp.push(this);
+            if(this.ID != 1)
+                temp.push(this);
         }
         return this._cachedPath;
     };
@@ -81,9 +82,7 @@ angular.module('goboxWebapp')
     };
     
     GoBoxFile.prototype.isDirectory = function () {
-        if(!angular.isDefined(this.isDirectory))
-            return false;
-        return this.isDirectory;  
+        return angular.isDefined(this.isDirectory) ? this.isDirectory : false;
     };
     
     GoBoxFile.prototype.hasChild = function (child) {
@@ -91,6 +90,14 @@ angular.module('goboxWebapp')
             if(this.children[i].ID == child.ID)
                 return true;
         return false
+    };
+    
+    GoBoxFile.prototype.setMime = function (typeOfFile) {
+        this.mime = typeOfFile;
+    };
+    
+    GoBoxFile.prototype.getMime = function () {
+        return this.mime;
     };
     
     return GoBoxFile;

@@ -4,13 +4,29 @@
         margin: 0;
     }
 </style>
-<md-content class="center-card">
-    <md-card flex="50">
+<md-content class="center-card" >
+    <md-card flex>
         <md-toolbar class="md-toolbar-tools">
             <md-title>Settings</md-title>
         </md-toolbar>
         <md-card-content>
-            Contenuto
+            <md-subheader>Password</md-subheader>
+            <md-content>
+                <md-input-container>
+                    <label>Old Password</label>
+                    <input type="password" ng-model="password.old">
+                </md-input-container>
+                <md-input-container>
+                    <label>New Password</label>
+                    <input type="password" ng-model="password.new">
+                </md-input-container>
+                <md-button class="md-raised md-warn" ng-click="password.change()">Change</md-button>
+                <md-progress-circular ng-if="password.loading" class="md-hue-2" md-mode="indeterminate" md-diameter="20px"></md-progress-circular>
+            </md-content>
+            <md-divider></md-divider>
+            <md-subheader>Profile Image</md-subheader>
+            <p>Select and upload a new profile image</p>
+            <md-button>Upload Image</md-button>
         </md-card-content>
     </md-card>
 </md-content>

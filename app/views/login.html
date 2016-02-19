@@ -5,6 +5,7 @@
         background-attachment: fixed;
         background-position: center;
     }
+    
     .center-captcha {
         text-align: center;
         margin: 0 auto;
@@ -58,7 +59,7 @@
                 <input type="text" ng-model="form.email" />
             </md-input-container>
             <md-input-container class="center-captcha">
-                <div vc-recaptcha key="'6Lfd4RcTAAAAALCKgY7-3QlAOLQL3dOscKUYcOIK'"></div>
+                <div vc-recaptcha on-success="reCaptcha.setResponse(response)" on-expire="reCaptcha.expire()" key="'6Lfd4RcTAAAAALCKgY7-3QlAOLQL3dOscKUYcOIK'"></div>
             </md-input-container>
             <md-input-container>
                 <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">

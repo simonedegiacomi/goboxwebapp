@@ -9,12 +9,40 @@
  */
 angular.module('goboxWebapp')
 
-.directive('uploadBox', function() {
+.directive('uploadBox', function($mdDialog, $mdMedia) {
+
+    function ctrl($scope) {
+        var uploads = $scope.config.uploads;
+        var uploadFile = $scope.config.uploadFile;
+        $scope.showDialog = function($event) {
+            
+            function dialogCtrl ($scope) {
+                $scope.uploads = uploads;
+                $scope.uploadFile = uploadFile;
+                $scope.close = function () {
+                    $mdDialog.hide();  
+                };
+            }
+            
+            var dialog = {
+                controller: dialogCtrl,
+                templateUrl: 'views/uploaddialog.tmpl.html',
+                parent: angular.element(document.body),
+                targetEvent: $event,
+                clickOutsideToClose: true,
+                fullscreen: ($mdMedia('sm') || $mdMedia('xs'))
+            };
+
+            $mdDialog.show(dialog);
+        };
+    }
+
     return {
         templateUrl: 'views/uploadbox.tmpl.html',
         restrict: 'E',
         scope: {
-            uploads: '=uploads'
-        }
+            config: '=config'
+        },
+        controller: ctrl
     };
 });

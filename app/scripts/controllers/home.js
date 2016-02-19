@@ -9,50 +9,37 @@
  */
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($scope, $state, $stateParams, $timeout, GoBoxClient, Clipboard) {
+.controller('HomeCtrl', function($scope, $state, $stateParams, $mdSidenav, $timeout, GoBoxClient, Clipboard, GoBoxFile, Upload, Env, Previewer) {
 
     $scope.connection = {
-        state: 'pending'
+        state: 'notIni'
     };
 
-    if (GoBoxClient.getState() == 'notInitialized')
-        GoBoxClient.init();
-    else
-        $scope.connection.state = 'ok';
-
     function onStateChange(newState) {
-        switch (newState) {
-            // Connected to the server and to the storage
-            case 'ready':
-                $timeout(function() {
-                    $scope.connection.state = 'ok';
-                });
-                break;
-                // No storage
-            case 'noStorage':
-                // Connection close
-            case 'close':
-                // Error
-            case 'error':
-                $scope.connection.state = 'error';
-                $state.go('home.error');
-                break;
-            case 'unauthorized':
-                GoBoxClient.getAuth().removeCookie();
-                $state.go('login');
-                break;
-        }
+        $timeout(function() {
+            switch (newState) {
+                case 'noStorage':
+                case 'close':
+                case 'error':
+                    console.log("Redirect to error");
+                    $scope.connection.state = 'error';
+                    $state.go('home.error');
+                    break;
+                default:
+                    $scope.connection.state = newState;
+                    break;
+            }
+        });
     }
+
+    var currentState = GoBoxClient.getState();
+    if (currentState == 'notInitialized')
+        GoBoxClient.init();
+
+    onStateChange(currentState);
 
     // Active the listener
     GoBoxClient.onStateChange(onStateChange);
-    
-    function onEventSync(changedFile) {
-        if(changedFile.getId() == $stateParams.id)
-            $state.go('home.files', { id: $stateParams.id });
-    }
-
-    GoBoxClient.addSyncListener(onEventSync);
 
     /**
      * Sidenav
@@ -70,6 +57,7 @@ angular.module('goboxWebapp')
             name: 'Shared',
             icon: 'share',
             divider: true,
+            link: $state.href('home.share')
         }, {
             name: 'Music',
             icon: 'library_music',
@@ -100,44 +88,92 @@ angular.module('goboxWebapp')
             icon: 'settings',
             link: $state.href('home.settings')
         }],
-        
+
         menuItems: [{
             name: 'Connection Info',
             icon: 'info',
-            action: function () {
-                
+            action: function() {
+
             }
         }, {
             name: 'Settings',
             icon: 'settings',
-            action: function () {
-                
+            action: function() {
+
             }
         }, {
             name: 'Logout',
             icon: 'exit_to_app',
-            action: function () {
-                
+            action: function() {
+
             }
         }]
     };
-    
+
+    $scope.toggleSidenav = function() {
+        $mdSidenav('sidenav').toggle();
+    };
+
     /**
      * Create a new clipboard
      */
-     var clipboard = $scope.clipboard = new Clipboard();
-     
-     clipboard.setOpenAction(function (file) {
-        if(file.isDirectory)
-            $state.go('home.files', { id: file.getId() });
-        else {
-            
-        }
-     });
-     
-     /**
-      * Uploads
-      */
-     $scope.uploads = [];
-});
+    var clipboard = $scope.clipboard = new Clipboard();
 
+    clipboard.setOpenAction(function(file) {
+        if (file.isDirectory)
+            $state.go('home.files', {
+                id: file.getId()
+            });
+        else {
+            Previewer.show(file);
+        }
+    });
+
+    /**
+     * Uploads
+     */
+    $scope.upload = {
+        uploads: []
+    };
+    var uploads = $scope.upload.uploads;
+
+    $scope.upload.uploadFile = function(files, errFiles) {
+        
+        console.log("OK", files);
+        
+        var fatherId = $stateParams.id == undefined ? 1 : $stateParams.id;
+
+        angular.forEach(files, function(file) {
+
+            var gbFile = new GoBoxFile(file.name);
+            gbFile.setFatherId(fatherId);
+            var upload = {
+                file: gbFile,
+                state: 'queue'
+            };
+            uploads.push(upload);
+
+            gbFile.setMime(file.type);
+
+            Upload.http({
+                // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
+                url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
+                data: file
+            }).then(function(response) {
+                $timeout(function() {
+                    upload.state = 'complete';
+                });
+            }, function(response) {
+                $timeout(function() {
+                    upload.state = 'failed';
+                });
+            }, function(evt) {
+                $timeout(function() {
+                    var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                    upload.state = percentage + '%';
+                });
+            });
+        });
+    };
+
+});

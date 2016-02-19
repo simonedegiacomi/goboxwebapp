@@ -14,7 +14,7 @@ angular.module('goboxWebapp')
 
     GoBoxAuth.prototype.setUsername = function(username) {
         this._username = username;
-    }
+    };
 
     GoBoxAuth.prototype.getUsername = function() {
         return this._username;
@@ -22,7 +22,7 @@ angular.module('goboxWebapp')
         
     GoBoxAuth.prototype.setEmail = function(email) {
         this._email = email;
-    }
+    };
 
     GoBoxAuth.prototype.getEmail = function() {
         return this.email;
@@ -66,7 +66,7 @@ angular.module('goboxWebapp')
     GoBoxAuth.prototype.deleteCookie = function () {
         $cookies.remove('gobox_username');
         $cookies.remove('gobox_token');
-    }
+    };
 
     /**
      * Load an existring session from the cookies and return a new
@@ -145,7 +145,7 @@ angular.module('goboxWebapp')
     /**
      * Create a new user
      */
-    GoBoxAuth.prototype.register = function() {
+    GoBoxAuth.prototype.register = function(reCaptcha) {
         
         // Create a ne wpromise
         var future = $q.defer();
@@ -154,7 +154,8 @@ angular.module('goboxWebapp')
         var request = {
             username: this._username,
             password: this._password,
-            email: this._email
+            email: this._email,
+            reCaptcha: reCaptcha
         };
             
         // Make the request
@@ -226,6 +227,13 @@ angular.module('goboxWebapp')
         // TODO: set the header only for the APIs
         $http.defaults.headers.common.Authorization = 'Bearer ' + token;
     }
+    
+    GoBoxAuth.prototype.changePassword = function (old, newPassword) {
+        return $http.post(Env.base + 'api/username/changePassword', {
+            'old': old,
+            'new': newP
+        });
+    };
 
     // Public API here
     return GoBoxAuth;

@@ -24,7 +24,7 @@ angular.module('goboxWebapp')
         ws.onopen = function () {
             executeEvent('open', { });
             for(var i in queue)
-                this.send(queue[i].event, queue[i].data);
+                this.send(queue[i].event, queue[i].data, queue[i].forServer, queue[i]._queryId);
         };
         
         ws.onmessage = function (incoming) {
@@ -64,12 +64,15 @@ angular.module('goboxWebapp')
         var objToSend = { event: event, data: data , forServer: forServer, _queryId: queryId };
         try {
             this._ws.send(JSON.stringify(objToSend));
+            console.log("sent", objToSend);
         } catch (e) {
+            console.log("Exception", e);
             this._queue.push(objToSend);
         }
     };
     
     MyWS.prototype.query = function (query, data) {
+        console.log("Query: ", query, "Data", data);
         var future = $q.defer();
         
         var id = '' + (new Date().getTime());

@@ -4,16 +4,16 @@
     }
 </style>
 
-<md-content layout="row" layout-fill flex>
+<md-content layout="row" layout-fill flex style="background-color: #aaa">
     
     <!-- Sidenav -->
     <!-- I know that this should be in the sidenav.html, but if i put it here, i am
     not able to keep the same graphical layout -->
-    <my-sidenav config="sidenav" uploads="uploads" layout-wrap layout></my-sidenav>
+    <my-sidenav config="sidenav" upload="upload" layout-wrap layout></my-sidenav>
 
     <!-- Main content -->
-    <md-content ng-if="connection.state != 'pending'" ui-view="main" flex layout-fill></md-content>
-
+    <md-content ng-if="connection.state != 'pending'" ui-view flex layout-fill></md-content>
+    
     <md-content ng-if="connection.state == 'pending'" >
         <md-progress-circular flex class="center md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
         <h2>Connecting to your Storage</h2>

@@ -1,6 +1,9 @@
 'use strict';
 
 /**
+ * @ngdoc service
+ * @name goboxWebapp.servicee:GoBoxClient
+ * @description
  * This is the official GoBox API Client. It offers some basic method that
  * allows you to get and upload files from/to the storage.
  * 
@@ -10,18 +13,23 @@ angular.module('goboxWebapp')
 
 .service('GoBoxClient', function($q, $cacheFactory, MyWS, GoBoxFile, Env) {
 
+    // Last state of the client
     this._lastState = 'notInitialized';
+    // Caches of the files
     this._caches = $cacheFactory('goboxclient');
-    this._syncListeners = [];
+    // Listeners for the states
     this._stateListeners = [];
+
+    this._doQueue = [];
 
     /**
      * Initialize the client oepning a new web socket connection to the server
      */
     this.init = function() {
-        
         var self = this;
 
+        // If the client is inizialize or an initialization is already
+        // running, return
         if (self._lastState != 'notInitialized')
             return;
 
@@ -62,30 +70,32 @@ angular.module('goboxWebapp')
         });
 
         ws.on('close', function() {
-            self.notifyState('close');
-            self.notifyState('notInitialized');
+            self.notifyState('error');
         });
 
         ws.on('error', function() {
             self.notifyState('error');
-            self.notifyState('notInitialized');
         });
 
-        var syncListeners = this._syncListeners;
 
         ws.on('syncEvent', function(data) {
             var changedFile = GoBoxFile.wrap(data.file);
-            
-            // Update the cache
-            self._caches.put(changedFile.getId(), changedFile);
-            
-            for (var i in syncListeners)
-                syncListeners[i](changedFile, data.kind);
+
+            // Invalidate the cache
+            self._caches.remove(changedFile.getId(), changedFile);
+            // Invalidate also the father
+            self._caches.remove(changedFile.getFatherId(), changedFile);
+
+            self._syncListener(changedFile, data.kind);
         });
     };
 
-    this.addSyncListener = function(listener) {
-        this._syncListeners.push(listener);
+    this.reset = function() {
+        this.notifyState('notInitialized');
+    };
+
+    this.setSyncListener = function(listener) {
+        this._syncListener = listener;
     };
 
     /**
@@ -124,15 +134,23 @@ angular.module('goboxWebapp')
     };
 
     this.notifyState = function(state) {
-
-        this.lastState = state;
+        this._lastState = state;
         var listeners = this._stateListeners;
         for (var i in listeners)
             listeners[i](state);
+        if (state == 'ready')
+            for (var i in this._doQueue)
+                this._doQueue[i]();
     };
 
     this.getState = function() {
         return this._lastState;
+    };
+
+    this._do = function(what) {
+        if (this._lastState == 'ready')
+            what();
+        this._doQueue.push(what);
     };
 
     this.getInfo = function(file) {
@@ -143,36 +161,53 @@ angular.module('goboxWebapp')
 
         if (cacheVal != null) {
             future.resolve(cacheVal);
-        } else {
+        }
+        else {
             // Prepare the request object
             var req = {
                 file: file,
                 findPath: true,
                 findChildren: true
             };
-            
-            self._ws.query('info', req).then(function(detailedFile) {
+            self._do(function() {
+                self._ws.query('info', req).then(function(detailedFile) {
 
-                // From the server i receive only a simple json, so let's wrap it
-                // in a new GoBoxFile
-                var wrappedFile = GoBoxFile.wrap(detailedFile);
-                
-                // Update the cache
-                self._caches.put(wrappedFile.getId(), wrappedFile);
-                
-                future.resolve(wrappedFile);
+                    if (!detailedFile.found) {
+                        future.reject();
+                        return;
+                    }
+
+                    // From the server i receive only a simple json, so let's wrap it
+                    // in a new GoBoxFile
+                    var wrappedFile = GoBoxFile.wrap(detailedFile.file);
+
+                    // Update the cache
+                    self._caches.put(wrappedFile.getId(), wrappedFile);
+
+                    future.resolve(wrappedFile);
+                });
             });
         }
 
         return future.promise;
     };
 
-    this.search = function (kind, keyword) {
+    this.search = function(kind, keyword, start, size) {
         var self = this;
         var future = $q.defer();
-        self._ws.query('search', req).then(function(res) {
-            
+        var req = {
+            kind: kind,
+            keyword: keyword,
+            from: start ? 0 : start,
+            size: size ? 50 : size
+        };
+
+        this._do(function() {
+            self._ws.query('search', req).then(function(res) {
+                future.resolve(res.files);
+            });
         });
+
         return future.promise;
     };
 
@@ -182,7 +217,8 @@ angular.module('goboxWebapp')
         this._ws.query('createFolder', file).then(function(res) {
             if (res.created) {
                 future.resolve();
-            } else {
+            }
+            else {
                 future.reject();
             }
         });
@@ -198,26 +234,61 @@ angular.module('goboxWebapp')
         var self = this;
         var future = $q.defer();
 
-        self._ws.query('removeFile', {
-            file: fileToRemove
-        }).then(function() {
-            // Update the cache
-            self._caches.remove(fileToRemove.getId());
-            future.resolve();
+        self._ws.query('removeFile', fileToRemove).then(function(res) {
+            if (res.success) {
+                // Update the cache
+                self._caches.remove(fileToRemove.getId());
+                future.resolve();
+            }
+            else {
+                future.reject();
+            }
         });
 
         return future.promise;
     };
-    
-    this.copy = function (file, destinationFather) {
-        
+
+    this.copyOrCut = function(file, destinationFile, cut) {
+        var self = this;
+        var future = $q.defer();
+
+        self._ws.query('copyOrCutFile', {
+            file: file,
+            destination: destinationFile,
+            cut: cut
+        }).then(function(result) {
+            if (result.success) {
+                // Update cache
+                self._caches.remove(destinationFile.getId());
+                if (cut)
+                    self._caches.remove(file.getFatherID());
+                future.resolve();
+            }
+            else {
+                future.reject();
+            }
+        })
+
+        return future.promise;
+    }
+
+    this.copy = function(file, destinationFatherID) {
+        return this.copyOrCut(file, destinationFatherID, false);
     };
-    
-    this.cut = function (file, destinationFather) {
-        
+
+    this.cut = function(file, destinationFatherID) {
+        return this.copyOrCut(file, destinationFatherID, true);
     };
-    
-    this.update = function () {
-        
+
+    this.update = function(file) {
+        var self = this;
+        var future = $q.defer();
+        self._ws.query('update', file).then(function(res) {
+            if (res.success)
+                future.resolve();
+            else
+                future.reject();
+        });
+        return future;
     };
 });

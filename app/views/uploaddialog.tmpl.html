@@ -1,0 +1,29 @@
+<md-dialog>
+    <md-toolbar class="md-toolbar-tools">
+        <span>Uploads</span>
+        <span flex></span>
+        <md-button ng-click="close()" class="md-icon-button">
+            <md-tooltip>Close</md-tooltip>
+            <md-icon>close</md-icon>
+        </md-button>
+    </md-toolbar>
+    <md-dialog-content>
+        <md-content layout-padding>
+            <md-content>
+                <md-list>
+                    <md-list-item ng-repeat="upload in uploads">
+                        <span>{{upload.file.name}} </span>
+                        <span>{{upload.state}}</span>
+                    </md-list-item>
+                </md-list>
+            </md-content>
+
+            <md-content ng-if="uploads.length <= 0">
+                <p>The Upload queue is empty</p>
+            </md-content>
+        </md-content>
+        <md-content>
+            <md-button ngf-select="uploadFile($files, $invalidFiles)" multiple>Upload File</md-button>
+        </md-content>
+    </md-dialog-content>
+</md-dialog>
