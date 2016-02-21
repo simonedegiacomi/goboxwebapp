@@ -15,8 +15,8 @@
     </md-title>
 
     <!-- Download button -->
-    <a ng-if="config.downloadUrl" ng-href="{{ config.downloadUrl }}" download class="md-icon-button" show-gt-sm>
-        <md-tooltip>Download</md-tooltip>
+    <a ng-if="config.download" ng-href="{{config.download.url}}" download="{{config.download.name}}" class="md-icon-button" show-gt-sm>
+        <md-tooltip>Download {{config.download.name}}</md-tooltip>
         <md-icon>file_download</md-icon>
     </a>
 

@@ -12,7 +12,6 @@ angular.module('goboxWebapp')
 
     function loadDir() {
         GoBoxClient.getInfo(dir).then(function(detailedDir) {
-            console.log(detailedDir);
             $timeout(function() {
                 $scope.dir = detailedDir;
             });
@@ -60,8 +59,14 @@ angular.module('goboxWebapp')
         }]
     };
     
-    $scope.$watch(isSingleFileSelected, function (single) {
-        $scope.toolbar.downloadUrl =  single ? generateDownloadLink() : null;
+    $scope.$watch(function () {
+        // This function return the first selected file.
+        // When this change, the secondo function of $watch is called (and so a new
+        // download url is generated)
+        var files = clipboard.getSelectedFiles();
+        return files.length > 0 ? files[0] : null;
+    }, function () {
+        $scope.toolbar.download = generateDownload();
     });
 
     /**
@@ -151,11 +156,14 @@ angular.module('goboxWebapp')
         return clipboard.getSelectedFiles().length > 0;
     }
     
-    function generateDownloadLink () {
+    function generateDownload () {
         var fileToDownload = clipboard.getSelectedFiles()[0];
         if(!angular.isDefined(fileToDownload))
-            return "";
-        return Env.base + "api/transfer/fromStorage?ID=" + fileToDownload.getId() + "&jwt=" + GoBoxClient.getAuth().getToken();
+            return null;
+        return {
+            name: fileToDownload.getName(),
+            url: GoBoxClient.getDownloadLink(fileToDownload)
+        };
     }
     
     function copyFile() {
