@@ -19,6 +19,7 @@ angular.module('goboxWebapp')
         links: [{
             name: 'My Files',
             icon: 'cloud',
+            state: 'home.files',
             link: $state.href('home.files', {
                 id: 1 // Link to the root folder
             }),
@@ -26,29 +27,34 @@ angular.module('goboxWebapp')
         }, {
             name: 'Shared',
             icon: 'share',
+            state: 'home.share',
             divider: true,
             link: $state.href('home.share')
         }, {
             name: 'Music',
             icon: 'library_music',
+            state: "home.filter({kind: 'audio'})",
             link: $state.href('home.filter', {
                 kind: 'audio'
             })
         }, {
             name: 'Images',
             icon: 'photo_library',
+            state: "home.filter({kind: 'image'})",
             link: $state.href('home.filter', {
                 kind: 'image'
             })
         }, {
             name: 'Documents',
             icon: 'picture_as_pdf',
+            state: "home.filter({kind: 'document'})",
             link: $state.href('home.filter', {
                 kind: 'document'
             })
         }, {
             name: 'Videos',
             icon: 'video_library',
+            state: "home.filter({kind: 'video'})",
             link: $state.href('home.filter', {
                 kind: 'video'
             }),
@@ -56,6 +62,7 @@ angular.module('goboxWebapp')
         }, {
             name: 'Settings',
             icon: 'settings',
+            state: 'home.settings',
             link: $state.href('home.settings')
         }],
 
@@ -109,8 +116,6 @@ angular.module('goboxWebapp')
 
     $scope.upload.uploadFile = function(files, errFiles) {
         
-        console.log("OK", files);
-        console.log($stateParams)
         var fatherId = $stateParams.id == undefined ? 1 : $stateParams.id;
 
         angular.forEach(files, function(file) {
@@ -123,6 +128,7 @@ angular.module('goboxWebapp')
             };
             uploads.push(upload);
 
+            gbFile.setIsDirectory(false);
             gbFile.setMime(file.type);
 
             Upload.http({
@@ -140,7 +146,7 @@ angular.module('goboxWebapp')
             }, function(evt) {
                 $timeout(function() {
                     var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-                    upload.state = percentage + '%';
+                    upload.state = percentage;
                 });
             });
         });

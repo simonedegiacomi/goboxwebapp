@@ -4,13 +4,17 @@
         background-repeat: no-repeat;
         background-position: center;
     }
+    
+    .active {
+        border: 10px solid black;
+    }
 </style>
 <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="sidenav" md-is-locked-open="$mdMedia('gt-sm')" layoutlayout-fill flex>
     <md-toolbar class="md-toolbar-tools md-tall my-sidenav">
         <div layout="column">
             <img ng-src="{{ '/api/user/image/' + config.user.getUsername() }}" width="64px" height="64px">
             <div layout="row">
-                <p>Ciao</p>
+                <p>{{config.user.getUsername()}}</p>
             </div>
         </div>
         <md-menu>
@@ -29,7 +33,7 @@
     </md-toolbar>
     <md-content>
         <md-list>
-            <md-list-item ng-repeat="link in config.links" ng-href="{{link.link}}">
+            <md-list-item ng-repeat="link in config.links" ng-href="{{link.link}}"  ui-sref-active='active' ui-sref="{{link.state}}">
                 <md-icon>{{link.icon}}</md-icon>
                 <p>{{link.name}}</p>
                 <md-divider ng-if="link.divider"></md-divider>
