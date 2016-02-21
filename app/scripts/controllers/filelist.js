@@ -7,17 +7,10 @@ angular.module('goboxWebapp')
 
 .controller('FileListCtrl', function($scope, $stateParams, $timeout, $mdToast, $state, $mdDialog, GoBoxClient, GoBoxFile, Env, Upload) {
 
-    console.log("FileListCtrl");
-
-    var currentState = GoBoxClient.getState();
-    if(currentState == 'error' || currentState == 'noStorage')
-        $state.go('home.error');
-
     var dir = new GoBoxFile();
     dir.setId($stateParams.id);
 
     function loadDir() {
-        console.log("load dir called");
         GoBoxClient.getInfo(dir).then(function(detailedDir) {
             console.log(detailedDir);
             $timeout(function() {

@@ -11,36 +11,6 @@ angular.module('goboxWebapp')
 
 .controller('HomeCtrl', function($scope, $state, $stateParams, $mdSidenav, $timeout, GoBoxClient, Clipboard, GoBoxFile, Upload, Env, Previewer) {
 
-    $scope.connection = {
-        state: 'notIni'
-    };
-
-    function onStateChange(newState) {
-        $timeout(function() {
-            switch (newState) {
-                case 'noStorage':
-                case 'close':
-                case 'error':
-                    console.log("Redirect to error");
-                    $scope.connection.state = 'error';
-                    $state.go('home.error');
-                    break;
-                default:
-                    $scope.connection.state = newState;
-                    break;
-            }
-        });
-    }
-
-    var currentState = GoBoxClient.getState();
-    if (currentState == 'notInitialized')
-        GoBoxClient.init();
-
-    onStateChange(currentState);
-
-    // Active the listener
-    GoBoxClient.onStateChange(onStateChange);
-
     /**
      * Sidenav
      */
@@ -93,13 +63,13 @@ angular.module('goboxWebapp')
             name: 'Connection Info',
             icon: 'info',
             action: function() {
-
+                // Open a dialog
             }
         }, {
             name: 'Settings',
             icon: 'settings',
             action: function() {
-
+                $state.go('home.settings');
             }
         }, {
             name: 'Logout',
@@ -140,7 +110,7 @@ angular.module('goboxWebapp')
     $scope.upload.uploadFile = function(files, errFiles) {
         
         console.log("OK", files);
-        
+        console.log($stateParams)
         var fatherId = $stateParams.id == undefined ? 1 : $stateParams.id;
 
         angular.forEach(files, function(file) {

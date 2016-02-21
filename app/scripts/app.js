@@ -79,23 +79,83 @@ angular
         url: '/error',
         restricted: true,
         templateUrl: 'views/home.error.html',
-        controller: 'ErrorCtrl'
+        controller: 'ErrorCtrl',
+        preventLoop: true
+    })
+    
+    .state('home.loading', {
+        url: '/loading',
+        restricted: true,
+        templateUrl: 'views/home.loading.html',
+        controller: 'LoadingCtrl',
+        preventLoop: true
     });
-
+    
     $urlRouterProvider.otherwise("/login");
 })
 
 .run(function($rootScope, GoBoxClient, GoBoxAuth, $state) {
+    
+    // This object contains the last state params before the state has changed
+    // not by the user
+    var lastToState = {};
+    
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
-
+        
+        // TODO: clean this unredable code!
+        
         // Check if the user is authorized to access the next state
-        if (toState.restricted == GoBoxClient.isLogged())
+        if (toState.restricted == GoBoxClient.isLogged()) {
+            
+            // If the next state is an error or loading state, i must not check the
+            // GoBoxClient state, otherwise i'll fall in a loop
+            if(toState.preventLoop) {
+                
+                // Is at least the GoBoxClient trying to connect? Maybe (s)he
+                // typed the loading or error state url
+                if(GoBoxClient.getState() == 'notInitialized') {
+                    // Init
+                    GoBoxClient.init();
+                    // And show the loading state
+                    $state.go('home.loading');
+                }
+                return;
+            }
+                
+            // Ok, now i know that the user is logged, check if the GoBoxClient
+            // is ready.
+            switch (GoBoxClient.getState()) {
+                case 'ready':
+                    // Let the user go to the state (s)he wants
+                    break;
+                case 'error':
+                case 'noStorage':
+                    // Error view
+                    event.preventDefault();
+                    $state.go('home.error');
+                    break;
+                
+                default:
+                    // No error? not ready? this means that the user needs to wait
+                    event.preventDefault();
+                    
+                    // Wait, let me save the 'toStateParams' before change the state
+                    // so i can redirect the user to the state he wants
+                    lastToState.state = toState.name;
+                    lastToState.params = toStateParams;
+                    
+                    $state.go('home.loading');
+                    break;
+            }
             return;
-        // If is not authorized, prevent the next state
+        }
+        
+        // If is not authorized to ACCESS (this doesn't mean that is not loggged!)
+        // the next state, prevent the next state
         event.preventDefault();
         if (GoBoxClient.isLogged()) {
-            console.log("Redirect because the user is logger");
-            // If the user is logged and it was going to the 'login' router,
+            
+            // If the user is logged and it was going to the 'login' state,
             // redirect him to the home and show the root folder
             $state.go('home.files', {
                 id: 1
@@ -106,7 +166,7 @@ angular
         /**
          * Check if there is an old session in the cookie
          */
-        // TODO: Move this code to a service
+        // TODO: Move the logic of this code to a service
 
         // Load an hypotetical old session
         var auth = GoBoxAuth.loadFromCookie();
@@ -117,19 +177,37 @@ angular
             auth.check().then(function(valid) {
 
                 if (!valid) {
-                    console.log("Redirect to login because the user is not logger");
                     // Redirect to the login
                     $state.go('login');
                     return;
                 }
 
-                // If is still valid configure the API Client
+                // If is still valid configure the API Client Object
                 GoBoxClient.setAuth(auth);
 
                 // And redirect to the home
                 $state.go(toState, toStateParams);
             });
-
+        } else {
+            // If there wasn't old sessions
+            $state.go('login');
+        }
+    });
+    
+    GoBoxClient.onStateChange(function (newState) {
+        // when the state change
+        switch(newState) {
+            case 'ready':
+                // If now the GoBoxClient is ready let the user see his files
+                if(angular.isDefined(lastToState.state))
+                    $state.go(lastToState.state, lastToState.params);
+                else
+                    $state.go('home.files', { id: 1 });
+                break;
+            case 'error':
+                // If the initialization has failed, show the error
+                $state.go('home.error');
+                break;
         }
     });
 });
