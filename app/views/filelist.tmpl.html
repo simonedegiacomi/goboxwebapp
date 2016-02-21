@@ -9,29 +9,46 @@
     border-style: dashed;
 }
 
+.sort:after {
+  content: '\25b2';
+}
+.sort.reverse:after {
+  content: '\25bc';
+}
+
 </style>
 
 <md-subheader class="md-primary"  style="background-color: #eee;">
     <div layout="row">
         <div flex="10">Icon</div>
-        <div flex>Name</div>
-        <div flex="15" hide show-gt-sm>Size</div>
-        <div flex="15" hide show-gt-md>Date</div>
+        <div flex="50">
+            <span ng-click="order.toggle('name')">Name </span>
+            <span class="sort" ng-if="order.what == 'name'" ng-class="{reverse: order.reverse}"></span>
+        </div>
+        <div flex="15">
+            <span ng-click="order.toggle('size')" hide show-gt-sm>Size </span>
+            <span class="sort" ng-if="order.what == 'size'" ng-class="{reverse: order.reverse}"></span>
+        </div>
+        <div flex="25">
+            <span ng-click="order.toggle('date')" hide show-gt-md>Date </span>
+            <span class="sort" ng-if="order.what == 'date'" ng-class="{reverse: order.reverse}"></span>
+        </div>
     </div>
 </md-subheader>
 
 <md-list layout-padding>
-    <md-list-item ng-repeat="file in files" file="file" ng-click="click(file)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
+    <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" file="file" ng-click="click(file)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
     
         <!-- Icon -->
         <div flex="10">
             <md-icon>{{file | iconFilter}}</md-icon>
         </div>
         <!-- File name -->
-        <div flex>{{file.getName()}}</div>
+        <div flex="50">{{file.getName()}}</div>
         <!-- File size -->
         <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
         <!-- Last update date -->
-        <div flex flex="15" hide show-gt-md>{{file.getLastUpdate()}}</div>
+        <div flex flex="25" hide show-gt-md>{{file.getLastUpdate() | date:"MM/dd/yyyy 'at' h:mma"}}</div>
+        
     </md-list-item>
 </md-list>

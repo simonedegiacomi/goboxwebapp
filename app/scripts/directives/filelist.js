@@ -25,6 +25,15 @@ angular.module('goboxWebapp')
                 clipboard.singleClick(file, false);
             }
         };
+        
+        $scope.order = {
+            what: 'name',
+            reverse: false,
+            toggle: function (newWhat) {
+                this.reverse = this.what == newWhat ? !this.reverse : false;
+                this.what = newWhat;
+            }
+        };
     };
 
     return {
