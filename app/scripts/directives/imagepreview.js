@@ -2,15 +2,15 @@
 
 /**
  * @ngdoc directive
- * @name goboxWebapp.directive:pdfPreview
+ * @name goboxWebapp.directive:imagePreview
  * @description
- * # pdfPreview
+ * # imagePreview
  */
 angular.module('goboxWebapp')
 
-.directive('pdfPreview', function() {
+.directive('imagePreview', function() {
     return {
-        templateUrl: 'views/pdf.preview.html',
+        template: '<img ng-src="{{preview.link}}" width="100%">',
         restrict: 'E',
         scope: {
             preview: '=preview'

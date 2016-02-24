@@ -8,10 +8,13 @@
  * Controller of the goboxWebapp
  */
 angular.module('goboxWebapp')
-  .controller('SharedCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+
+.controller('ShareCtrl', function($scope, GoBoxClient) {
+
+    $scope.share = {};
+
+    GoBoxClient.getSharedFiles().then(function (files) {
+        $scope.share.files = files; 
+    });
+
+});

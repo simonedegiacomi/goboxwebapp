@@ -9,13 +9,19 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FilterCtrl', function($scope, $stateParams, GoBoxClient) {
+.controller('FilterCtrl', function($state, $scope, $stateParams, GoBoxClient) {
     
-    var kind = $stateParams.kind;
-    var keyword = $stateParams.keyword;
+    var search = $scope.search = {
+        kind: $stateParams.kind,
+        keyword: $stateParams.keyword
+    };
     
-    GoBoxClient.search(kind, keyword).then(function(detailedDir) {
-        $scope.dir = detailedDir;
+    $scope.go = function () {
+        $state.go('home.filter', search);
+    };
+    
+    GoBoxClient.search(search.keyword, search.kind).then(function (res) {
+        $scope.res = res;
     });
     
     /**

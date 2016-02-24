@@ -5,21 +5,22 @@
  */
 angular.module('goboxWebapp')
 
-.filter('iconFilter', function() {
-    var types = {
-        "application/pdf": "picture_as_pdf",
-        "default": "insert_drive_file",
-        "audio/mp3": "library_music",
-        "audio/mpeg": "library_music",
-        "image/png": "collections"
+.filter('iconFilter', function(Kind) {
+    var icons = {
+        "unkown": "insert_drive_file",
+        "folder": "folder",
+        "audio": "library_music",
+        "image": "collections",
+        "video": "video_library",
+        "pdf": "picture_as_pdf"
     };
     
     return function(file) {
-        if (file.isDirectory)
-            return 'folder';
-        else if(!angular.isDefined(file.getMime()) || ! angular.isDefined(types[file.getMime()]))
-            return types.default;
+        var probeKind = Kind.fromFile(file);
         
-        return types[file.getMime()];
+        if(angular.isDefined(icons[probeKind]))
+            return icons[probeKind];
+        
+        return icons['unkown'];
     };
 });

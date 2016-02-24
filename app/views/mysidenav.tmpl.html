@@ -23,7 +23,7 @@
             </md-button>
             <md-menu-content width="3">
                 <md-menu-item ng-repeat="item in config.menuItems">
-                    <md-button>
+                    <md-button ng-click="item.action($event)">
                         <md-icon>{{item.icon}}</md-icon>
                         {{item.name}}
                     </md-button>

@@ -14,10 +14,10 @@ angular.module('goboxWebapp')
         change: function () {
             GoBoxClient.getAuth().changePassword($scope.password.old, $scope.password.new).then(function(){
                 $mdToast.showSimple("Password changed");
-                this.loading = false;
+                $scope.password.loading = false;
             }, function () {
                 $mdToast.showSimple("Sorry, can't change the password");
-                this.loading = false;
+                $scope.password.loading = false;
             });
             this.loading = true;
         }

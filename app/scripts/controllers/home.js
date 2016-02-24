@@ -9,7 +9,7 @@
  */
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($scope, $state, $stateParams, $mdSidenav, $timeout, GoBoxClient, Clipboard, GoBoxFile, Upload, Env, Previewer) {
+.controller('HomeCtrl', function($scope, $state, $stateParams, $mdSidenav, $timeout, $mdMedia, $mdDialog,  GoBoxClient, Clipboard, GoBoxFile, Upload, Env, Previewer) {
 
     /**
      * Sidenav
@@ -21,7 +21,7 @@ angular.module('goboxWebapp')
             icon: 'cloud',
             state: 'home.files',
             link: $state.href('home.files', {
-                id: 1 // Link to the root folder
+                id: 1
             }),
             selected: true
         }, {
@@ -30,6 +30,13 @@ angular.module('goboxWebapp')
             state: 'home.share',
             divider: true,
             link: $state.href('home.share')
+        }, {
+            name: 'Search',
+            icon: 'search',
+            state: "home.filter({kind: 'any'})",
+            link: $state.href('home.filter', {
+                kind: 'any'
+            })
         }, {
             name: 'Music',
             icon: 'library_music',
@@ -47,7 +54,7 @@ angular.module('goboxWebapp')
         }, {
             name: 'Documents',
             icon: 'picture_as_pdf',
-            state: "home.filter({kind: 'document'})",
+            state: "home.filter({kind: 'pdf'})",
             link: $state.href('home.filter', {
                 kind: 'document'
             })
@@ -69,8 +76,9 @@ angular.module('goboxWebapp')
         menuItems: [{
             name: 'Connection Info',
             icon: 'info',
-            action: function() {
+            action: function($event) {
                 // Open a dialog
+                openInfoDialog($event);
             }
         }, {
             name: 'Settings',
@@ -82,7 +90,8 @@ angular.module('goboxWebapp')
             name: 'Logout',
             icon: 'exit_to_app',
             action: function() {
-
+                GoBoxClient.logout();
+                $state.go('login');
             }
         }]
     };
@@ -115,7 +124,7 @@ angular.module('goboxWebapp')
     var uploads = $scope.upload.uploads;
 
     $scope.upload.uploadFile = function(files, errFiles) {
-        
+
         var fatherId = $stateParams.id == undefined ? 1 : $stateParams.id;
 
         angular.forEach(files, function(file) {
@@ -145,11 +154,38 @@ angular.module('goboxWebapp')
                 });
             }, function(evt) {
                 $timeout(function() {
-                    var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                    var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total, 10));
                     upload.state = percentage;
                 });
             });
         });
     };
+
+    function openInfoDialog($event) {
+        
+        function infoDialogCtrl ($scope) {
+            $scope.conn = {
+                ping: -1
+            };
+            GoBoxClient.ping().then(function (time) {
+                $timeout(function(){
+                    $scope.conn.ping = time;
+                });
+            });
+            $scope.close = function () {
+                $mdDialog.hide();
+            };
+        }
+        
+        var dialog = {
+            controller: infoDialogCtrl,
+            templateUrl: 'views/info.dialog.html',
+            parent: angular.element(document.body),
+            targetEvent: $event,
+            clickOutsideToClose: true,
+            fullscreen: ($mdMedia('sm') || $mdMedia('xs'))
+        };
+        $mdDialog.show(dialog);
+    }
 
 });

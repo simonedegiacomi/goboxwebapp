@@ -14,9 +14,8 @@ angular.module('goboxWebapp')
     var form = $scope.form = {};
 
     // Load an hypotetical old session
-    var auth = GoBoxAuth.loadFromCookie();
-
-
+    var auth = new GoBoxAuth();
+    
     $scope.state = 'welcome';
 
     /**
@@ -65,10 +64,6 @@ angular.module('goboxWebapp')
             //Stop the spinner
             form.loading = false;
 
-            // If the user want to stay logged, save a new cookie
-            if (form.keepLogged)
-                auth.saveToCookie();
-
             GoBoxClient.setAuth(auth);
 
             // Ok, logged.
@@ -103,11 +98,8 @@ angular.module('goboxWebapp')
         // Register
         auth.register(form.reCaptchaResponse).then(function(registered) {
 
-            // TODO: implement captcha
-
             // Registered, now login
             self.login();
-
         }, function(error) {
 
             $scope.loading = false;
@@ -127,5 +119,4 @@ angular.module('goboxWebapp')
     $scope.reset = function() {
         $scope.state = 'welcome';
     };
-
 });

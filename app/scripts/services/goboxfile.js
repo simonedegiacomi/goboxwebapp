@@ -100,6 +100,18 @@ angular.module('goboxWebapp')
         return this.mime;
     };
     
+    GoBoxFile.prototype.getLastUpdate = function () {
+        return new Date(parseInt(this.lastUpdateDate, 10));  
+    };
+    
+    GoBoxFile.prototype.getCreation = function () {
+        return new Date(parseInt(this.creationDate, 10));
+    };
+    
+    GoBoxFile.prototype.getSize = function () {
+        return this.size;
+    };
+
     return GoBoxFile;
 
 });

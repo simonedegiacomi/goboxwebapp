@@ -1,8 +1,27 @@
 <md-dialog>
-    <md-toolbar>
-        <md-toolbar-title>{{file.name}} - Preview</md-toolbar-title>
+     <md-toolbar class="md-toolbar-tools">
+        <span>Preview - {{preview.file.name}}</span>
+        <span flex></span>
+        <md-button ng-click="close()" class="md-icon-button">
+            <md-tooltip>Close</md-tooltip>
+            <md-icon>close</md-icon>
+        </md-button>
     </md-toolbar>
     <md-dialog-content>
-        <pdf-previev file="file"></pdf-previev>
+        <!-- Find a better approach, maybe compile the html -->
+        <md-content ng-switch="preview.type" flex>
+            <pdf-preview ng-switch-when="pdf" preview="preview"></pdf-preview>
+            <image-preview ng-switch-when="image" preview="preview"></image-preview>
+            <video-preview ng-switch-when="video" preview="preview"></video-preview>
+            <audio-preview ng-switch-when="audio" preview="preview"></audio-preview>
+            <md-content ng-switch-default>
+                Preview not available
+            </md-content>
+        </md-content>
     </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <a ng-href="{{preview.link}}" download="{{preview.file.name}}" class="md-button md-primary md-raised">
+            <span>Download</span>
+        </a>
+    </md-dialog-actions>
 </md-dialog>

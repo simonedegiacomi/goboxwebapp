@@ -9,29 +9,31 @@
     <md-content layout-padding layout="row">
         <md-input-container class="md-block">
             <label>Kind</label>
-            <md-select ng-model="user.state">
-                <md-option value="all">All</md-option>
-                <md-option value="music">Music</md-option>
-                <md-option value="Piwi">Photos</md-option>
-                <md-option value="Piwi">Documents</md-option>
+            <md-select ng-model="search.kind" ng-change="go()">
+                <md-option value="any">All</md-option>
+                <md-option value="audio">Songs</md-option>
+                <md-option value="image">Images</md-option>
+                <md-option value="video">Videos</md-option>
+                <md-option value="pdf">Documents</md-option>
             </md-select>
         </md-input-container>
         
         <md-input-container flex>
             <label>Search</label>
-            <input>
+            <input ng-model="search.keyword">
         </md-input-container>
         
-        <md-button class="md-icon-button">
+        <md-button ng-click="go()" class="md-icon-button">
             <md-tooltip>Go!</md-tooltip>
             <md-icon>search</md-icon>
         </md-button>
     </md-content>
+    <md-title>Results</md-title>
     </md-subheader>
     <md-content ng-if="res.length > 0">
         <file-list files="res" clipboard="clipboard"></file-list>
     </md-content>
-    <md-content ng-if="res.length <= 0">
+    <md-content ng-if="res.length <= 0" layout-padding>
         Nessun risultato
     </md-content>
 </md-content>

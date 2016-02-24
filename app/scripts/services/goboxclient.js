@@ -21,13 +21,13 @@ angular.module('goboxWebapp')
     this._stateListeners = [];
 
     this._doQueue = [];
+    
+    var self = this;
 
     /**
      * Initialize the client oepning a new web socket connection to the server
      */
     this.init = function() {
-        var self = this;
-
         // If the client is inizialize or an initialization is already
         // running, return
         if (self._lastState != 'notInitialized')
@@ -45,16 +45,14 @@ angular.module('goboxWebapp')
         // Add on 'open' listener
         ws.on('open', function() {
 
-            // Now in authentication state
-            self.notifyState('authenticating');
-
             // Prepare the auth result listener
             ws.on('authentication', function(data) {
-                if (data.result)
-                    self.notifyState('authorized');
-                else {
+                
+                if (!data.result) {
+                    // The connection is not authorized, so remove auth
                     self._auth = null;
-                    self.notifyState('unauthorized');
+                    // And change state
+                    self.notifyState('error');
                 }
             });
 
@@ -155,7 +153,6 @@ angular.module('goboxWebapp')
 
     this.getInfo = function(file) {
 
-        var self = this;
         var future = $q.defer();
         var cacheVal = self._caches.get(file.getId());
 
@@ -192,8 +189,7 @@ angular.module('goboxWebapp')
         return future.promise;
     };
 
-    this.search = function(kind, keyword, start, size) {
-        var self = this;
+    this.search = function(keyword, kind, start, size) {
         var future = $q.defer();
         var req = {
             kind: kind,
@@ -202,9 +198,16 @@ angular.module('goboxWebapp')
             size: size ? 50 : size
         };
 
-        this._do(function() {
+        self._do(function() {
             self._ws.query('search', req).then(function(res) {
-                future.resolve(res.files);
+                if(res.error)
+                    future.reject();
+                else {
+                    var wrapped = [];
+                    for(var i in res.result)
+                        wrapped[i] = GoBoxFile.wrap(res.result[i]);
+                    future.resolve(wrapped);
+                }
             });
         });
 
@@ -214,7 +217,7 @@ angular.module('goboxWebapp')
     this.createFolder = function(file) {
         var future = $q.defer();
 
-        this._ws.query('createFolder', file).then(function(res) {
+        self._ws.query('createFolder', file).then(function(res) {
             if (res.created) {
                 future.resolve();
             }
@@ -267,7 +270,7 @@ angular.module('goboxWebapp')
             else {
                 future.reject();
             }
-        })
+        });
 
         return future.promise;
     }
@@ -281,7 +284,6 @@ angular.module('goboxWebapp')
     };
 
     this.update = function(file) {
-        var self = this;
         var future = $q.defer();
         self._ws.query('update', file).then(function(res) {
             if (res.success)
@@ -290,5 +292,30 @@ angular.module('goboxWebapp')
                 future.reject();
         });
         return future;
+    };
+    
+    this.getSharedFiles = function () {
+         var future = $q.defer();
+         self._do(function() {
+            self._ws.query('getSharedFiles').then(function(share) {
+                future.resolve(share.files);
+            });
+         });
+         return future.promise;
+    };
+    
+    this.ping = function () {
+        var sentDate = new Date();
+        var future = $q.defer();
+        self._do(function() {
+            self._ws.query('ping').then(function () {
+                future.resolve(new Date().getTime() - sentDate.getTime());    
+            });
+        });
+        return future.promise;
+    };
+    
+    this.getDownloadLink = function (file) {
+        return Env.base + "api/transfer/fromStorage?ID=" + file.getId();
     };
 });

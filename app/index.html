@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title></title>
@@ -9,6 +10,7 @@
   <!-- build:css(.) styles/vendor.css -->
   <!-- bower:css -->
   <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
+  <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
@@ -28,6 +30,7 @@
 
   <!-- build:js(.) scripts/vendor.js -->
   <!-- bower:js -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/angular-animate/angular-animate.js"></script>
   <script src="bower_components/angular-cookies/angular-cookies.js"></script>
@@ -38,6 +41,32 @@
   <script src="bower_components/angular-material/angular-material.js"></script>
   <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
   <script src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
+  <script src="bower_components/videogular/videogular.js"></script>
+  <script src="bower_components/videogular-controls/vg-controls.js"></script>
+  <script src="bower_components/videogular-buffering/vg-buffering.js"></script>
+  <script src="bower_components/videogular-overlay-play/vg-overlay-play.js"></script>
+  <script src="bower_components/videogular-poster/vg-poster.js"></script>
+  <script src="bower_components/videogular-ima-ads/vg-ima-ads.js"></script>
+  <script src="bower_components/waypoints/waypoints.js"></script>
+  <script src="bower_components/SHA-1/sha1.js"></script>
+  <script src="bower_components/angulartics/src/angulartics.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-adobe.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-chartbeat.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-cnzz.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-flurry.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-ga-cordova.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-ga.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-gtm.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-kissmetrics.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-mixpanel.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-piwik.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-scroll.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-segmentio.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-splunk.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-woopra.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-marketo.js"></script>
+  <script src="bower_components/angulartics/src/angulartics-intercom.js"></script>
+  <script src="bower_components/videogular-angulartics/vg-analytics.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -48,7 +77,6 @@
   <script src="scripts/controllers/filelist.js"></script>
   <script src="scripts/services/myws.js"></script>
   <script src="scripts/services/env.js"></script>
-  <script src="scripts/services/goboxpath.js"></script>
   <script src="scripts/services/goboxfile.js"></script>
   <script src="scripts/controllers/settings.js"></script>
   <script src="scripts/directives/path-pwd.js"></script>
@@ -64,6 +92,12 @@
   <script src="scripts/directives/uploadbox.js"></script>
   <script src="scripts/services/previewer.js"></script>
   <script src="scripts/directives/pdfpreview.js"></script>
+  <script src="scripts/directives/imagepreview.js"></script>
+  <script src="scripts/directives/videopreview.js"></script>
+  <script src="scripts/directives/soundpreview.js"></script>
+  <script src="scripts/controllers/loading.js"></script>
+  <script src="scripts/services/kind.js"></script>
   <!-- endbuild -->
 </body>
+
 </html>

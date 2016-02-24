@@ -5,7 +5,7 @@
  */
 angular.module('goboxWebapp')
     
-.factory('GoBoxAuth', function($http, $q, $cookies, Env) {
+.factory('GoBoxAuth', function($http, $q, Env) {
 
     var GoBoxAuth = function() {
         // constructor
@@ -37,58 +37,6 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Set the token and update the authorization http header.
-     * If the old token was saved in a cookie, update it
-     */
-    GoBoxAuth.prototype.setToken = function(token) {
-        this._token = token;
-        setAuthHeader(token);
-        if($cookies.get('gobox_keepLogged'))
-            $cookies.put('gobox_token', token);
-    };
-
-    GoBoxAuth.prototype.getToken = function() {
-        return this._token;
-    };
-
-    /**
-     * Save the account informations ina  new cookie
-     */
-    GoBoxAuth.prototype.saveToCookie = function() {
-        
-        // Save the token
-        $cookies.put('gobox_token', this._token);
-        $cookies.put('gobox_username', this._username);
-        // And a flag to save that the user want to stay logged
-        $cookies.put('gobox_keepLogged', true);
-    };
-    
-    GoBoxAuth.prototype.deleteCookie = function () {
-        $cookies.remove('gobox_username');
-        $cookies.remove('gobox_token');
-    };
-
-    /**
-     * Load an existring session from the cookies and return a new
-     * GoBoaAuth object
-     */
-    GoBoxAuth.loadFromCookie = function() {
-        
-        // Crate a new GoBoxAuth
-        var auth = new GoBoxAuth();
-        
-        // Load informations from the cookie
-        auth._token = $cookies.get('gobox_token');
-        auth._username = $cookies.get('gobox_username');
-
-        return auth;
-    };
-
-    GoBoxAuth.prototype.hasToken = function() {
-        return angular.isDefined(this._token);
-    };
-
-    /**
      * Query the server and try to login. If the informations are correct
      * a new token is saved in this object. This function return a new promise.
      */
@@ -101,7 +49,8 @@ angular.module('goboxWebapp')
         var request = {
             username: this._username,
             password: this._password,
-            type: 'C'
+            type: 'C',
+            cookie: true
         };
 
         var self = this;
@@ -109,7 +58,6 @@ angular.module('goboxWebapp')
         // Make the http request
         $http.post(Env.base + 'api/user/login', request).then(function(response) {
             if (response.data.result == 'logged in') {
-                self.setToken(response.data.token);
                 self._valid = true;
                 future.resolve(true);
             }
@@ -132,9 +80,7 @@ angular.module('goboxWebapp')
      */
     GoBoxAuth.prototype.logout = function() {
         
-        $cookies.remove('gobox_token');
         delete this._token;
-        $cookies.remove('gobox_username');
         delete this._username;
         delete this._password;
 
@@ -170,29 +116,23 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Check if a session token is stil valid and get a new one.
+     * Check if a the session is still valid
      */
     GoBoxAuth.prototype.check = function() {
         var future = $q.defer();
-            
-        var authString = 'Bearer ' + this._token;
 
         var request = {
             method: 'POST',
-            url: Env.base + '/api/user/check',
-            headers: {
-                'Authorization': authString
-            }
-        }
+            url: Env.base + '/api/user/check'
+        };
             
         var self = this;
             
         $http(request).then(function(response) {
             self._valid = true;
-            self.setToken(response.data.newOne);
+            self._username = response.username;
             future.resolve(true);
         }, function (error) {
-            future.resolve(false);
             future.resolve(false);
         });
 
@@ -200,7 +140,6 @@ angular.module('goboxWebapp')
     };
         
     GoBoxAuth.existUser = function (username) {
-            
         var future = $q.defer();
             
         var config = {
@@ -217,24 +156,19 @@ angular.module('goboxWebapp')
         });
         
         return future.promise;
-    }
+    };
     
     GoBoxAuth.prototype.isValid = function () {
         return this._valid;
     };
-        
-    function setAuthHeader (token) {
-        // TODO: set the header only for the APIs
-        $http.defaults.headers.common.Authorization = 'Bearer ' + token;
-    }
     
     GoBoxAuth.prototype.changePassword = function (old, newPassword) {
-        return $http.post(Env.base + 'api/username/changePassword', {
+        return $http.post(Env.base + 'api/user/changePassword', {
             'old': old,
-            'new': newP
+            'new': newPassword
         });
     };
 
-    // Public API here
+    // Return the API Object
     return GoBoxAuth;
 });
