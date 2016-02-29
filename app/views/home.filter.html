@@ -30,7 +30,7 @@
     </md-content>
     <md-title>Results</md-title>
     </md-subheader>
-    <md-content ng-if="res.length > 0">
+    <md-content ng-if="res.length > 0" scroll-listener on-scroll-end="fullScroll">
         <file-list files="res" clipboard="clipboard"></file-list>
     </md-content>
     <md-content ng-if="res.length <= 0" layout-padding>

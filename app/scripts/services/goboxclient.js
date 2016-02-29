@@ -11,16 +11,19 @@
  */
 angular.module('goboxWebapp')
 
-.service('GoBoxClient', function($q, $cacheFactory, MyWS, GoBoxFile, Env) {
+.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxFile, Env, GoBoxAuth) {
 
     // Last state of the client
     this._lastState = 'notInitialized';
-    // Caches of the files
-    this._caches = $cacheFactory('goboxclient');
+    
     // Listeners for the states
     this._stateListeners = [];
 
+    // Queue of ws messages to send
     this._doQueue = [];
+
+    // Caches of the files
+    this._caches = $cacheFactory('goboxclient');
     
     var self = this;
 
@@ -30,14 +33,11 @@ angular.module('goboxWebapp')
     this.init = function() {
         // If the client is inizialize or an initialization is already
         // running, return
-        if (self._lastState != 'notInitialized')
+        if (this._lastState == 'ready' || this._lastState == 'pending')
             return;
 
         // Now is in pending state
-        self.notifyState('pending');
-
-        // Save the auth object
-        var auth = self._auth;
+        this.notifyState('pending');
 
         // Open the socket connection
         var ws = self._ws = new MyWS(Env.ws);
@@ -47,7 +47,7 @@ angular.module('goboxWebapp')
 
             // Prepare the auth result listener
             ws.on('authentication', function(data) {
-                
+
                 if (!data.result) {
                     // The connection is not authorized, so remove auth
                     self._auth = null;
@@ -60,11 +60,6 @@ angular.module('goboxWebapp')
             ws.on('storageInfo', function(info) {
                 self.notifyState(info.connected ? 'ready' : 'noStorage');
             });
-
-            // Send auth informations
-            ws.send('authentication', {
-                token: auth.getToken()
-            });
         });
 
         ws.on('close', function() {
@@ -75,23 +70,32 @@ angular.module('goboxWebapp')
             self.notifyState('error');
         });
 
-
         ws.on('syncEvent', function(data) {
+            // Wrap the changed file
             var changedFile = GoBoxFile.wrap(data.file);
 
             // Invalidate the cache
             self._caches.remove(changedFile.getId(), changedFile);
-            // Invalidate also the father
+            
+            // Invalidate also the cache of the father
             self._caches.remove(changedFile.getFatherId(), changedFile);
 
+            // Call the sync listener
             self._syncListener(changedFile, data.kind);
         });
     };
 
+    /**
+     * Reinitialize the client object
+     */
     this.reset = function() {
-        this.notifyState('notInitialized');
+        self.ws.close();
+        self.notifyState('notInitialized');
     };
 
+    /**
+     * Set the sync event listener
+     */
     this.setSyncListener = function(listener) {
         this._syncListener = listener;
     };
@@ -100,7 +104,6 @@ angular.module('goboxWebapp')
      * Return if the client is initialized wit the auth object
      */
     this.isLogged = function() {
-
         // If the auth is setted, check if is valid
         if (angular.isDefined(this._auth))
             return this._auth.isValid();
@@ -109,6 +112,8 @@ angular.module('goboxWebapp')
     };
 
     this.getAuth = function() {
+        if(!angular.isDefined(this._auth))
+            this._auth = new GoBoxAuth();
         return this._auth;
     };
 
@@ -116,12 +121,35 @@ angular.module('goboxWebapp')
         this._auth = newAuth;
     };
 
+    /**
+     * Close the ws connection
+     */
     this.logout = function() {
-        this._auth.logout();
-        delete this._auth;
-        this._ws.send('goodbye', {
-            invalidate: true
+        self._auth.logout();
+        delete self._auth;
+        self._ws.close();
+    };
+
+    /**
+     * Disable a specific client session
+     */
+    this.disableSession = function(sessionToDisable) {
+        return $http.delete(Env.base + "api/user/session", sessionToDisable);
+    };
+
+    /**
+     * Get the list of active sessions
+     */
+    this.getSessions = function(sessionToDisable) {
+        var future = $q.defer();
+
+        $http.get(Env.base + "api/user/sessions", sessionToDisable).then(function(response) {
+            future.resolve(response.data);
+        }, function() {
+            future.reject();
         });
+
+        return future.promise;
     };
 
     /**
@@ -131,6 +159,9 @@ angular.module('goboxWebapp')
         this._stateListeners.push(listener);
     };
 
+    /**
+     * Notify a new state of this client
+     */
     this.notifyState = function(state) {
         this._lastState = state;
         var listeners = this._stateListeners;
@@ -141,16 +172,25 @@ angular.module('goboxWebapp')
                 this._doQueue[i]();
     };
 
+    /**
+     * Return the state of this client
+     */
     this.getState = function() {
         return this._lastState;
     };
 
+    /**
+     * Call the spicified function when the ws connection is estabilishedt
+     */
     this._do = function(what) {
         if (this._lastState == 'ready')
             what();
         this._doQueue.push(what);
     };
 
+    /**
+     * Get the information about the specified file
+     */
     this.getInfo = function(file) {
 
         var future = $q.defer();
@@ -189,22 +229,25 @@ angular.module('goboxWebapp')
         return future.promise;
     };
 
+    /**
+     * Return a list of file, searching by name and filtering by kind
+     */
     this.search = function(keyword, kind, start, size) {
         var future = $q.defer();
         var req = {
             kind: kind,
             keyword: keyword,
-            from: start ? 0 : start,
-            size: size ? 50 : size
+            from: start ? start : 0,
+            size: size ? size : 0
         };
 
         self._do(function() {
             self._ws.query('search', req).then(function(res) {
-                if(res.error)
+                if (res.error)
                     future.reject();
                 else {
                     var wrapped = [];
-                    for(var i in res.result)
+                    for (var i in res.result)
                         wrapped[i] = GoBoxFile.wrap(res.result[i]);
                     future.resolve(wrapped);
                 }
@@ -214,6 +257,10 @@ angular.module('goboxWebapp')
         return future.promise;
     };
 
+    /**
+     * Create a new folder. The file passed as argument must have
+     * set the id of the father and the name of the new folder
+     */
     this.createFolder = function(file) {
         var future = $q.defer();
 
@@ -251,6 +298,9 @@ angular.module('goboxWebapp')
         return future.promise;
     };
 
+    /**
+     * Copy or cut the specified file
+     */
     this.copyOrCut = function(file, destinationFile, cut) {
         var self = this;
         var future = $q.defer();
@@ -273,16 +323,27 @@ angular.module('goboxWebapp')
         });
 
         return future.promise;
-    }
+    };
 
+    /**
+     * Copy the file in the specified destination. This function call
+     * the copyOrCut method
+     */
     this.copy = function(file, destinationFatherID) {
         return this.copyOrCut(file, destinationFatherID, false);
     };
 
+    /**
+     * Cut the file in the specified destination. This function call
+     * the copyOrCut method
+     */
     this.cut = function(file, destinationFatherID) {
         return this.copyOrCut(file, destinationFatherID, true);
     };
 
+    /**
+     * Update the information of the specified file. Don't use this
+     * to update the 'real' file.
     this.update = function(file) {
         var future = $q.defer();
         self._ws.query('update', file).then(function(res) {
@@ -293,29 +354,61 @@ angular.module('goboxWebapp')
         });
         return future;
     };
-    
-    this.getSharedFiles = function () {
-         var future = $q.defer();
-         self._do(function() {
-            self._ws.query('getSharedFiles').then(function(share) {
-                future.resolve(share.files);
-            });
-         });
-         return future.promise;
-    };
-    
-    this.ping = function () {
-        var sentDate = new Date();
+
+    /**
+     * Get the list of the shared files
+     */
+    this.getSharedFiles = function() {
         var future = $q.defer();
         self._do(function() {
-            self._ws.query('ping').then(function () {
-                future.resolve(new Date().getTime() - sentDate.getTime());    
+            self._ws.query('getSharedFiles').then(function(share) {
+                future.resolve(share.files);
             });
         });
         return future.promise;
     };
     
-    this.getDownloadLink = function (file) {
+    /**
+     * Estimates the ping of the connection to the storage
+     */
+    this.ping = function() {
+        var sentDate = new Date();
+        var future = $q.defer();
+        self._do(function() {
+            self._ws.query('ping').then(function() {
+                future.resolve(new Date().getTime() - sentDate.getTime());
+            });
+        });
+        return future.promise;
+    };
+    
+    /**
+     * Get the private download link
+     */
+    this.getDownloadLink = function(file) {
         return Env.base + "api/transfer/fromStorage?ID=" + file.getId();
+    };
+
+    /**
+     * Share and return the public url of the file
+     */
+    this.share = function(file, unShare) {
+        var future = $q.defer();
+
+        var req = {
+            share: angular.isDefined(unShare) ? unShare : true,
+            file: file
+        };
+
+        self._do(function() {
+            self._ws.query('share', req).then(function(res) {
+                if(res.success)
+                    future.resolve(res.link);
+                else
+                    future.reject();
+            });
+        });
+
+        return future.promise;
     };
 });
