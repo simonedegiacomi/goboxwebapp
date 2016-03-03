@@ -5,66 +5,63 @@
  */
 angular.module('goboxWebapp')
 
-.controller('LoginCtrl', function($scope, $state, $mdToast, GoBoxAuth, GoBoxClient) {
-
-    // Show loading spinner
-    $scope.state = 'loading';
-
-    // TODO: find a better solution
-    var form = $scope.form = {};
+.controller('LoginCtrl', function(GoBoxAuth, $scope, $state, $mdToast, $timeout, GoBoxClient) {
 
     // Load an hypotetical old session
-    var auth = new GoBoxAuth();
-    
+    var auth = GoBoxClient.getAuth();
+
     $scope.state = 'welcome';
 
     /**
      * Call this function to show the login or register card
      */
-    $scope.show = function(nextState) {
+    $scope.show = function(nextState, user) {
 
-        form.loading = true;
+        $scope.loading = true;
+
+        $scope.name = user.name;
 
         // Check if the user exist or not
-        GoBoxAuth.existUser(form.username).then(function(exist) {
+        GoBoxAuth.existUser(user.name).then(function(exist) {
 
-            //Stop the spinner
-            form.loading = false;
+            $timeout(function() {
+                //Stop the spinner
+                $scope.loading = false;
 
-            // If it doesn't exist and the user want to log ...
-            if (!exist && nextState == 'login') {
-                $mdToast.showSimple("Invalid Username");
-            }
+                // If it doesn't exist and the user want to log ...
+                //if (!exist && nextState == 'login') {
+                //    $mdToast.showSimple("Invalid Username");
+                //}
 
-            // If the account exist but the user want to create a new account ...
-            else if (exist && nextState == 'register') {
-                $mdToast.showSimple("Sorry, this username is not available");
-            }
+                // If the account exist but the user want to create a new account ...
+                if (exist && nextState == 'register') {
+                    $mdToast.showSimple("Sorry, this username is not available");
+                }
 
-            // If the user existency is corret for the selected action
-            else
-                $scope.state = nextState;
+                // If the user existency is corret for the selected action
+                else
+                    $scope.state = nextState;
+            });
+
         });
     };
 
     /**
      * Login contatting the server trough http
      */
-    $scope.login = function() {
+    $scope.login = function(user) {
 
         // Show loading spinner
-        form.loading = true;
+        $scope.loading = true;
 
         // Prepare the auth object
-        auth.setUsername(form.username);
-        auth.setPassword(form.password);
+        auth.setUsername(user.name);
+        auth.setPassword(user.password);
 
         // Login using the API
         auth.login().then(function(logged) {
             //Stop the spinner
-            form.loading = false;
-
-            GoBoxClient.setAuth(auth);
+            $scope.loading = false;
 
             // Ok, logged.
             $state.go('home.files', {
@@ -73,7 +70,7 @@ angular.module('goboxWebapp')
         }, function(error) {
 
             // Mmm an error
-            form.loading = false;
+            $scope.loading = false;
 
             // And the error
             $mdToast.showSimple("Sorry, wrong Username or Password");
@@ -83,20 +80,20 @@ angular.module('goboxWebapp')
     /**
      * Register with inserted information in the form
      */
-    $scope.register = function() {
+    $scope.register = function(user) {
 
         // Show loading spinner
         $scope.loading = true;
 
         // Prepare auth object
-        auth.setUsername(form.username);
-        auth.setPassword(form.password);
-        auth.setEmail(form.email);
+        auth.setUsername(user.name);
+        auth.setPassword(user.password);
+        auth.setEmail(user.email);
 
         var self = this;
 
         // Register
-        auth.register(form.reCaptchaResponse).then(function(registered) {
+        auth.register($scope.reCaptcha.response).then(function(registered) {
 
             // Registered, now login
             self.login();
@@ -109,10 +106,10 @@ angular.module('goboxWebapp')
 
     $scope.reCaptcha = {
         setResponse: function(response) {
-            form.reCaptchaResponse = response;
+            $scope.reCaptcha.response = response;
         },
         expire: function() {
-            form.reCaptchaResponseResponse = null;
+            $scope.reCaptcha.response = null;
         }
     };
 

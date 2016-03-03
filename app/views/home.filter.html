@@ -6,7 +6,7 @@
     <!-- Toolbar -->
     <my-toolbar config="toolbar"></my-toolbar>
     <md-subheader class="md-primary">
-    <md-content layout-padding layout="row">
+    <form layout-padding layout="row" ng-submit="go()">
         <md-input-container class="md-block">
             <label>Kind</label>
             <md-select ng-model="search.kind" ng-change="go()">
@@ -27,7 +27,7 @@
             <md-tooltip>Go!</md-tooltip>
             <md-icon>search</md-icon>
         </md-button>
-    </md-content>
+    </form>
     <md-title>Results</md-title>
     </md-subheader>
     <md-content ng-if="res.length > 0" scroll-listener on-scroll-end="fullScroll">

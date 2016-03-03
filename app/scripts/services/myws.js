@@ -19,8 +19,6 @@ angular.module('goboxWebapp')
         
         var ws = this._ws = new WebSocket(server);
         
-        var self = this;
-        
         ws.onopen = function () {
             executeEvent('open', { });
             for(var i in queue)
@@ -33,12 +31,10 @@ angular.module('goboxWebapp')
         };
         
         ws.onclose = function () {
-            console.log('Socket Closed!');
             executeEvent('close', { });  
         };
         
         ws.onerror = function () {
-            console.log('Socket Error!');
             executeEvent('error', { });
         };
         
@@ -56,10 +52,12 @@ angular.module('goboxWebapp')
         
     };
     
+    // Register a new listener for a event
     MyWS.prototype.on = function (event, listener) {
         this._eventListeners[event] = listener;  
     };
     
+    // Send a new event or a new query (if the query id params is specified)
     MyWS.prototype.send = function (event, data, forServer, queryId) {
         var objToSend = { event: event, data: data , forServer: forServer, _queryId: queryId };
         try {
@@ -71,6 +69,7 @@ angular.module('goboxWebapp')
         }
     };
     
+    // Create a new query and auto generate the relative id
     MyWS.prototype.query = function (query, data) {
         console.log("Query: ", query, "Data", data);
         var future = $q.defer();
@@ -83,5 +82,4 @@ angular.module('goboxWebapp')
     };
     
     return MyWS;
-    
 });

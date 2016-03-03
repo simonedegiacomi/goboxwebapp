@@ -13,6 +13,87 @@
 </style>
 
 <md-container class="login-container" layout-fill layout="row" layout-align="center center">
+    <!-- Login card -->
+    <md-card style="width: 400px;">
+        <!-- Toolbar of the card -->
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <md-button ng-show="state == 'register'" class="md-icon-button" ng-click="reset()" aria-label="Back">
+                    <md-icon>arrow_back</md-icon>
+                </md-button>
+                <h2>
+                    <span ng-switch="state">
+                        <span ng-switch-when="welcome">Welcome!</span>
+                        <span ng-switch-when="register">Register - {{ name }}</span>
+                    </span>
+                </h2>
+            </div>
+        </md-toolbar>
+        <!-- Content of the card woth the form -->
+        <md-card-content flex>
+            <!-- First form for the login -->
+            <form flex ng-if="state == 'welcome'" ng-submit="loginForm.$valid && login(user)" name="loginForm" layout="column" novalidate>
+                <!-- Username -->
+                <md-input-container>
+                    <label>Username</label>
+                    <input type="text" ng-model="user.name" name="name" required ng-minlength="4" />
+                    <div ng-messages="loginForm.name.$error">
+                        <div ng-message="required">Username is required</div>
+                        <div ng-message="minlength">Username is too short</div>
+                    </div>
+                </md-input-container>
+                <!-- Password -->
+                <md-input-container>
+                    <label>Password</label>
+                    <input type="text" ng-model="user.password" name="password" required ng-minlength="4" />
+                    <div ng-messages="loginForm.password.$error">
+                        <div ng-message="required">Password is required</div>
+                        <div ng-message="minlength">Password is too short</div>
+                    </div>
+                </md-input-container>
+                <!-- Keep logged -->
+                <md-input-container>
+                    <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
+                        <span>Keep Logged</span></br>
+                </md-input-container>
+                <!-- Submit button -->
+                <input type="submit" class="md-button md-primary md-raised" value="Login">
+                <!-- Register button -->
+                <md-button ng-click="show('register', user)" class="md-primary">Register</md-button>
+            </form>
+
+            <!-- Registration Form -->
+            <form ng-if="state == 'register'" name="registerForm" ng-submit="loginForm.$valid && register(user)" layout="column">
+                <!-- Password -->
+                <md-input-container>
+                    <label>Password</label>
+                    <input type="text" ng-model="user.password" name="password" required ng-minlength="4" />
+                    <div ng-messages="registerForm.password.$error">
+                        <div ng-message="required">Password is required</div>
+                        <div ng-message="minlength">Password is too short</div>
+                    </div>
+                </md-input-container>
+                <!-- Email -->
+                <md-input-container>
+                    <label>Email</label>
+                    <input type="text" ng-model="user.email" name="email" required/>
+                    <div ng-messages="registerForm.email.$error">
+                        <div ng-message="required">Password is required</div>
+                    </div>
+                </md-input-container>
+                <!-- ReCaptcha -->
+                <md-input-container class="center-captcha">
+                    <div vc-recaptcha on-success="reCaptcha.setResponse(response)" on-expire="reCaptcha.expire()" key="'6Lfd4RcTAAAAALCKgY7-3QlAOLQL3dOscKUYcOIK'"></div>
+                </md-input-container>
+                <!-- Submit button -->
+                <input type="submit" class="md-button md-primary md-raised" value="Register">
+            </form>
+        </md-card-content>
+        <md-progress-linear ng-show="loading" md-mode="indeterminate"></md-progress-linear>
+    </md-card>
+
+    <!--
+
     <md-card ng-if="state == 'welcome'" class="login-card">
         <md-toolbar>
             <md-title>
@@ -21,21 +102,31 @@
                 </div>
             </md-title>
         </md-toolbar>
-        <md-card-content layout="column">
-            <md-input-container>
-                <label>Username</label>
-                <input type="text" ng-disabled="form.loading" ng-model="form.username" />
-            </md-input-container>
-            <md-input-container>
-                <label>Password</label>
-                <input type="password" ng-disabled="form.loading" ng-model="form.password" />
-            </md-input-container>
-            <md-input-container>
-                <md-checkbox ng-model="form.keepLogged" aria-label="Keep Logged">
-                    <span>Keep Logged</span></br>
-            </md-input-container>
-            <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
-            <md-button class="md-primary" ng-click="show('register')">Register</md-button>
+        <md-card-content>
+            <form name="loginForm" novalidate ng-submit="login(user)" layout="column">
+                <md-input-container>
+                    <label>Username</label>
+                    <input type="text" ng-disabled="form.loading" ng-model="user.name" name="name" required ng-minlength="4" />
+                    <div ng-messages="loginForm.name.$error">
+                        <div ng-message="required">Username is required</div>
+                        <div ng-message="minlength">Username is too short</div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                    <label>Password</label>
+                    <input type="password" ng-disabled="form.loading" ng-model="user.password" name="password" required ng-minlength="4" />
+                    <div ng-messages="loginForm.password.$error">
+                        <div ng-message="required">Password is required</div>
+                        <div ng-message="minlength">Password is too short</div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                    <md-checkbox ng-model="user.keepLogged" aria-label="Keep Logged">
+                        <span>Keep Logged</span></br>
+                </md-input-container>
+                <md-button class="md-raised md-primary" ng-disabled="!loginForm.$valid" ng-click="login(user)">Login</md-button>
+                <md-button class="md-primary" ng-disabled="!loginForm.$valid" ng-click="show('register')">Register</md-button>
+            </form>
         </md-card-content>
         <md-progress-linear ng-show="form.loading" md-mode="indeterminate"></md-progress-linear>
     </md-card>
@@ -70,4 +161,8 @@
         <md-progress-linear ng-show="form.loading" md-mode="indeterminate"></md-progress-linear>
     </md-card>
     <md-progress-circular ng-if="state == 'loading'" class="md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+    
+    
+    
+    -->
 </md-container>

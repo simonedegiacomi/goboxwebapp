@@ -59,6 +59,7 @@ angular.module('goboxWebapp')
         $http.post(Env.base + 'api/user/login', request).then(function(response) {
             if (response.data.result == 'logged in') {
                 self._valid = true;
+                self._id = response.data.id;
                 future.resolve(true);
             }
             else {
@@ -123,14 +124,15 @@ angular.module('goboxWebapp')
 
         var request = {
             method: 'POST',
-            url: Env.base + '/api/user/check'
+            url: Env.base + 'api/user/check'
         };
             
         var self = this;
             
         $http(request).then(function(response) {
             self._valid = true;
-            self._username = response.username;
+            self._username = response.data.username;
+            self._id = response.data.id;
             future.resolve(true);
         }, function (error) {
             future.resolve(false);
@@ -150,7 +152,7 @@ angular.module('goboxWebapp')
 
         $http.get(Env.base + 'api/user/exist', config).then(function (response) {
             
-            future.resolve(true);
+            future.resolve(response.data.exist);
         }, function (response) {
             future.resolve(false);
         });

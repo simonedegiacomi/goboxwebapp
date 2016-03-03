@@ -22,4 +22,15 @@ angular.module('goboxWebapp')
             this.loading = true;
         }
     };
+    
+    $scope.account = { };
+    
+    GoBoxClient.getSessions().then(function(sessions){
+        console.log(sessions);
+        $scope.account.sessions = sessions;
+    });
+    
+    $scope.disableSession = function (session) {
+        GoBoxClient.disableSession(session);  
+    };
 });

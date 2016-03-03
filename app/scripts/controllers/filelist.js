@@ -4,77 +4,45 @@
  * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
+.controller('FileListCtrl', function($scope, $stateParams, $utils, $state, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard) {
 
-.controller('FileListCtrl', function($scope, $stateParams, $timeout, $mdToast, $state, $mdDialog, GoBoxClient, GoBoxFile, Env, Upload) {
-
+    // Create the file from the url
     var dir = new GoBoxFile();
     dir.setId($stateParams.id);
+    Clipboard.setCurrentFather(dir);
 
+    // Function that retrieve the info about the file using the GoBoxClient
     function loadDir() {
         GoBoxClient.getInfo(dir).then(function(detailedDir) {
-            $timeout(function() {
+            $utils.$timeout(function() {
                 $scope.dir = detailedDir;
             });
         });
     }
-
+    
+    // Get the info now
     loadDir();
 
-    /**
-     * Sync Event listener
-     */
+    // Register the listener for the sync events
     GoBoxClient.setSyncListener(function() {
+        // When a new event arrive, reload the info of this file
         loadDir();
     });
 
-    /**
-     * Configure the toolbar
-     */
-    $scope.toolbar = {
-        title: {
-            mode: 'pwd'
-        },
-        showSearchLink: true,
-        downloadUrl: null,
-        tools: [{
-            tooltip: 'Copy',
-            icon: 'content_copy',
-            show: isFilesSecelted,
-            action: copyFile
-        }, {
-            tooltip: 'Cut',
-            icon: 'content_cut',
-            show: isFilesSecelted,
-            action: cutFile
-        }, {
-            tooltip: 'Delete',
-            icon: 'delete',
-            show: isFilesSecelted,
-            action: deleteFile
-        }, {
-            tooltip: 'Share',
-            icon: 'share',
-            show: isSingleFileSelected,
-            action: shareFile
-        }]
-    };
-    
-    $scope.$watch(function () {
-        // This function return the first selected file.
-        // When this change, the secondo function of $watch is called (and so a new
-        // download url is generated)
-        var files = clipboard.getSelectedFiles();
-        return files.length > 0 ? files[0] : null;
-    }, function () {
-        $scope.toolbar.download = generateDownload();
+    // Configure the toolbar
+    // The title is the path
+    ToolbarManager.setTitle({
+        mode: 'pwd'
     });
+    // Show search button and tools
+    ToolbarManager.showSearch(true);
+    ToolbarManager.showTools(true);
+    ToolbarManager.apply();
 
-    /**
-     * Functions of the fab buttons
-     */
-
+    // Functions of the fab buttons
+    // New folder fab button
     $scope.newFolder = function(evt) {
-        $mdDialog.show({
+        $utils.$mdDialog.show({
             controller: function($scope, $mdDialog) {
                 $scope.abort = function() {
                     $mdDialog.hide();
@@ -85,9 +53,9 @@ angular.module('goboxWebapp')
                     newFolder.setFatherId(dir.getId());
 
                     GoBoxClient.createFolder(newFolder).then(function() {
-                        $mdToast.showSimple("Directory " + $scope.input.name + " Created");
+                        $utils.$mdToast.showSimple("Directory " + $scope.input.name + " Created");
                     }, function() {
-                        $mdToast.showSimple("Sorry, can't create the folder");
+                        $utils.$mdToast.showSimple("Sorry, can't create the folder");
                     });
                     $mdDialog.hide();
                 };
@@ -99,95 +67,16 @@ angular.module('goboxWebapp')
         });
     };
 
+    // Paste fab button
     $scope.paste = function() {
-        var cut = clipboard.getState() == 'cut';
-        var files = clipboard.getHoldFiles();
+        var cut = Clipboard.getState() == 'cut';
+        var files = Clipboard.getHoldFiles();
         angular.forEach(files, function(file) {
             GoBoxClient.copyOrCut(file, dir, cut).then(function() {
-                $mdToast.showSimple("File " + file.getName() + " moved");
+                $utils.$mdToast.showSimple("File " + file.getName() + " moved");
             }, function() {
-                $mdToast.showSimple("Sorry, there was an error with " + file.getName());
+                $utils.$mdToast.showSimple("Sorry, there was an error with " + file.getName());
             });
         });
     };
-
-    var uploads = $scope.uploads;
-
-    $scope.uploadFiles = function(files, errFiles) {
-
-        angular.forEach(files, function(file) {
-
-            var gbFile = new GoBoxFile(file.name);
-            gbFile.setFatherId(dir.getId());
-            var upload = {
-                file: gbFile,
-                state: 'queue'
-            };
-            uploads.push(upload);
-
-            Upload.http({
-                // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
-                url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
-                data: file
-            }).then(function(response) {
-                $timeout(function() {
-                    upload.state = 'complete';
-                });
-            }, function(response) {
-                $timeout(function() {
-                    upload.state = 'failed';
-                });
-            }, function(evt) {
-                $timeout(function() {
-                    var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
-                    upload.state = percentage + '%';
-                });
-            });
-        });
-    };
-
-    var clipboard = $scope.clipboard;
-
-    function isSingleFileSelected() {
-        return clipboard.getSelectedFiles().length == 1;
-    }
-
-    function isFilesSecelted() {
-        return clipboard.getSelectedFiles().length > 0;
-    }
-    
-    function generateDownload () {
-        var fileToDownload = clipboard.getSelectedFiles()[0];
-        if(!angular.isDefined(fileToDownload))
-            return null;
-        return {
-            name: fileToDownload.getName(),
-            url: GoBoxClient.getDownloadLink(fileToDownload)
-        };
-    }
-    
-    function copyFile() {
-        clipboard.holdState('copy');
-        $mdToast.showSimple("Copied to clipboard");
-    }
-
-    function cutFile() {
-        clipboard.holdState('cut');
-        $mdToast.showSimple("Hold in clipboard");
-    }
-
-    function deleteFile() {
-        // TODO show dialog
-        var files = clipboard.getSelectedFiles();
-        for (var i in files)
-            GoBoxClient.remove(files[i]).then(function() {
-                $mdToast.showSimple("File " + files[i].getName() + " deleted!");
-            }, function() {
-                $mdToast.showSimple("Sorry, can't delete " + files[i].getName());
-            });
-    }
-
-    function shareFile() {
-
-    }
 });

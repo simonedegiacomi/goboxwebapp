@@ -5,27 +5,28 @@
  */
 angular.module('goboxWebapp')
 
-.directive('fileList', function($timeout) {
+.directive('fileList', function($timeout, Clipboard) {
 
     var ctrl = function($scope) {
-        var clipboard = $scope.clipboard;
-        
+        // Time of the last click
         var lastClick = 0;
+        // Last clicked file
         var lastClickedFile;
         
         $scope.click = function(file) {
             
             if(lastClickedFile == file && Date.now() - lastClick <= 300) { // Double click
                 // And then call the correct clipboard method
-                clipboard.doubleClick(file);
+                Clipboard.doubleClick(file);
             } else {
                 lastClick = Date.now();
                 lastClickedFile = file;
                 
-                clipboard.singleClick(file, false);
+                Clipboard.singleClick(file, false);
             }
         };
         
+        // List order config
         $scope.order = {
             what: 'name',
             reverse: false,

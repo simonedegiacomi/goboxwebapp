@@ -25,22 +25,43 @@ angular
 
 .config(function($stateProvider, $urlRouterProvider) {
 
+    /**
+     * Route config
+     */
     $stateProvider
     // This state is active only when the user is not logged
         .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
         controller: 'LoginCtrl',
-        restricted: false
+        access: {
+            restricted: false,
+            connected: false,
+        }
     })
 
     // This is the main state. When the user is logged this state is alway on.
     // This contains the sidenav
     .state('home', {
         abstract: true,
-        templateUrl: 'views/home.html',
-        controller: 'HomeCtrl',
-        restricted: true
+        views: {
+            '': {
+                templateUrl: 'views/home.html',
+                controller: 'HomeCtrl',
+            },
+            'sidenav@home': {
+                templateUrl: 'views/home.sidenav.html',
+                controller: 'SidenavCtrl'
+            },
+            'toolbar@home': {
+                templateUrl: 'views/home.toolbar.html',
+                controller: 'ToolbarCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: false,
+        }
     })
 
     // This state is active when the user wants see his file. This
@@ -48,72 +69,136 @@ angular
     // This contains the sidenav with the search button
     .state('home.files', {
         url: '/files/:id',
-        restricted: true,
-        templateUrl: 'views/home.files.html',
-        controller: 'FileListCtrl'
+        views: {
+            'main@home': {
+                templateUrl: 'views/home.files.html',
+                controller: 'FileListCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: true,
+        }
     })
 
     .state('home.share', {
         url: '/share',
-        restricted: true,
-        templateUrl: 'views/home.share.html',
-        controller: 'ShareCtrl'
+        voews: {
+            'main@home': {
+                templateUrl: 'views/home.share.html',
+                controller: 'ShareCtrl',
+            }
+        },
+        access: {
+            restricted: true,
+            connected: true,
+        }
     })
 
     // This state show the files. In the sidenav you'll see the pwd. When the user
     // will click the search button the state 'search' is activated.
     .state('home.filter', {
         url: '/search/:kind/:keyword',
-        restricted: true,
-        templateUrl: 'views/home.filter.html',
-        controller: 'FilterCtrl'
+        views: {
+            'main@home': {
+                templateUrl: 'views/home.filter.html',
+                controller: 'FilterCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: true,
+        }
     })
 
     // This state is an alternative to 'home.files'
     .state('home.settings', {
         url: '/settings',
-        restricted: true,
-        templateUrl: 'views/home.settings.html',
-        controller: 'SettingsCtrl'
+        views: {
+            'main@home': {
+                templateUrl: 'views/home.settings.html',
+                controller: 'SettingsCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: false,
+        }
     })
 
     // This show the error message relative to the conneciton. Not sure
     // if this is a view...
     .state('home.error', {
         url: '/error',
-        restricted: true,
-        templateUrl: 'views/home.error.html',
-        controller: 'ErrorCtrl',
-        preventLoop: true
+        views: {
+            'main@home': {
+                templateUrl: 'views/home.error.html',
+                controller: 'ErrorCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: false,
+            preventLoop: true
+        }
     })
 
     .state('home.loading', {
         url: '/loading',
-        restricted: true,
-        templateUrl: 'views/home.loading.html',
-        controller: 'LoadingCtrl',
-        preventLoop: true
+        views: {
+            'main@home': {
+                templateUrl: 'views/home.loading.html',
+                controller: 'LoadingCtrl'
+            }
+        },
+        access: {
+            restricted: true,
+            connected: false,
+            preventLoop: true
+        }
     });
 
     $urlRouterProvider.otherwise("/login");
 })
 
-.run(function($rootScope, GoBoxClient, GoBoxAuth, $state) {
+.run(function($rootScope, GoBoxClient, $state, $timeout) {
 
     // This object contains the last state params before the state has changed
     // not by the user
     var lastToState = {};
 
+    GoBoxClient.onStateChange(function(newState) {
+        // when the state change
+        switch (newState) {
+            case 'ready':
+                // If now the GoBoxClient is ready let the user see his files
+                if (angular.isDefined(lastToState.state))
+                    $state.go(lastToState.state, lastToState.params);
+                else
+                    $state.go('home.files', {
+                        id: 1
+                    });
+                break;
+            case 'noStorage':
+                retryConnect();
+                break;
+            case 'error':
+                // If the initialization has failed, show the error
+                $state.go('home.error');
+                break;
+        }
+    });
+
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
 
         // TODO: clean this unredable code!
-
+        var access = toState.access;
         // Check if the user is authorized to access the next state
-        if (toState.restricted == GoBoxClient.isLogged()) {
+        if (access.restricted == GoBoxClient.isLogged()) {
 
             // If the next state is an error or loading state, i must not check the
             // GoBoxClient state, otherwise i'll fall in a loop
-            if (toState.preventLoop) {
+            if (access.preventLoop) {
 
                 // Is at least the GoBoxClient trying to connect? Maybe (s)he
                 // typed the loading or error state url
@@ -127,6 +212,9 @@ angular
             }
 
             if (toState.name == 'login')
+                return;
+
+            if (!access.connected)
                 return;
 
             // Ok, now i know that the user is logged, check if the GoBoxClient
@@ -175,9 +263,7 @@ angular
          */
         // TODO: Move the logic of this code to a service
 
-        var auth = new GoBoxAuth();
-
-        auth.check().then(function(valid) {
+        GoBoxClient.getAuth().check().then(function(valid) {
 
             if (!valid) {
                 // Redirect to the login
@@ -185,33 +271,20 @@ angular
                 return;
             }
 
-            // If is still valid configure the API Client Object
-            GoBoxClient.setAuth(auth);
-
             // And redirect to the home
-            $state.go(toState, toStateParams);
+            $state.go(toState, toStateParams, {
+                reload: true
+            });
+
         }, function(response) {
             $state.go('login');
         });
 
     });
 
-    GoBoxClient.onStateChange(function(newState) {
-        // when the state change
-        switch (newState) {
-            case 'ready':
-                // If now the GoBoxClient is ready let the user see his files
-                if (angular.isDefined(lastToState.state))
-                    $state.go(lastToState.state, lastToState.params);
-                else
-                    $state.go('home.files', {
-                        id: 1
-                    });
-                break;
-            case 'error':
-                // If the initialization has failed, show the error
-                $state.go('home.error');
-                break;
-        }
-    });
+    function retryConnect() {
+        $timeout(function() {
+            GoBoxClient.init();
+        }, 5000);
+    }
 });

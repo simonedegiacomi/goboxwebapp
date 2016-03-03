@@ -6,7 +6,7 @@
     </md-button>
 
     <!-- Title -->
-    <md-title ng-switch="config.title.mode" flex>
+    <md-title ng-switch="title.mode" flex>
         <path-pwd ng-switch-when="pwd" path="file.getPath()"></path-pwd>
         <span ng-switch-when="title">{{config.title.str}}</span>
         <div ng-switch-when="search">
@@ -15,22 +15,22 @@
     </md-title>
 
     <!-- Download button -->
-    <a ng-if="config.download" ng-href="{{config.download.url}}" download="{{config.download.name}}" class="md-icon-button" show-gt-sm>
+    <md-button ng-if="download" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button" show-gt-sm>
         <md-tooltip>Download {{config.download.name}}</md-tooltip>
         <md-icon>file_download</md-icon>
-    </a>
+    </md-button>
 
     <!-- All the other tools -->
-    <md-button ng-repeat="tool in config.tools" ng-if="tool.show()" ng-click="tool.action()" class="md-icon-button" show-gt-sm>
+    <md-button ng-repeat="tool in tools" ng-if="showTools && tool.show()" ng-click="tool.action()" class="md-icon-button" show-gt-sm>
         <md-tooltip>{{tool.tooltip}}</md-tooltip>
         <md-icon>{{tool.icon}}</md-icon>
     </md-button>
 
     <!-- Search button link -->
-    <a href="#/search/any/" ng-if="config.showSearchLink" class="md-icon-button" show-gt-sm>
+    <md-button href="#/search/any/" ng-if="showSearchLink" class="md-icon-button" show-gt-sm>
         <md-tooltip>Search</md-tooltip>
         <md-icon>search</md-icon>
-    </a>
+    </md-button>
 
     <!-- Menu for small display -->
     <md-menu>
@@ -43,15 +43,15 @@
             <!-- TODO: find a better way to not copy so much code -->
 
             <!-- Download button -->
-            <md-menu-item ng-if="config.downloadUrl">
-                <md-button ng-href="{{config.downloadUrl}}" download>
+            <md-menu-item ng-if="downloadUrl">
+                <md-button ng-href="{{downloadUrl}}" download>
                     <md-icon>file_download</md-icon>
                     <span>Download</span>
                 </md-button>
             </md-menu-item>
 
             <!-- Tools -->
-            <md-menu-item ng-repeat="tool in config.tools" ng-if="tool.show()">
+            <md-menu-item ng-repeat="tool in tools" ng-if="tool.show()">
                 <md-button ng-click="tool.action()">
                     <md-tooltip>{{tool.tooltip}}</md-tooltip>
                     <md-icon>{{tool.icon}}</md-icon>
@@ -59,7 +59,7 @@
                 </md-button>
             </md-menu-item>
 
-            <md-menu-item ng-if="config.showSearchLink">
+            <md-menu-item ng-if="showSearchLink">
                 <!-- Search button link -->
                 <md-button href="#/search/any/">
                     <md-tooltip>Search</md-tooltip>

@@ -8,10 +8,7 @@
  * Controller of the goboxWebapp
  */
 angular.module('goboxWebapp')
-  .controller('LoadingCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+
+.controller('LoadingCtrl', function() {
+
+});

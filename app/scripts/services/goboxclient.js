@@ -11,11 +11,11 @@
  */
 angular.module('goboxWebapp')
 
-.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxFile, Env, GoBoxAuth) {
+.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxFile, Env, GoBoxAuth, Upload) {
 
     // Last state of the client
     this._lastState = 'notInitialized';
-    
+
     // Listeners for the states
     this._stateListeners = [];
 
@@ -25,6 +25,9 @@ angular.module('goboxWebapp')
     // Caches of the files
     this._caches = $cacheFactory('goboxclient');
     
+    // Uploads queue
+    this._uploads = [];
+
     var self = this;
 
     /**
@@ -76,7 +79,7 @@ angular.module('goboxWebapp')
 
             // Invalidate the cache
             self._caches.remove(changedFile.getId(), changedFile);
-            
+
             // Invalidate also the cache of the father
             self._caches.remove(changedFile.getFatherId(), changedFile);
 
@@ -112,7 +115,7 @@ angular.module('goboxWebapp')
     };
 
     this.getAuth = function() {
-        if(!angular.isDefined(this._auth))
+        if (!angular.isDefined(this._auth))
             this._auth = new GoBoxAuth();
         return this._auth;
     };
@@ -367,7 +370,7 @@ angular.module('goboxWebapp')
         });
         return future.promise;
     };
-    
+
     /**
      * Estimates the ping of the connection to the storage
      */
@@ -381,7 +384,7 @@ angular.module('goboxWebapp')
         });
         return future.promise;
     };
-    
+
     /**
      * Get the private download link
      */
@@ -402,7 +405,7 @@ angular.module('goboxWebapp')
 
         self._do(function() {
             self._ws.query('share', req).then(function(res) {
-                if(res.success)
+                if (res.success)
                     future.resolve(res.link);
                 else
                     future.reject();
@@ -411,4 +414,45 @@ angular.module('goboxWebapp')
 
         return future.promise;
     };
+    
+    this.getUploadsQueue = function () {
+        return this._uploads;
+    };
+
+    this.uploadFile = function(file, fatherId) {
+        var future = $q.defer();
+        var gbFile = new GoBoxFile(file.name);
+        gbFile.setFatherId(fatherId);
+        var upload = {
+            file: gbFile,
+            state: 'queue'
+        };
+        this._uploads.push(upload);
+
+        gbFile.setIsDirectory(false);
+        gbFile.setMime(file.type);
+
+        Upload.http({
+            // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
+            url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
+            data: file
+        }).then(function(response) {
+            upload.state = 'complete';
+            future.resolve();
+        }, function(response) {
+            upload.state = 'failed';
+            future.reject();
+        }, function(evt) {
+            var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total, 10));
+            upload.state = percentage;
+            future.notify(percentage);
+        });
+        return future.promise;
+    };
+})
+
+.constant('GOBOX_EVENT', {
+    NO_STORAGE: 'noStorage',
+    ERROR: 'error',
+    READY: 'ready'
 });

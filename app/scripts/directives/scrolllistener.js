@@ -13,7 +13,7 @@ angular.module('goboxWebapp')
             var element = elements[0];
             
             // Bind the scroll event
-            element.bind('scroll', function() {
+            elements.bind('scroll', function() {
                 
                 // If the user reach the end of the page, call the listener
                 if (element.scrollTop + element.offsetHeight >= element.scrollHeight) {
