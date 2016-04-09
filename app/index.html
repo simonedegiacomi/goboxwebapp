@@ -70,38 +70,47 @@
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
-  <script src="scripts/app.js"></script>
-  <script src="scripts/services/goboxclient.js"></script>
-  <script src="scripts/services/goboxauth.js"></script>
-  <script src="scripts/controllers/login.js"></script>
-  <script src="scripts/controllers/filelist.js"></script>
-  <script src="scripts/services/myws.js"></script>
-  <script src="scripts/services/env.js"></script>
-  <script src="scripts/services/goboxfile.js"></script>
-  <script src="scripts/controllers/settings.js"></script>
-  <script src="scripts/directives/path-pwd.js"></script>
-  <script src="scripts/directives/filelist.js"></script>
-  <script src="scripts/filters/iconfilter.js"></script>
-  <script src="scripts/controllers/home.js"></script>
-  <script src="scripts/controllers/filter.js"></script>
-  <script src="scripts/controllers/shared.js"></script>
-  <script src="scripts/controllers/error.js"></script>
-  <script src="scripts/services/clipboard.js"></script>
-  <script src="scripts/directives/uploadbox.js"></script>
-  <script src="scripts/services/previewer.js"></script>
-  <script src="scripts/directives/pdfpreview.js"></script>
-  <script src="scripts/directives/imagepreview.js"></script>
-  <script src="scripts/directives/videopreview.js"></script>
-  <script src="scripts/directives/soundpreview.js"></script>
-  <script src="scripts/controllers/loading.js"></script>
-  <script src="scripts/services/kind.js"></script>
-  <script src="scripts/directives/scrolllistener.js"></script>
-  <script src="scripts/controllers/sidenav.js"></script>
-  <script src="scripts/controllers/toolbar.js"></script>
-  <script src="scripts/services/sidenavemanager.js"></script>
-  <script src="scripts/services/toolbarmanager.js"></script>
-  <script src="scripts/services/mdutils.js"></script>
+  
   <!-- endbuild -->
+  
+  <!-- GoBox angular API -->
+  <script src="common/goboxapi/clientstate.js"></script>
+  <script src="common/goboxapi/goboxauth.js"></script>
+  <script src="common/goboxapi/goboxfile.js"></script>
+  <script src="common/goboxapi/goboxclient.js"></script>
+  
+  <!-- Directive file list -->
+  <script src="components/filelist/filelist.js"></script>
+  
+  <!-- Directive pwd -->
+  <script src="components/pwd/pwd.js"></script>
+  
+  <!-- Upload manager -->
+  <script src="components/upload/uploadmanager.js"></script>
+  
+  <!-- Directive Upload box -->
+  <script src="components/upload/uploadbox.js"></script>
+  
+  <!-- Directive Scroll listener -->
+  <script src="components/scrolllistener/scrolllistener.js"></script>
+  
+  <!-- Filter url preview -->
+  <script src="filter/preview.js"></script>
+  
+  <!-- Filter icon file -->
+  <script src="filter/iconfilter.js"></script>
+  
+  <!-- Component clipboard -->
+  <script src="components/clipboard/clipboard.js"></script>
+  
+  <!-- Utils -->
+  <script src="components/utils/utils.js"></script>
+  
+  <!-- Environment -->
+  <script src="env.js"></script>
+  
+  <!-- Main app.js -->
+  <script src="app.js"></script>
 </body>
 
 </html>

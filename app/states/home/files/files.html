@@ -1,0 +1,40 @@
+<style>
+    .fab-box {
+        position: fixed;
+        right: 25px;
+        bottom: 15px;
+        list-style-type: none;
+    }
+</style>
+
+<md-content layout="column" layout-fill>
+
+    <!-- Toolbar -->
+    <!--<my-toolbar config="toolbar" file="dir"></my-toolbar>-->
+
+    <!-- Main content of the view -->
+    <md-content>
+        <file-list files="dir.children" clipboard="clipboard" config="fileListConfig"></file-list>
+    </md-content>
+
+</md-content>
+
+<!-- Fabs -->
+<ul class="fab-box">
+    <!-- Paste -->
+    <li ng-if="Clipboard.getHoldFiles().length > 0">
+        <md-button ng-click="paste()" aria-label="menu" class="md-fab md-warn">
+            <md-tooltip md-direction="left">Paste</md-tooltip>
+            <md-icon>content_paste</md-icon>
+        </md-button>
+    </li>
+    
+    <!-- New Folder -->
+    <li>
+        <md-button aria-label="menu" class="md-fab md-warn" ng-click="newFolder($event)">
+            <md-tooltip md-direction="down">Create New Folder</md-tooltip>
+            <md-icon>create_new_folder</md-icon>
+        </md-button>
+    </li>
+    </li>
+</ul>

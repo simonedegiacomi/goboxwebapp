@@ -1,0 +1,59 @@
+<md-content>
+
+    <!-- List layout -->
+    <md-content ng-if="config.mode == 'list'" flex>
+        <md-subheader class="md-primary" style="background-color: #eee;">
+            <div layout="row">
+                <div flex="10" >Icon</div>
+                
+                
+                <div flex="50">
+                    <span ng-click="order.toggle('name')">Name </span>
+                    <span class="sort" ng-if="order.what == 'name'" ng-class="{reverse: order.reverse}"></span>
+                </div>
+                <div flex="15">
+                    <span ng-click="order.toggle('size')" hide show-gt-sm>Size </span>
+                    <span class="sort" ng-if="order.what == 'size'" ng-class="{reverse: order.reverse}"></span>
+                </div>
+                <div flex="25">
+                    <span ng-click="order.toggle('date')" hide show-gt-md>Date </span>
+                    <span class="sort" ng-if="order.what == 'date'" ng-class="{reverse: order.reverse}"></span>
+                </div>
+            </div>
+        </md-subheader>
+        
+        <!--scroll-listener on-scroll-end="console.log('ok')"-->
+        <md-list ng-if="config.mode == 'list'">
+
+            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" file="file" ng-click="click(file)" ng-class="{ 'selected-file': file.selected }" class="no-padding selected">
+
+                <!-- Icon or checkbox-->
+                <div flex="10">
+                    <!-- Icon -->
+                    <md-icon  ng-hide="file.selected">{{file | iconFilter}}</md-icon>
+                    
+                    <!-- File selection -->
+                    <md-checkbox ng-show="file.selected" ng-model="file.selected" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
+                </div>
+                <!-- File name -->
+                <div flex="50">{{file.getName()}}</div>
+                <!-- File size -->
+                <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
+                <!-- Last update date -->
+                <div flex flex="25" hide show-gt-md>{{file.getLastUpdate() | date:"MM/dd/yy 'at' h:mma"}}</div>
+
+            </md-list-item>
+        </md-list>
+    </md-content>
+    
+    <!-- Cards layout -->
+    <md-content layout-padding ng-if="config.mode == 'grid'">
+        <md-grid-list md-cols-gt-md="12" md-cols-sm="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-gt-sm="8px" md-gutter="4px">
+            <md-grid-tile ng-repeat="file in files">
+                <md-card>
+                    {{file.getName()}}
+                </md-card>
+            </md-grid-tile>
+        </md-grid-list>
+    </md-content>
+</md-content>

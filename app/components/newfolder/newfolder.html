@@ -1,0 +1,32 @@
+<md-dialog aria-label="New folder" style="min-width: 40%;">
+
+    <!-- Title of the dialog -->
+    <md-toolbar class="md-toolbar-tools">
+        <span>New Folder</span>
+
+        <!-- Empty space -->
+        <span flex></span>
+
+        <!-- Close button -->
+        <md-button ng-click="abort()" class="md-icon-button">
+            <md-tooltip>Close</md-tooltip>
+            <md-icon>close</md-icon>
+        </md-button>
+    </md-toolbar>
+
+    <!-- Name of the new folder -->
+    <md-dialog-content flex>
+        <md-content layout="row" class="md-padding">
+            <md-input-container flex>
+                <label>New Folder Name</label>
+                <input type="text" ng-model="input.name">
+            </md-input-container>
+        </md-content>
+    </md-dialog-content>
+
+    <!-- Create and close buttons -->
+    <md-dialog-actions layout="row">
+        <md-button ng-click="abort()" class="md-primary">Close</md-button>
+        <md-button ng-click="create()" class="md-primary md-raised">Create</md-button>
+    </md-dialog-actions>
+</md-dialog>
