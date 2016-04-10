@@ -4,31 +4,57 @@
  * @author Degiacomi Simone
  */
 angular.module('goboxWebapp')
-.controller('FileListCtrl', function($scope, $stateParams, $utils, $state, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard) {
 
+.controller('FileListCtrl', function($scope, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard, Previewer) {
+
+    // Attach the clipboard to the scope
     $scope.Clipboard = Clipboard;
 
-    // Create the file from the url
-    var dir = new GoBoxFile();
-    dir.setId($stateParams.id);
-    Clipboard.setCurrentFather(dir);
+    // Clear the clipboard
     Clipboard.clear();
 
     // Function that retrieve the info about the file using the GoBoxClient
-    function loadDir() {
-        GoBoxClient.getInfo(dir).then(function(detailedDir) {
-            $utils.$timeout(function() {
-                $scope.dir = detailedDir;
-                Clipboard.setCurrentFather(detailedDir);
+    function loadDir(dirId) {
+
+        GoBoxClient.getInfo(dirId).then(function(detailedFile) {
+            $timeout(function() {
+
+                if (detailedFile.isDirectory) {
+
+                    // Set the current directory
+                    $scope.dir = detailedFile;
+                    
+                    // And update the clipboard
+                    Clipboard.setCurrentFather(detailedFile);
+                }
+                else {
+
+                    // Otherwise set as dir the father of the file
+                    var path = detailedFile.getPath();
+                    var father = path[path.length - 1];
+
+                    // Set it to the scope
+                    $scope.dir = father;
+
+                    // And in the clipboard
+                    Clipboard.setCurrentFather(father);
+
+                    // And open the previewer
+                    Previewer.show(detailedFile);
+                }
+
+                // Refresh the toolbar
+                ToolbarManager.apply();
             });
         });
     }
-    
+
     // Get the info now
-    loadDir();
+    loadDir($stateParams.id);
 
     // Register the listener for the sync events
     GoBoxClient.setSyncListener(function() {
+
         // When a new event arrive, reload the info of this file
         loadDir();
     });
@@ -38,56 +64,75 @@ angular.module('goboxWebapp')
     ToolbarManager.setTitle({
         mode: 'pwd'
     });
+
     // Show search button and tools
     ToolbarManager.showSearch(true);
+
+    // And also the tool
     ToolbarManager.showTools(true);
+
+    // Finally refresh the toolbar
     ToolbarManager.apply();
 
     // Functions of the fab buttons
     // New folder fab button
     $scope.newFolder = function(evt) {
-        $utils.$mdDialog.show({
-            controller: function($scope, $mdDialog) {
-                $scope.abort = function() {
-                    $mdDialog.hide();
-                };
-                $scope.create = function() {
-                    var newFolder = new GoBoxFile($scope.input.name);
-                    newFolder.setIsDirectory(true);
-                    newFolder.setFatherId(dir.getId());
 
-                    GoBoxClient.createFolder(newFolder).then(function() {
-                        $utils.$mdToast.showSimple("Directory " + $scope.input.name + " Created");
-                        loadDir();
-                    }, function() {
-                        $utils.$mdToast.showSimple("Sorry, can't create the folder");
-                    });
-                    $mdDialog.hide();
-                };
-            },
-            templateUrl: 'views/dialog/newfolder.html',
-            targetEvent: evt,
-            parent: angular.element(document.body),
-            clickOutsideToClose: true
+        // Create the dialog
+        var dialog = $mdDialog.prompt()
+            .title('New Folder')
+            .textContent('Insert the name of the new folder. The new folder will appear in ' + $scope.dir.getName())
+            .placeholder('ex: documents, work...')
+            .ariaLabel('New folder name')
+            .targetEvent(evt)
+            .ok('Create')
+            .cancel('Cancel');
+
+        // Show the dialog
+        $mdDialog.show(dialog).then(function(result) {
+            
+            // Create the new folder
+            var newFolder = new GoBoxFile($scope.input.name);
+            newFolder.setIsDirectory(true);
+            newFolder.setFatherId($stateParams.id);
+            
+            // Call the API method to create the effective directory
+            GoBoxClient.createFolder(newFolder).then(function() {
+                
+                $mdToast.showSimple("Directory " + $scope.input.name + " Created");
+                loadDir();
+            }, function() {
+                
+                // Ops... something wrong
+                $mdToast.showSimple("Sorry, can't create the folder");
+            });
         });
     };
 
     // Paste fab button
     $scope.paste = function() {
-        console.log("called");
+        
+        // Checkif the action is copy or cut
         var cut = Clipboard.getState() == 'cut';
+        
+        // Get the holded files
         var files = Clipboard.getHoldFiles();
-        console.log(files);
+        
+        // For each file...
         angular.forEach(files, function(file) {
-            console.log("Chiamo il client");
-            GoBoxClient.copyOrCut(file, dir, cut).then(function() {
-                $utils.$mdToast.showSimple("File " + file.getName() + " moved");
+            
+            // Call the client method
+            GoBoxClient.copyOrCut(file, $scope.dir, cut).then(function() {
+                
+                $mdToast.showSimple("File " + file.getName() + " moved");
             }, function() {
-                $utils.$mdToast.showSimple("Sorry, there was an error with " + file.getName());
+                
+                $mdToast.showSimple("Sorry, there was an error with " + file.getName());
             });
         });
     };
-    
+
+    // Show the files as listb
     $scope.fileListConfig = {
         mode: 'list'
     };

@@ -78,5 +78,10 @@ angular.module('goboxWebapp')
         return future.promise;
     };
     
+    MyWS.prototype.close = function () {
+        
+        this._ws.close();
+    };
+    
     return MyWS;
 });

@@ -23,6 +23,7 @@
         </md-subheader>
         
         <!--scroll-listener on-scroll-end="console.log('ok')"-->
+        
         <md-list ng-if="config.mode == 'list'">
 
             <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" file="file" ng-click="click(file)" ng-class="{ 'selected-file': file.selected }" class="no-padding selected">

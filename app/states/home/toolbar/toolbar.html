@@ -1,5 +1,6 @@
 <!-- Toolbar -->
 <md-toolbar class="md-toolbar-tools">
+    
     <!-- Button to open the sidenav in small display -->
     <md-button hide-gt-sm class="md-icon-button" ng-click="toggleSidenav()">
         <md-icon>menu</md-icon>
@@ -7,15 +8,12 @@
 
     <!-- Title -->
     <md-title ng-switch="title.mode" flex>
-        <path-pwd ng-switch-when="pwd" path="Clipboard.getCurrenFather().getPath()"></path-pwd>
+        <path-pwd ng-switch-when="pwd" path="currentFile.getPath()"></path-pwd>
         <span ng-switch-when="title">{{title.str}}</span>
-        <div ng-switch-when="search">
-            <p>Search</p>
-        </div>
     </md-title>
 
     <!-- Download button -->
-    <md-button ng-show="download && Clipboard.isSingleFileSelected()" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button">
+    <md-button ng-show="download" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button">
         <md-tooltip>Download {{config.download.name}}</md-tooltip>
         <md-icon>file_download</md-icon>
     </md-button>

@@ -13,7 +13,7 @@
             <md-icon>close</md-icon>
         </md-button>
     </md-toolbar>
-    <md-dialog-content ngf-drop="uploadFile($files, $invalidFiles)" ngf-multiple="true" ngf-allow-dir="true" ngf-drag-over-class="'dragover'">
+    <md-dialog-content ngf-drop="upload($files)" ngf-multiple="true" ngf-allow-dir="true" ngf-drag-over-class="'dragover'">
         <!-- Md content with the list -->
 
         <md-content ng-if="uploads.length > 0" layout-padding>
@@ -24,8 +24,11 @@
                         {{upload.file.name}}
                         <span flex layout-fill></span>
                     </span>
-                    <md-progress-linear ng-if="!isNaN(upload.state)" md-mode="determinate" value="{{upload.state}}"></md-progress-linear>
-                    <p ng-if="isNaN(upload.state)">{{upload.state}}</p>
+                    <md-progress-linear ng-show="upload.pending" md-mode="determinate" value="{{upload.percentage}}"></md-progress-linear>
+                    <p>
+                        <span ng-show="upload.uploaded">Completated</span>
+                        <span ng-show="upload.error">Failed</span>
+                    </p>
                 </md-list-item>
             </md-list>
         </md-content>
@@ -38,6 +41,6 @@
         </md-content>
     </md-dialog-content>
     <md-dialog-actions layout="row">
-        <md-button ngf-select="uploadFile($files, $invalidFiles)" class="md-raised md-primary" multiple>Upload File</md-button>
+        <md-button ngf-select="upload($files)" class="md-raised md-primary" multiple>Upload File</md-button>
     </md-dialog-actions>
 </md-dialog>

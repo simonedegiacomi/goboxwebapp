@@ -14,8 +14,6 @@
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/login.css">
-  <link rel="stylesheet" href="styles/filelist.css">
   <!-- endbuild -->
 
   <!-- Icons -->
@@ -73,14 +71,25 @@
   
   <!-- endbuild -->
   
+  <!-- Main app.js -->
+  <script src="app.js"></script>
+  
+  <!-- My ws wrapper -->
+  <script type="text/javascript" src="common/myws/myws.js"></script>
+  
   <!-- GoBox angular API -->
   <script src="common/goboxapi/clientstate.js"></script>
   <script src="common/goboxapi/goboxauth.js"></script>
   <script src="common/goboxapi/goboxfile.js"></script>
   <script src="common/goboxapi/goboxclient.js"></script>
+  <script src="common/goboxapi/kind.js"></script>
   
   <!-- Directive file list -->
   <script src="components/filelist/filelist.js"></script>
+  <link rel="stylesheet" href="components/filelist/filelist.css" />
+  
+  <!-- Connection info dialog -->
+  <script type="text/javascript" src="components/connectioninfo/info.js"></script>
   
   <!-- Directive pwd -->
   <script src="components/pwd/pwd.js"></script>
@@ -91,17 +100,23 @@
   <!-- Directive Upload box -->
   <script src="components/upload/uploadbox.js"></script>
   
+  <!-- Upload dialog -->
+  <script type="text/javascript" src="components/upload/uploaddialog.js"></script>
+  
   <!-- Directive Scroll listener -->
   <script src="components/scrolllistener/scrolllistener.js"></script>
   
   <!-- Filter url preview -->
-  <script src="filter/preview.js"></script>
+  <script src="filters/preview.js"></script>
   
   <!-- Filter icon file -->
-  <script src="filter/iconfilter.js"></script>
+  <script src="filters/iconfilter.js"></script>
   
   <!-- Component clipboard -->
   <script src="components/clipboard/clipboard.js"></script>
+  
+  <!-- Previewer component (service) -->
+  <script type="text/javascript" src="components/previewer/previewer.js"></script>
   
   <!-- Utils -->
   <script src="components/utils/utils.js"></script>
@@ -109,8 +124,51 @@
   <!-- Environment -->
   <script src="env.js"></script>
   
-  <!-- Main app.js -->
-  <script src="app.js"></script>
+  <!-- States -->
+  
+  <!-- Login state -->
+  <script src="states/login/login.js"></script>
+  
+  <!-- Public file state -->
+  <script src="states/publicfile/publicfile.js"></script>
+  
+  <!-- Home (root) state -->
+  <script src="states/home/home.js"></script>
+  
+  <!-- Root toolbar -->
+  <script src="states/home/toolbar/toolbar.js"></script>
+  
+  <!-- And also the toolbar manager -->
+  <script type="text/javascript" src="states/home/toolbar/toolbarmanager.js"></script>
+  
+  <!-- Root sidenav -->
+  <script type="text/javascript" src="states/home/sidenav/sidenav.js"></script>
+  
+  <!-- Files state -->
+  <script type="text/javascript" src="states/home/files/files.js"></script>
+  <link rel="stylesheet" href="states/home/files/files.css" />
+  
+  <!-- Shared state -->
+  <script type="text/javascript" src="states/home/share/share.js"></script>
+  
+  <!-- Filter state -->
+  <script type="text/javascript" src="states/home/filter/filter.js"></script>
+  
+  <!-- Recent files state -->
+  <script type="text/javascript" src="states/home/recent/recent.js"></script>
+  
+  <!-- Trash state -->
+  <script type="text/javascript" src="states/home/trash/trash.js"></script>
+  
+  <!-- Settings state -->
+  <script type="text/javascript" src="states/home/settings/settings.js"></script>
+  
+  <!-- Error state -->
+  <script type="text/javascript" src="states/home/error/error.js"></script>
+  
+  <!-- Loading state -->
+  <script type="text/javascript" src="states/home/loading/loading.js"></script>
+  
 </body>
 
 </html>

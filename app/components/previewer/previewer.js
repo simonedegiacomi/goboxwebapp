@@ -1,12 +1,5 @@
 'use strict';
 
-/**
- * @ngdoc service
- * @name goboxWebapp.Previewer
- * @description
- * # Previewer
- * Service in the goboxWebapp.
- */
 angular.module('goboxWebapp')
 
 .service('Previewer', function($mdDialog, GoBoxClient, Kind) {

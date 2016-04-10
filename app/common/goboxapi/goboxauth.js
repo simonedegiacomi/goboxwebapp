@@ -186,9 +186,9 @@ angular.module('goboxWebapp')
     };
 
     // Check if this is usefull or not
-    // GoBoxAuth.prototype.isValid = function() {
-    //     return this._valid;
-    // };
+    GoBoxAuth.prototype.isValid = function() {
+        return this._valid;
+    };
 
     /**
      * Change the password of the user

@@ -24,23 +24,33 @@ angular.module('goboxWebapp')
             files = [file];
         }
 
-        angular.forEach(files, function(file) {
+        angular.forEach(files, function(uploadfile) {
 
-            file.pendind = true;
-
+            // Create a new upload object
+            var upload = {
+                file: file,
+                pending: true,
+                error: false,
+                uploaded: false,
+                percentage: 0
+            };
+            
+            // Add the upload to the list
+            self._uploads.push(upload);
+            
             GoBoxClient.uploadFile(file, currentFolder.getId()).then(function() {
 
-                file.pendind = false;
-                file.uploaded = true;
-                file.error = false;
+                upload.pending = false;
+                upload.uploaded = true;
+                upload.error = false;
             }, function() {
 
-                file.pendind = false;
-                file.uploaded = false;
-                file.error = true;
+                upload.pending = false;
+                upload.uploaded = false;
+                upload.error = true;
             }, function(percentage) {
 
-                file.percentage = percentage;
+                upload.percentage = percentage;
             });
         });
     };

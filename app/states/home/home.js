@@ -1,23 +1,21 @@
 'use strict';
 
-/**
- * @author Degiacomi Simone
- * @name goboxWebapp.controller:HomeCtrl
- * @description
- * # HomeCtrl
- * Controller of the goboxWebapp
- */
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($scope, $state, $timeout,  GoBoxClient, Clipboard, GoBoxFile, Previewer) {
+.controller('HomeCtrl', function(Clipboard, Previewer) {
 
-    // Set the default function to cal when a file is double clicked
+    // Set the default function to call when a file is double clicked
     Clipboard.setOpenAction(function(file) {
-        if (file.isDirectory)
+        
+        // If the file is a directory, show that directory
+        if (file.isDirectory) {
+            
             $state.go('home.files', {
                 id: file.getId()
             });
-        else {
+        } else {
+            
+            // Otherwise show the preview
             Previewer.show(file);
         }
     });

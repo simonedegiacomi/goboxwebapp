@@ -1,9 +1,10 @@
 <style>
     .login-container {
-        background-image: url("http://wallpaperandroid.info/wp-content/uploads/2015/10/material-design-wallpaper-10.jpg");
+        background-image: url("images/login_background.jpg");
         background-repeat: no-repeat;
         background-attachment: fixed;
         background-position: center;
+        background-size: cover;
     }
     
     .center-captcha {
@@ -45,7 +46,7 @@
                 <!-- Password -->
                 <md-input-container>
                     <label>Password</label>
-                    <input type="text" ng-model="user.password" name="password" required ng-minlength="4" />
+                    <input type="password" ng-model="user.password" name="password" required ng-minlength="4" />
                     <div ng-messages="loginForm.password.$error">
                         <div ng-message="required">Password is required</div>
                         <div ng-message="minlength">Password is too short</div>
@@ -67,7 +68,7 @@
                 <!-- Password -->
                 <md-input-container>
                     <label>Password</label>
-                    <input type="text" ng-model="user.password" name="password" required ng-minlength="4" />
+                    <input type="password" ng-model="user.password" name="password" required ng-minlength="4" />
                     <div ng-messages="registerForm.password.$error">
                         <div ng-message="required">Password is required</div>
                         <div ng-message="minlength">Password is too short</div>

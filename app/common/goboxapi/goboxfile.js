@@ -51,6 +51,7 @@ angular.module('goboxWebapp')
     GoBoxFile.prototype.getPath = function () {
         
         if(this._cachedPath == undefined) {
+            
             // Angular loop reason
             // TODO: Document this
             var temp = this._cachedPath = [];
@@ -97,7 +98,7 @@ angular.module('goboxWebapp')
         for(var i in this.children)
             if(this.children[i].ID == child.ID)
                 return true;
-        return false
+        return false;
     };
     
     GoBoxFile.prototype.setMime = function (typeOfFile) {

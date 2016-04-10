@@ -11,7 +11,6 @@
 angular
     .module('goboxWebapp', [
         'ngAnimate',
-        'ngCookies',
         'ui.router',
         'ngMaterial',
         'ngMessages',
@@ -32,7 +31,7 @@ angular
     // This state is active only when the user is not logged
         .state('login', {
         url: '/login',
-        templateUrl: 'views/login.html',
+        templateUrl: 'states/login/login.html',
         controller: 'LoginCtrl',
         access: {
             restricted: false,
@@ -43,7 +42,7 @@ angular
     // State for the preview of a shared file
     .state('public_file', {
         url: '/public_file/:hostName/:id',
-        templateUrl: 'views/public_file.html',
+        templateUrl: 'states/publicfile/publicfile.html',
         controller: 'PublicFileCtrl'
     })
 
@@ -53,15 +52,15 @@ angular
         abstract: true,
         views: {
             '': {
-                templateUrl: 'views/home.html',
+                templateUrl: 'states/home/home.html',
                 controller: 'HomeCtrl',
             },
             'sidenav@home': {
-                templateUrl: 'views/home.sidenav.html',
+                templateUrl: 'states/home/sidenav/sidenav.html',
                 controller: 'SidenavCtrl'
             },
             'toolbar@home': {
-                templateUrl: 'views/home.toolbar.html',
+                templateUrl: 'states/home/toolbar/toolbar.html',
                 controller: 'ToolbarCtrl'
             }
         },
@@ -78,7 +77,7 @@ angular
         url: '/files/:id',
         views: {
             'main@home': {
-                templateUrl: 'views/home.files.html',
+                templateUrl: 'states/home/files/files.html',
                 controller: 'FileListCtrl'
             }
         },
@@ -88,11 +87,12 @@ angular
         }
     })
 
+    // State with the list of the shared files
     .state('home.share', {
         url: '/share',
         views: {
             'main@home': {
-                templateUrl: 'views/home.share.html',
+                templateUrl: 'states/home/share/share.html',
                 controller: 'ShareCtrl',
             }
         },
@@ -108,7 +108,7 @@ angular
         url: '/search/:kind/:keyword',
         views: {
             'main@home': {
-                templateUrl: 'views/home.filter.html',
+                templateUrl: 'states/home/filter/filter.html',
                 controller: 'FilterCtrl'
             }
         },
@@ -118,68 +118,99 @@ angular
         }
     })
 
-    .state('home.images', {
-        url: '/images',
+    // All this states are now simple filters. The folter in this case sow the files
+    // in a grid view. all the preview are dialogs, except for the music that will use
+    // a some background manager that insert a toolbar a the bottom of the page
+    // .state('home.images', {
+    //     url: '/images',
+    //     views: {
+    //         'main@home': {
+    //             templateUrl: 'views/home.images.html',
+    //             controller: 'ImagesCtrl'
+    //         }
+    //     },
+    //     access: {
+    //         restricted: true,
+    //         connected: true,
+    //     }
+    // })
+
+    // .state('home.videos', {
+    //     url: '/videos',
+    //     views: {
+    //         'main@home': {
+    //             templateUrl: 'views/home.videos.html',
+    //             controller: 'VideosCtrl'
+    //         }
+    //     },
+    //     access: {
+    //         restricted: true,
+    //         connected: true,
+    //     }
+    // })
+
+    // .state('home.music', {
+    //     url: '/music',
+    //     views: {
+    //         'main@home': {
+    //             templateUrl: 'views/home.music.html',
+    //             controller: 'MusicCtrl'
+    //         }
+    //     },
+    //     access: {
+    //         restricted: true,
+    //         connected: true,
+    //     }
+    // })
+
+    // .state('home.documents', {
+    //     url: '/documents',
+    //     views: {
+    //         'main@home': {
+    //             templateUrl: 'views/home.videos.html',
+    //             controller: 'DocumentsCtrl'
+    //         }
+    //     },
+    //     access: {
+    //         restricted: true,
+    //         connected: true,
+    //     }
+    // })
+    
+    .state('home.recent', {
+        url: '/recent',
         views: {
             'main@home': {
-                templateUrl: 'views/home.images.html',
-                controller: 'ImagesCtrl'
+                templateUrl: 'states/home/recent/recent.js',
+                controller: 'RecentCtrl'
             }
         },
         access: {
             restricted: true,
-            connected: true,
+            connected: true
         }
     })
 
-    .state('home.videos', {
-        url: '/videos',
+
+    .state('home.trash', {
+        url: '/recent',
         views: {
             'main@home': {
-                templateUrl: 'views/home.videos.html',
-                controller: 'VideosCtrl'
+                templateUrl: 'states/home/trash/trash.js',
+                controller: 'TrashCtrl'
             }
         },
         access: {
             restricted: true,
-            connected: true,
+            connected: true
         }
     })
-
-    .state('home.music', {
-        url: '/music',
-        views: {
-            'main@home': {
-                templateUrl: 'views/home.music.html',
-                controller: 'MusicCtrl'
-            }
-        },
-        access: {
-            restricted: true,
-            connected: true,
-        }
-    })
-
-    .state('home.documents', {
-        url: '/documents',
-        views: {
-            'main@home': {
-                templateUrl: 'views/home.videos.html',
-                controller: 'DocumentsCtrl'
-            }
-        },
-        access: {
-            restricted: true,
-            connected: true,
-        }
-    })
-
-    // This state is an alternative to 'home.files'
+    
     .state('home.settings', {
         url: '/settings',
         views: {
             'main@home': {
-                templateUrl: 'views/home.settings.html',
+                templateUrl: 'states/home/settings/settings.html',
                 controller: 'SettingsCtrl'
             }
         },
@@ -195,7 +226,7 @@ angular
         url: '/error',
         views: {
             'main@home': {
-                templateUrl: 'views/home.error.html',
+                templateUrl: 'states/home/error/error.html',
                 controller: 'ErrorCtrl'
             }
         },
@@ -210,7 +241,7 @@ angular
         url: '/loading',
         views: {
             'main@home': {
-                templateUrl: 'views/home.loading.html',
+                templateUrl: 'states/home/loading/loading.html',
                 controller: 'LoadingCtrl'
             }
         },

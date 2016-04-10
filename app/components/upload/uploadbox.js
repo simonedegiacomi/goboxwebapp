@@ -9,42 +9,24 @@
  */
 angular.module('goboxWebapp')
 
-.directive('uploadBox', function($mdDialog, $mdMedia, UploadManager) {
+.directive('uploadBox', function($mdDialog, UploadManager, UploadDialog) {
 
+    // Controller of the directive
     function ctrl($scope) {
         
-        var uploads = UploadManager.getUploadsList();
-        var uploadFile = UploadManager.uploadFile;
+        // List of pending uploads
+        $scope.uploads = UploadManager.getUploadsList();
         
-        $scope.showDialog = function($event) {
+        $scope.showDialog = function ($event) {
             
-            function dialogCtrl ($scope) {
-                $scope.uploads = uploads;
-                $scope.uploadFile = uploadFile;
-                $scope.close = function () {
-                    $mdDialog.hide();  
-                };
-            }
-            
-            var dialog = {
-                controller: dialogCtrl,
-                templateUrl: 'components/uploaddialog.html',
-                parent: angular.element(document.body),
-                targetEvent: $event,
-                clickOutsideToClose: true,
-                fullscreen: ($mdMedia('sm') || $mdMedia('xs'))
-            };
-
-            $mdDialog.show(dialog);
+            UploadDialog.show($event);
         };
     }
 
+    // Return the object that describes the directive
     return {
-        templateUrl: 'components/uploaddialog/uploadbox.html',
+        templateUrl: 'components/upload/uploadbox.html',
         restrict: 'E',
-        scope: {
-            config: '=config'
-        },
         controller: ctrl
     };
 });

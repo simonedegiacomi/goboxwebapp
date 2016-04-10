@@ -9,12 +9,13 @@
  */
 angular.module('goboxWebapp')
 
-.controller('SidenavCtrl', function($rootScope, $scope, $mdSidenav, $state, $utils, GoBoxClient, Clipboard) {
+.controller('SidenavCtrl', function($rootScope, $scope, $mdSidenav, $state, GoBoxClient, ConnectionInfoDialog) {
     
     // Get the user from the client
     $scope.user = GoBoxClient.getAuth();
     
     // Set the static links
+    // TODO: maybe move these links to angular contant?
     $scope.links = [{
         name: 'My Files',
         icon: 'cloud',
@@ -51,79 +52,42 @@ angular.module('goboxWebapp')
         icon: 'settings',
         state: 'home.settings'
     }];
+    
+    // Item on the menu at the top of the sidenav
     $scope.menuItems = [{
         name: 'Connection Info',
         icon: 'info',
         action: function($event) {
+            
             // Open a dialog
-            openInfoDialog($event);
+            ConnectionInfoDialog.open($event);
         }
-    }, {
+    }, { 
         name: 'Settings',
         icon: 'settings',
         action: function() {
+            
+            // Go to the state settings
             $state.go('home.settings');
         }
     }, {
         name: 'Logout',
         icon: 'exit_to_app',
         action: function() {
+            
+            // Disconnect the client and invalidate this session
             GoBoxClient.logout();
+            
+            // Go to the login
             $state.go('login');
         }
     }];
     
-    function openInfoDialog($event) {
-        
-        function infoDialogCtrl ($scope) {
-            $scope.conn = {
-                ping: -1
-            };
-            $utils.$interval(function() {
-                GoBoxClient.ping().then(function(time) {
-                    $utils.$timeout(function() {
-                        $scope.conn.ping = time;
-                    });
-                });
-            }, 1000);
-            $scope.close = function () {
-                $utils.$mdDialog.hide();
-            };
-        }
-        
-        var dialog = {
-            controller: infoDialogCtrl,
-            templateUrl: 'views/dialog/info.html',
-            parent: angular.element(document.body),
-            targetEvent: $event,
-            clickOutsideToClose: true
-        };
-        $utils.$mdDialog.show(dialog);
-    }
-    
+    // Expose in every scope the method that toggle the sidenav
     $rootScope.toggleSidenav = function () {
+        
+        // Just toggle the sidenav
         $mdSidenav('sidenav').toggle();
     };
     
-    /**
-     * Configure uploads queue
-     */
-    $scope.upload = {
-        uploads: GoBoxClient.getUploadsQueue(),
-        uploadFile: uploadFile
-    };
-
-    function uploadFile (files, errFiles) {
-
-        var currentFolder = Clipboard.getCurrenFather();
-
-        angular.forEach(files, function(file) {
-
-            GoBoxClient.uploadFile(file, currentFolder.getId()).then(function(){
-                $utils.$mdToast.showSimple("Upload completed");
-            }, function(){
-                $utils.$mdToast.showSimple("Upload failed");
-            });
-        });
-    }
 });

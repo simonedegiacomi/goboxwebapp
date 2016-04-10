@@ -1,19 +1,10 @@
 'use strict';
 
-/**
- * @author Degiacomi Simone
- * @ngdoc function
- * @name goboxWebapp.controller:ToolbarCtrl
- * @description
- * # ToolbarCtrl
- * Controller of the goboxWebapp
- */
 angular.module('goboxWebapp')
 
-.controller('ToolbarCtrl', function($scope, $utils, Clipboard, ToolbarManager) {
+.controller('ToolbarCtrl', function($scope, $timeout, Clipboard, ToolbarManager) {
 
-    $scope.Clipboard = Clipboard;
-
+    // Tools of the toolbar
     $scope.tools = [{
         tooltip: 'Copy',
         icon: 'content_copy',
@@ -36,25 +27,38 @@ angular.module('goboxWebapp')
         action: Clipboard.shareFile
     }];
 
+    // Configure the toolbar with the info of the toolbar manager
+    function configFromManager() {
+        
+        $scope.showTools = ToolbarManager.getShowTools();
+        $scope.showSearchLink = ToolbarManager.getShowSearch();
+        $scope.title = ToolbarManager.getTitle();
+        $scope.currentFile = Clipboard.getCurrenFather();
+    }
+
+    // When the toolbar manager change the config of the toolbar
     ToolbarManager.onChange(function() {
-        $utils.$timeout(function() {
+
+        $timeout(function() {
+
+            // Reload the settings
             configFromManager();
         });
     });
 
-    Clipboard.addListener(function() {
-       $utils.$timeout(function() {
-            $scope.download = Clipboard.getDownloadLink();   
-       });
-    });
 
-    function configFromManager() {
-        $scope.showTools = ToolbarManager.getShowTools();
-        $scope.showSearchLink = ToolbarManager.getShowSearch();
-        $scope.title = ToolbarManager.getTitle();
-        $scope.file = Clipboard.getCurrenFather();
-        $scope.download = Clipboard.getDownloadLink();
-    }
+    // Add a listener to the toolbar
+    Clipboard.addListener(function() {
+        
+        $timeout(function() {
+            
+            // Update the download link
+            if(Clipboard.isSingleFileSelected())
+                $scope.download = Clipboard.getDownloadLink();
+            else
+                $scope.download = undefined;
+        });
+    });
 
     configFromManager();
 });

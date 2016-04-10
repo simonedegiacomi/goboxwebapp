@@ -38,18 +38,18 @@ angular.module('goboxWebapp')
             what: 'name',
             reverse: false,
             toggle: function (newWhat) {
-                this.reverse = this.what == newWhatt ? !this.reverse : false;
+                this.reverse = this.what == newWhat ? !this.reverse : false;
                 this.what = newWhat;
             }
         };
     };
 
+    // Return the object that describes the directive
     return {
         templateUrl: 'components/filelist/filelist.html',
         restrict: 'E',
         scope: {
             files: '=files',
-            clipboard: '=clipboard',
             config: '=config'
         },
         controller: ctrl
