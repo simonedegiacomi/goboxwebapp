@@ -19,7 +19,12 @@ angular.module('goboxWebapp')
         tooltip: 'Delete',
         icon: 'delete',
         show: Clipboard.isFilesSecelted,
-        action: Clipboard.deleteFile
+        action: Clipboard.tashFiles
+    }, {
+        tooltip: 'Rename',
+        icon: 'mode_edit',
+        show: Clipboard.isSingleFileSelected,
+        action: Clipboard.renameFile
     }, {
         tooltip: 'Share',
         icon: 'share',

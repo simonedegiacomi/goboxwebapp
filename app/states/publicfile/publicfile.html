@@ -1,21 +1,34 @@
 <md-container layout-fill layout="row" layout-align="center center">
     
+    <!-- Loading card -->
+    <md-card ng-show="fileState == 'loading'">
+        Loading
+    </md-card>
+    
     <!-- File card -->
-    <md-card style="width: 400px;">
+    <md-card ng-show="fileState == 'available'" style="width: 400px;">
         
         <!-- Toolbar of the card -->
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2>Prova - Song.mp3</h2>
+                <h2>{{hostName}} - {{file.name}}</h2>
             </div>
         </md-toolbar>
         
         <!-- Content of the card -->
-        <md-card-content flex>
+        <md-card-content>
+            <!-- Photo of the host -->
+            <img ng-src="/api/user/image/{{hostName}}">
             
-            <preview preview=""></preview>
+            <!-- Preview -->
+            <preview preview="preview"></preview>
             
         </md-card-content>
         
+    </md-card>
+    
+    <!-- Not available -->
+    <md-card ng-show="fileState == 'notAvailable'">
+        File not available
     </md-card>
 </md-container>

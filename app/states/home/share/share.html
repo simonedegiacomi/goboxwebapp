@@ -1,14 +1,33 @@
 <md-content layout="column" layout-fill>
-    
+
     <md-content ng-show="share.files.length <= 0">
-        <md-title>Nessun file condiviso</md-title>
-        <p>Mettere qui la guida sulla condivisione di un file</p>
+        
+        <md-card>
+            <md-toolbar>
+                <md-title class="md-toolbar-tools">No Shared Files</md-title>
+            </md-toolbar>
+            
+            <md-card-content>
+                <p>You haven't shared any file yet. Go to the file list or find something
+                with the search tool ad press the 'Share' Button. This will create an unique url
+                that anyone can open!</p>
+            </md-card-content>
+        </md-card>
+        
     </md-content>
-    
-    <md-subheader class="md-primary" style="background-color: #eee;">
-        <span flex="80">File Name</span>
-        <span flex="10">Unshare</span>
-        <span flex="10">Find</span>
+
+    <md-subheader ng-hide="share.files.length <= 0" class="md-primary" style="background-color: #eee;">
+        <div layout="row">
+            <div flex="80">
+                <span>File Name</span>
+            </div>
+            <div flex="10">
+                <span>Unshare</span>
+            </div>
+            <div flex="10">
+                <span>Find</span>
+            </div>
+        </div>
     </md-subheader>
     <md-content layout-padding>
         <md-list>

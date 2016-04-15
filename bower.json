@@ -9,7 +9,16 @@
     "angular-ui-router": "~0.2.16",
     "angular-material": "master",
     "ng-file-upload": "~11.2.3",
-    "angular-recaptcha": "~2.4.1"
+    "angular-recaptcha": "~2.4.1",
+    "videogular": "^1.4.1",
+    "videogular-controls": "^1.4.1",
+    "videogular-buffering": "^1.4.1",
+    "videogular-overlay-play": "^1.4.1",
+    "videogular-poster": "^1.4.1",
+    "videogular-ima-ads": "^1.4.1",
+    "videogular-angulartics": "^1.4.1",
+    "videogular-themes-default": "^1.4.1",
+    "ng-img-crop": "ngImgCrop#^0.3.2"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

@@ -11,6 +11,7 @@
   <!-- bower:css -->
   <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
   <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
+  <link rel="stylesheet" href="bower_components/ng-img-crop/compile/minified/ng-img-crop.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
@@ -25,6 +26,7 @@
 <body ng-app="goboxWebapp">
 
   <div layout-fill ui-view></div>
+  
 
   <!-- build:js(.) scripts/vendor.js -->
   <!-- bower:js -->
@@ -65,6 +67,7 @@
   <script src="bower_components/angulartics/src/angulartics-marketo.js"></script>
   <script src="bower_components/angulartics/src/angulartics-intercom.js"></script>
   <script src="bower_components/videogular-angulartics/vg-analytics.js"></script>
+  <script src="bower_components/ng-img-crop/compile/minified/ng-img-crop.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -83,13 +86,19 @@
   <script src="common/goboxapi/goboxfile.js"></script>
   <script src="common/goboxapi/goboxclient.js"></script>
   <script src="common/goboxapi/kind.js"></script>
+  <script src="common/goboxapi/mode.js"></script>
   
   <!-- Directive file list -->
   <script src="components/filelist/filelist.js"></script>
   <link rel="stylesheet" href="components/filelist/filelist.css" />
+  <link rel="stylesheet" href="states/login/login.css" type="text/css" />
+  <link rel="stylesheet" href="states/home/sidenav/sidenav.css" type="text/css" />
   
   <!-- Connection info dialog -->
   <script type="text/javascript" src="components/connectioninfo/info.js"></script>
+  
+  <!-- Connecton box -->
+  <script type="text/javascript" src="components/easyconnectionbox/easyconnectionbox.js"></script>
   
   <!-- Directive pwd -->
   <script src="components/pwd/pwd.js"></script>
@@ -112,14 +121,32 @@
   <!-- Filter icon file -->
   <script src="filters/iconfilter.js"></script>
   
+  <!-- Filter download link -->
+  <script type="text/javascript" src="filters/downloadlink.js"></script>
+  
   <!-- Component clipboard -->
   <script src="components/clipboard/clipboard.js"></script>
   
+  <!-- Preview components -->
   <!-- Previewer component (service) -->
   <script type="text/javascript" src="components/previewer/previewer.js"></script>
   
-  <!-- Utils -->
-  <script src="components/utils/utils.js"></script>
+  <!-- Preview directive -->
+  <script type="text/javascript" src="components/previewer/directive/preview.js"></script>
+  
+  <!-- Image preview -->
+  <script type="text/javascript" src="components/previewer/directive/image/image.js"></script>
+  
+  <!-- Music preview -->
+  <script type="text/javascript" src="components/previewer/directive/music/music.js"></script>
+  
+  <!-- Video preview -->
+  <script type="text/javascript" src="components/previewer/directive/video/video.js"></script>
+  
+  <!-- PDF preview -->
+  <script type="text/javascript" src="components/previewer/directive/pdf/pdf.js"></script>
+  
+  <!-- End preview Components -->
   
   <!-- Environment -->
   <script src="env.js"></script>
@@ -168,6 +195,7 @@
   
   <!-- Loading state -->
   <script type="text/javascript" src="states/home/loading/loading.js"></script>
+  
   
 </body>
 

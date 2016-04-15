@@ -1,0 +1,23 @@
+<md-content layout="column" layout-fill>
+    
+    <md-subheader class="md-primary" style="background-color: #eee;">
+        <span flex="80">File Name</span>
+        <span flex="10">Download</span>
+        <span flex="10">Find</span>
+    </md-subheader>
+    <md-content layout-padding>
+        <md-list>
+            <md-list-item ng-repeat="file in files">
+                <span flex>{{file.getName()}}</span>
+                <md-button ng-href="{{file | downloadLink}}" class="md-icon-button">
+                    <md-icon>lock</md-icon>
+                    <md-tooltip>Unshare</md-tooltip>
+                </md-button>
+                <md-button ng-click="show(file)" class="md-icon-button">
+                    <md-icon>pageview</md-icon>
+                    <md-tooltip>Show file</md-tooltip>
+                </md-button>
+            </md-list-item>
+        </md-list>
+    </md-content>
+</md-content>

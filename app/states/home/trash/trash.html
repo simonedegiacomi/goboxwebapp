@@ -1,0 +1,25 @@
+<md-content layout="column" layout-fill>
+    
+    <md-button ng-click="emptyTrash()">Empty Trash</md-button>
+    
+    <md-subheader class="md-primary" style="background-color: #eee;">
+        <span flex="80">File Name</span>
+        <span flex="10">Recover</span>
+        <span flex="10">Delete</span>
+    </md-subheader>
+    <md-content layout-padding>
+        <md-list>
+            <md-list-item ng-repeat="file in files">
+                <span flex>{{file.getName()}}</span>
+                <md-button ng-click="recover(file)" class="md-icon-button">
+                    <md-icon>undo</md-icon>
+                    <md-tooltip>Recover</md-tooltip>
+                </md-button>
+                <md-button ng-click="delete(file)" class="md-icon-button">
+                    <md-icon>delete_forever</md-icon>
+                    <md-tooltip>Delete File</md-tooltip>
+                </md-button>
+            </md-list-item>
+        </md-list>
+    </md-content>
+</md-content>

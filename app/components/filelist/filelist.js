@@ -18,12 +18,12 @@ angular.module('goboxWebapp')
         
         // Function called when a file is clicked
         // TODO: move this low level login is a dedicate directive
-        $scope.click = function(file) {
+        $scope.click = function(file, $event) {
             
             if(lastClickedFile == file && Date.now() - lastClick <= 300) { // Double click
             
                 // And then call the correct clipboard method
-                Clipboard.doubleClick(file);
+                Clipboard.doubleClick(file, $event);
             } else {
                 
                 lastClick = Date.now();

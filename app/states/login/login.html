@@ -1,18 +1,3 @@
-<style>
-    .login-container {
-        background-image: url("images/login_background.jpg");
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-        background-size: cover;
-    }
-    
-    .center-captcha {
-        text-align: center;
-        margin: 0 auto;
-    }
-</style>
-
 <md-container class="login-container" layout-fill layout="row" layout-align="center center">
     <!-- Login card -->
     <md-card style="width: 400px;">
@@ -34,6 +19,10 @@
         <md-card-content flex>
             <!-- First form for the login -->
             <form flex ng-if="state == 'welcome'" ng-submit="loginForm.$valid && login(user)" name="loginForm" layout="column" novalidate>
+                
+                <!-- User image -->
+                <img ng-show="user.name.length >= 4" ng-src="{{ '/api/user/image/' + user.name }}" class="login-avatar">
+                
                 <!-- Username -->
                 <md-input-container>
                     <label>Username</label>

@@ -1,15 +1,8 @@
 'use strict';
 
-/**
- * @author Degiacomi Simone
- * @name goboxWebapp.controller:SharedCtrl
- * @description
- * # SharedCtrl
- * Controller of the goboxWebapp
- */
 angular.module('goboxWebapp')
 
-.controller('ShareCtrl', function($scope, GoBoxClient, $utils, ToolbarManager) {
+.controller('ShareCtrl', function($scope, $state, $mdDialog, $mdToast, GoBoxClient, ToolbarManager) {
 
     $scope.share = {};
 
@@ -24,13 +17,13 @@ angular.module('goboxWebapp')
     ToolbarManager.showSearch(true);
     ToolbarManager.showTools(false);
     ToolbarManager.apply();
-    console.log("Fatto");
 
     $scope.unshare = function(file, evt) {
-        $utils.$mdDialog.show($utils.$mdDialog.confirm()
+        
+        $mdDialog.show($mdDialog.confirm()
                 .targetEvent(evt)
                 .ariaLabel("Unshare file")
-                .title("Unashare '" + file.getName() + "' ?")
+                .title("Unashare " + file.getName() + " ?")
                 .textContent("If you unshare this file the other people can't download it anymore")
                 .ok("Unshare File")
                 .cancel("Keep this file public")
@@ -39,15 +32,16 @@ angular.module('goboxWebapp')
                 GoBoxClient.getSharedFiles().then(function(files) {
                     $scope.share.files = files;
                 });
-                $utils.$mdToast.showSimple("File unshared");
+                $mdToast.showSimple("File unshared");
             }, function () {
-                $utils.$mdToast.showSimple("Sorry, can't unshare!");
+                $mdToast.showSimple("Sorry, can't unshare!");
             });
         });
     };
 
     $scope.show = function(file) {
-        $utils.$state.go('home.files', {
+        
+        $state.go('home.files', {
             id: file.getId()
         });
     };

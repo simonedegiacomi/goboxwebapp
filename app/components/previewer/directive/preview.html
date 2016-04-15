@@ -1,0 +1,10 @@
+<md-content ng-switch on="preview.kind">
+    <music-preview ng-switch-when="audio" preview="preview"></music-preview>
+    <image-preview ng-switch-when="image" preview="preview"></image-preview>
+    <video-preview ng-switch-when="video" preview="preview"></video-preview>
+    <pdf-preview ng-switch-when="pdf" preview="preview"></music-preview>
+    <md-content ng-switch-default>
+        <p>Preview not available</p>
+        <md-button ng-href="{{preview.link}}">Download</md-button>
+    </md-content>
+</md-content>

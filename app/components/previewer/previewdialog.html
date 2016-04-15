@@ -1,0 +1,21 @@
+<md-dialog>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-title>{{preview.file.getName()}} - Preview</md-title>
+            <span flex></span>
+            <md-button ng-click="close()" class="md-icon-button">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <preview preview="preview"></preview>
+    </md-dialog-content>
+
+    <md-dialog-actions>
+        <md-button ng-click="close()">Close</md-button>
+        <md-button ng-href="{{preview.link}}" class="md-primary">Download</md-button>
+    </md-dialog-actions>
+</md-dialog>

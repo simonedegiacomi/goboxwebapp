@@ -48,7 +48,7 @@ angular.module('goboxWebapp')
     };
     
     $scope.fileListConfig = {
-        mode: 'list'
+        mode: 'grid'
     };
 
 });

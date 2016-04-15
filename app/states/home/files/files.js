@@ -13,8 +13,10 @@ angular.module('goboxWebapp')
     // Clear the clipboard
     Clipboard.clear();
 
+    var dirId = $stateParams.id;
+
     // Function that retrieve the info about the file using the GoBoxClient
-    function loadDir(dirId) {
+    function loadDir() {
 
         GoBoxClient.getInfo(dirId).then(function(detailedFile) {
             $timeout(function() {
@@ -50,7 +52,7 @@ angular.module('goboxWebapp')
     }
 
     // Get the info now
-    loadDir($stateParams.id);
+    loadDir();
 
     // Register the listener for the sync events
     GoBoxClient.setSyncListener(function() {
@@ -91,15 +93,18 @@ angular.module('goboxWebapp')
         // Show the dialog
         $mdDialog.show(dialog).then(function(result) {
             
+            if (result.length <= 0)
+                return;
+            
             // Create the new folder
-            var newFolder = new GoBoxFile($scope.input.name);
+            var newFolder = new GoBoxFile(result);
             newFolder.setIsDirectory(true);
             newFolder.setFatherId($stateParams.id);
             
             // Call the API method to create the effective directory
             GoBoxClient.createFolder(newFolder).then(function() {
                 
-                $mdToast.showSimple("Directory " + $scope.input.name + " Created");
+                $mdToast.showSimple("Directory " + result + " Created");
                 loadDir();
             }, function() {
                 

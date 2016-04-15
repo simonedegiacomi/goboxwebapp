@@ -1,0 +1,26 @@
+<md-content layout="column">
+    <md-content>
+        <!--<img ng-src="{{preview.file | preview}}">-->
+    </md-content>
+    <md-content layout="row">
+        <md-content>{{preview.file.getName()}}</md-content>
+
+
+        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.min.css'" class="videogular-container audio">
+            <vg-media vg-src="player.src" vg-type="audio"></vg-media>
+
+            <vg-controls>
+                <vg-play-pause-button></vg-play-pause-button>
+                <vg-time-display>{{ currentTime | date:'mm:ss':'+0000' }}</vg-time-display>
+                <vg-scrub-bar>
+                    <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                </vg-scrub-bar>
+                <vg-time-display>{{ timeLeft | date:'mm:ss':'+0000' }}</vg-time-display>
+                <vg-volume>
+                    <vg-mute-button></vg-mute-button>
+                </vg-volume>
+            </vg-controls>
+        </videogular>
+
+    </md-content>
+</md-content>

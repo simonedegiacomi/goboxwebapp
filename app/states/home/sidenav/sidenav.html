@@ -1,18 +1,6 @@
-<style type="text/css">
-    .my-sidenav {
-        background-image: url('images/sidenav-background.png');
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-    
-    .active {
-        background-color: #267ED5 !important;
-    }
-</style>
-
 <md-toolbar class="md-toolbar-tools md-tall my-sidenav">
     <div layout="column">
-        <img ng-src="{{ '/api/user/image/' + user.getUsername() }}" width="64px" height="64px">
+        <img ng-src="{{ '/api/user/image/' + user.getUsername() }}" class="avatar">
         <div layout="row">
             <p>{{user.getUsername()}}</p>
         </div>
@@ -41,5 +29,13 @@
     </md-list>
 </md-content>
 <span flex layout-fill></span>
+
+
 <md-divider></md-divider>
+
+<!-- Upload box -->
 <upload-box></upload-box>
+
+<md-divider></md-divider>
+<!-- Easy Connection box -->
+<easy-connection-box ></easy-connection-box>

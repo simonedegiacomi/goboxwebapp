@@ -17,14 +17,14 @@ angular.module('goboxWebapp')
         var currentFolder = Clipboard.getCurrenFather();
 
         // If is a file instead of an array
-        if (angular.isArray(files)) {
+        if (!angular.isArray(files)) {
 
             // Insert the file into a new array
-            var file = files;
-            files = [file];
+            var temp = files;
+            files = [temp];
         }
 
-        angular.forEach(files, function(uploadfile) {
+        angular.forEach(files, function(file) {
 
             // Create a new upload object
             var upload = {

@@ -24,8 +24,16 @@ angular.module('goboxWebapp')
     }, {
         name: 'Shared',
         icon: 'share',
-        state: 'home.share',
-        divider: true,
+        state: 'home.share'
+    }, {
+        name: 'Recent',
+        icon: 'history',
+        state: 'home.recent'
+    }, {
+        name: 'Trash',
+        icon: 'delete',
+        state: 'home.trash',
+        divider: true
     }, {
         name: 'Search',
         icon: 'search',
@@ -33,19 +41,19 @@ angular.module('goboxWebapp')
     }, {
         name: 'Music',
         icon: 'library_music',
-        state: "home.music",
+        state: "home.filter({kind: 'audio'})",
     }, {
         name: 'Images',
         icon: 'photo_library',
-        state: "home.images",
+        state: "home.filter({kind: 'image'})",
     }, {
         name: 'Documents',
         icon: 'picture_as_pdf',
-        state: "home.documents",
+        state: "home.filter({kind: 'pdf'})",
     }, {
         name: 'Videos',
         icon: 'video_library',
-        state: "home.videos",
+        state: "home.filter({kind: 'video'})",
         divider: true
     }, {
         name: 'Settings',

@@ -13,22 +13,38 @@
             <md-icon>close</md-icon>
         </md-button>
     </md-toolbar>
-    <md-dialog-content ngf-drop="upload($files)" ngf-multiple="true" ngf-allow-dir="true" ngf-drag-over-class="'dragover'">
+    <md-dialog-content ngf-drop="uploadFile($files)" ngf-multiple="true" ngf-allow-dir="true" ngf-drag-over-class="'dragover'">
         <!-- Md content with the list -->
+
 
         <md-content ng-if="uploads.length > 0" layout-padding>
             <md-list>
-                <md-list-item layout="column" ng-repeat="upload in uploads" layout-padding>
-                    <span flex layout-fill>
-                        <md-icon>{{upload.file | iconFilter}}</md-icon>
-                        {{upload.file.name}}
-                        <span flex layout-fill></span>
-                    </span>
-                    <md-progress-linear ng-show="upload.pending" md-mode="determinate" value="{{upload.percentage}}"></md-progress-linear>
-                    <p>
-                        <span ng-show="upload.uploaded">Completated</span>
-                        <span ng-show="upload.error">Failed</span>
-                    </p>
+                <md-list-item ng-repeat="upload in uploads">
+                    <div layout="column" flex>
+                        <div layout="row">
+                            <!-- Icon -->
+                            <div flex="10">
+                                <md-icon>file_upload</md-icon>
+                            </div>
+                            <!-- Nome of the uplading file -->
+                            <div flex="auto">
+                                {{upload.file.name}}
+                            </div>
+                            
+                            <!-- Close icon button -->
+                            <div ng-if="upload.pending" ng-click="cancel(upload)" flex="10">
+                                <md-icon>close</md-icon>
+                            </div>
+                        </div>
+                        <div flex>
+                            <md-progress-linear ng-show="upload.pending" md-mode="determinate" value="{{upload.percentage}}"></md-progress-linear>
+                        </div>
+                        <!-- Result text -->
+                        <div ng-hide="upload.pending">
+                            <span ng-show="upload.uploaded">Completated</span>
+                            <span ng-show="upload.error">Failed</span>
+                        </div>
+                    </div>
                 </md-list-item>
             </md-list>
         </md-content>
@@ -37,10 +53,10 @@
         <!-- Md content with the message -->
         <md-content ng-if="uploads.length <= 0" layout-padding>
             <p>No uploads in queue!</p>
-            <p>Use the button od drop  to upload a new file!</p>
+            <p>Use the button od drop to upload a new file!</p>
         </md-content>
     </md-dialog-content>
     <md-dialog-actions layout="row">
-        <md-button ngf-select="upload($files)" class="md-raised md-primary" multiple>Upload File</md-button>
+        <md-button ngf-select="uploadFile($files)" class="md-raised md-primary" multiple>Upload File</md-button>
     </md-dialog-actions>
 </md-dialog>

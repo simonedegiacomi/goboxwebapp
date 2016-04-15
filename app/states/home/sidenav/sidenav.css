@@ -1,0 +1,15 @@
+.my-sidenav {
+    background-image: url('images/sidenav-background.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.active {
+    background-color: #267ED5 !important;
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 100%;
+}

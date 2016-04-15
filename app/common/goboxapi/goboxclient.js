@@ -8,7 +8,7 @@
  */
 angular.module('goboxWebapp')
 
-.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, Upload) {
+.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, GoBoxMode, Upload) {
 
     // Last state of the client
     this._lastState = GoBoxState.NOT_INITIALIZED;
@@ -24,6 +24,12 @@ angular.module('goboxWebapp')
 
     // Uploads queue
     this._uploads = [];
+
+    // The default mode is the bridge
+    this._mode = GoBoxMode.BRIDGE;
+
+    // When the client start, the base is the main server
+    this._base = Env.base;
 
     var self = this;
 
@@ -45,19 +51,6 @@ angular.module('goboxWebapp')
 
         // Add on 'open' listener
         ws.on('open', function() {
-
-            // Prepare the auth result listener
-            ws.on('authentication', function(data) {
-
-                if (!data.result) {
-
-                    // The connection is not authorized, so remove auth
-                    self._auth = null;
-
-                    // And change state
-                    self.notifyState('error');
-                }
-            });
 
             // Prepare the storag info listener
             ws.on('storageInfo', function(info) {
@@ -105,6 +98,77 @@ angular.module('goboxWebapp')
 
         // Change the state of the client
         self.notifyState(GoBoxState.NOT_INITIALIZED);
+    };
+
+    // Switch to the direct connection.
+    this.switch = function(mode) {
+        
+        // Prepare the promise
+        var future = $q.defer();
+        
+        if (mode == GoBoxMode.BRIDGE) {
+            
+            // Set the default base url
+            self._base = Env.Base;
+            
+            // And change the flag
+            self._mode = mode;
+            // Complete the promise
+            future.resolve();
+            
+            return future;
+        }
+
+        // Make the request to get the token and the address
+        $http.get(Env.base + 'api/directConnection').then(function(response) {
+
+            var data = response.data;
+            
+            // Create the address
+            var finalAddress = mode == GoBoxMode.LOCAL ? data.localIP : data.publicIP;
+            var finalPort = data.port;
+
+            // Create the url
+            var directBaseUrl = 'https://' + finalAddress + ':' + finalPort;
+
+            // Prepare the request
+            var req = {
+                temporaryToken: data.temporaryToken
+            };
+
+            self._do(function() {
+                
+                // Make the requst
+                $http({
+                    url: directBaseUrl + '/directLogin',
+                    data: req,
+                    method: 'POST'
+                }).then(function() {
+
+                    // Wow, it works! change the flag
+                    self._mode = mode;
+                    
+                    // And the download base url
+                    self._base = directBaseUrl;
+
+                    future.resolve(directBaseUrl);
+                }, function(error) {
+
+                    // Ops...
+                    future.reject(directBaseUrl);
+                });
+
+            }, function() {
+
+                future.reject('not found');
+            });
+        });
+        return future.promise;
+    };
+    
+    this.getConnectionMode = function () {
+        
+        return self._mode;
     };
 
     /**
@@ -262,7 +326,7 @@ angular.module('goboxWebapp')
      */
     this.getInfo = function(fileId) {
 
-        // Prepare the primise
+        // Prepare the promise
         var future = $q.defer();
 
         // Get the cached value
@@ -325,8 +389,8 @@ angular.module('goboxWebapp')
         var req = {
             kind: kind,
             keyword: keyword,
-            from: start ? start : 0,
-            size: size ? size : 50
+            from: start || 0,
+            size: size || 50
         };
 
         self._do(function() {
@@ -346,6 +410,60 @@ angular.module('goboxWebapp')
                     future.resolve(wrapped);
                 }
             });
+        });
+
+        return future.promise;
+    };
+
+    /**
+     * Get the list of the recent files
+     */
+    this.getRecentFiles = function(start, size) {
+
+        // Prepare the promise
+        var future = $q.defer();
+
+        var req = {
+            from: start || 0,
+            size: size || 50
+        };
+
+        self._do(function() {
+
+            self._ws.query('recent', req).then(function(res) {
+                if (res.error)
+                    future.reject();
+                else {
+
+                    // Wrap the files
+                    return GoBoxFile.wrap(res.files);
+                }
+            });
+        });
+        return future.promise;
+    };
+
+    /**
+     * Get the list of the deleted files
+     */
+    this.getTrashedFiles = function(start, size) {
+
+        // Prepare the promise
+        var future = $q.defer();
+
+        var req = {
+            from: start || 0,
+            size: size || 50
+        };
+
+        self._ws.query('trashedFiles', req).then(function(res) {
+            if (res.error)
+                future.reject();
+            else {
+
+                // Wrap the files
+                return GoBoxFile.wrap(res.files);
+            }
         });
 
         return future.promise;
@@ -382,7 +500,7 @@ angular.module('goboxWebapp')
      * This function talk with the storage and remove the file
      * or directory. If it's a directory also all the children are removed
      */
-    this.remove = function(fileToRemove) {
+    this.trash = function(fileToTrash) {
 
         // Prepare the promise
         var future = $q.defer();
@@ -390,11 +508,12 @@ angular.module('goboxWebapp')
         self._do(function() {
 
             // Make the query
-            self._ws.query('removeFile', fileToRemove).then(function(res) {
+            self._ws.query('trashFile', fileToTrash).then(function(res) {
+
                 if (res.success) {
 
                     // Update the cache
-                    self._caches.remove(fileToRemove.getId());
+                    self._caches.remove(fileToTrash.getId());
 
                     future.resolve();
                 }
@@ -403,7 +522,86 @@ angular.module('goboxWebapp')
                     future.reject();
                 }
             });
-        })
+        });
+
+        return future.promise;
+    };
+
+    /**
+     * Delete thespecified file. If the file was in the trash, the file will be removed.
+     * If the file wasn't in the trash the file is removed anyway, and cennot be recovered
+     */
+    this.delete = function(fileToDelete) {
+
+        // Preprare the promise
+        var future = $q.defer();
+
+        self._do(function() {
+
+            self._ws.query('delete', fileToDelete).then(function(response) {
+
+                if (response.deleted) {
+
+                    future.resolve();
+                }
+                else {
+
+                    future.reject();
+                }
+            });
+        });
+
+        return future.promise;
+    };
+
+    /**
+     * Empty the trash
+     */
+    this.emptyTrash = function() {
+
+        // Prepare the promise
+        var future = $q.defer();
+
+        self._do(function() {
+
+            // Make the query
+            self._ws.query('emptyTrash').then(function(response) {
+
+                if (response.success) {
+
+                    future.resolve();
+                }
+                else {
+
+                    future.reject();
+                }
+            });
+        });
+
+        return future.promise;
+    };
+
+    /**
+     * Recover a trashed file
+     */
+    this.recover = function(fileToRecover) {
+
+        // Prepare the promise
+        var future = $q.defer();
+
+        self._do(function() {
+
+            self._ws.query('recover', fileToRecover).then(function(response) {
+
+                if (response.success) {
+
+                    future.resolve();
+                }
+                else {
+                    future.reject();
+                }
+            });
+        });
 
         return future.promise;
     };
@@ -421,8 +619,10 @@ angular.module('goboxWebapp')
 
             // Make the query
             self._ws.query('copyOrCutFile', {
-                id: file.getId(),
-                fatherId: newFather.getId(),
+
+                // TODO: change in the storage
+                file: file,
+                newFather: newFather,
                 cut: cut
             }).then(function(result) {
 
@@ -465,27 +665,34 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Update the information of the specified file. Don't use this
+     * Rename the specified file. Don't use this
      * to update the 'real' file.
      */
-    this.update = function(file) {
+    this.rename = function(file, newName) {
 
         // Prepare the promise
         var future = $q.defer();
 
+        // Prepare the query
+        var query = {
+            file: file,
+            newName: newName
+        };
+
         self._do(function() {
-            self._ws.query('update', file).then(function(res) {
-                
+            self._ws.query('rename', query).then(function(res) {
+
                 if (res.success) {
-                    
+
                     // Invalidate the caches
                     self._caches.remove(file.getId());
-                    
+
                     // And also the cache of the file
                     self._caches.remove(file.getFatherId());
-                    
+
                     future.resolve();
-                } else
+                }
+                else
                     future.reject();
             });
         });
@@ -497,18 +704,18 @@ angular.module('goboxWebapp')
      * Get the list of the shared files
      */
     this.getSharedFiles = function() {
-        
+
         var future = $q.defer();
-        
+
         self._do(function() {
-            
+
             // Make the query
             self._ws.query('getSharedFiles').then(function(share) {
-                
+
                 future.resolve(GoBoxFile.wrap(share.files));
             });
         });
-        
+
         return future.promise;
     };
 
@@ -516,21 +723,21 @@ angular.module('goboxWebapp')
      * Estimates the ping of the connection to the storage
      */
     this.ping = function() {
-        
+
         // Prepare the promise
         var future = $q.defer();
-        
+
         // Date whem the ping query was made
         var sentDate = new Date();
-        
+
         self._do(function() {
-            
+
             self._ws.query('ping').then(function() {
-                
+
                 future.resolve(new Date().getTime() - sentDate.getTime());
             });
         });
-        
+
         return future.promise;
     };
 
@@ -538,12 +745,12 @@ angular.module('goboxWebapp')
      * Get the private download link
      */
     this.getDownloadLink = function(file) {
-        
-        return Env.base + "api/transfer/fromStorage?ID=" + file.getId();
+
+        return self._base + "api/transfer/fromStorage?ID=" + file.getId();
     };
 
     this.getPreviewLink = function(file) {
-        
+
         return self.getDownloadLink(file) + "&preview=true";
     };
 
@@ -559,7 +766,7 @@ angular.module('goboxWebapp')
         };
 
         self._do(function() {
-            
+
             self._ws.query('share', req).then(function(res) {
                 if (res.success)
                     future.resolve(res.link);
@@ -572,42 +779,42 @@ angular.module('goboxWebapp')
     };
 
     this.unshare = function(file) {
-        
+
         return this.share(file, false);
     };
 
     this.uploadFile = function(file, fatherId) {
-        
+
         // Prepare the promise
         var future = $q.defer();
-        
+
         // Create the logic representation of the new file
         var gbFile = new GoBoxFile(file.name);
-        
+
         // Set his father id
         gbFile.setFatherId(fatherId);
-        
+
         // And the other informations
         gbFile.setIsDirectory(false);
         gbFile.setMime(file.type);
 
         // Make the request
         Upload.http({
-            
+
             // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
             url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
             data: file
         }).then(function(response) {
-            
+
             future.resolve();
         }, function(response) {
-            
+
             future.reject();
         }, function(evt) {
-            
+
             // Calculate the progress percentage
             var percentage = Math.min(100, parseInt(100.0 * evt.loaded / evt.total, 10));
-            
+
             future.notify(percentage);
         });
         return future.promise;

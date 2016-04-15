@@ -1,0 +1,25 @@
+<style>
+
+</style>
+
+
+<div layout="row">
+
+    <!-- Bridge mode -->
+    <md-button ng-click="switchTo('bridge')" class="md-icon-button" ng-class="{'md-primary': mode == 'bridge'}" flex="auto">
+        <md-tooltip>Bridge Connection</md-tooltip>
+        <md-icon>domain</md-icon>
+    </md-button>
+
+    <!-- Direct mode -->
+    <md-button ng-click="switchTo('direct')" class="md-icon-button" ng-class="{'md-primary': mode == 'direct'}" flex="auto">
+        <md-tooltip>Direct Connection</md-tooltip>
+        <md-icon>import_export</md-icon>
+    </md-button>
+
+    <!-- Local direct mode -->
+    <md-button class="md-icon-button" ng-class="{'md-primary': mode == 'local'}" ng-click="switchTo('local')" flex="auto">
+        <md-tooltip>Local Direct Connection</md-tooltip>
+        <md-icon>home</md-icon>
+    </md-button>
+</div>

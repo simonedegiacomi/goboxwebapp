@@ -10,24 +10,24 @@
  */
 angular.module('goboxWebapp')
 
-.service('Clipboard', function($q, $utils, GoBoxFile, GoBoxClient) {
+.service('Clipboard', function($q, $mdToast, $mdDialog, GoBoxFile, GoBoxClient) {
 
     // Current folder
     var currentFather;
-    
+
     // Selected files
     var files = [];
-    
+
     // Hold files, when the copy or cut button is pressed
     var holdFiles = [];
-    
+
     // Listeners for a click event
     var listeners = [];
-    
+
     // Double click listener
     var open;
     var state;
-    
+
     var self = this;
 
     // Call all the listeners
@@ -50,12 +50,12 @@ angular.module('goboxWebapp')
     this.setCurrentFather = function(father) {
         currentFather = father;
     };
-    
+
     // Single click event. UPdate the selected file list and call the listeners.
     // It should be called with the value of the ctrl key button
     this.singleClick = function(file) {
-        
-        if(file.selected)
+
+        if (file.selected)
             files.splice(files.indexOf(file), 1);
         else
             files.push(file);
@@ -64,8 +64,8 @@ angular.module('goboxWebapp')
     };
 
     // Double click event, call the open listener
-    this.doubleClick = function(file) {
-        open(file);
+    this.doubleClick = function(file, $event) {
+        open(file, $event);
     };
 
     // Change the open function, the double click listener
@@ -106,8 +106,8 @@ angular.module('goboxWebapp')
 
     this.isSingleFileSelected = function() {
         var count = 0;
-        for(var i = 0;i < files.length && count <= 2; i++)
-            if(files[i].selected)
+        for (var i = 0; i < files.length && count <= 2; i++)
+            if (files[i].selected)
                 count++;
         return count == 1;
     };
@@ -128,42 +128,88 @@ angular.module('goboxWebapp')
 
     this.copyFile = function() {
         self.holdState('copy');
-        $utils.$mdToast.showSimple("Copied to clipboard");
+        $mdToast.showSimple("Copied to clipboard");
     };
 
     this.cutFile = function() {
         self.holdState('cut');
-        $utils.$mdToast.showSimple("Hold in clipboard");
+        $mdToast.showSimple("Hold in clipboard");
     };
 
-    this.deleteFile = function() {
-        // TODO show dialog
-        for (var i in files)
-            GoBoxClient.remove(files[i]).then(function() {
-                $utils.$mdToast.showSimple("File " + files[i].getName() + " deleted!");
+    this.tashFiles = function() {
+
+        // Prepare the dialog
+        var dialog = $mdDialog.confirm()
+            .title('Delete ?' + files.length > 1 ? 'files' : 'file')
+            .textContent('Are you sure you want to delete ' + files.length > 1 ? (files.length + ' files') : files[0].name  + ' ?')
+            .ariaLabel('Delete File')
+            .ok('Delete')
+            .cancel('Don\'t Delete');
+
+        // Show the dialog
+        $mdDialog.show(dialog).then(function(newName) {
+            
+            // Delete each file
+            for (var i in files) {
+                
+                GoBoxClient.trash(files[i]).then(function() {
+                    
+                    $mdToast.showSimple("File " + files[i].getName() + " deleted!");
+                }, function() {
+                    
+                    $mdToast.showSimple("Sorry, can't delete " + files[i].getName());
+                });
+            }
+        });
+
+    };
+
+    this.renameFile = function() {
+
+        // Get  the file to rename
+        var fileToRename = files[0];
+
+        // Create the dialog
+        var dialog = $mdDialog.prompt()
+            .title("Rename File")
+            .textContent("Choose the new name of the file")
+            .placeholder(fileToRename.getName())
+            .ariaLabel("Rename File")
+            .ok("Rename")
+            .cancel("Cancel");
+
+        // Show the dialog
+        $mdDialog.show(dialog).then(function(newName) {
+
+            GoBoxClient.rename(fileToRename, newName).then(function() {
+
+                $mdToast.showSimple("File updated");
             }, function() {
-                $utils.$mdToast.showSimple("Sorry, can't delete " + files[i].getName());
+
+                $mdToast.showSimple(("Canot rename the file"));
             });
+        });
     };
 
     this.shareFile = function() {
 
         // Take the first selected file
         var file = files[0];
-        
+
         // Use the client object to share the file
         GoBoxClient.share(file, true).then(function(url) {
+            
             // Show an alert with the link to the shared file
-            $utils.$mdDialog.show(
-                $utils.$mdDialog.alert()
+            var alert = $mdDialog.alert()
                 .clickOutsideToClose(true)
                 .title('Shared file Link')
                 .textContent('The public link of the file is: ' + url)
                 .ariaLabel('File shared')
-                .ok('Ok')
-            );
+                .ok('Ok');
+            
+            $mdDialog.show(alert);
         }, function() {
-            $utils.$mdToast.showSimple("Sorry, can't share " + file.getName());
+            $mdToast.showSimple("Sorry, can't share " + file.getName());
         });
     };
 });

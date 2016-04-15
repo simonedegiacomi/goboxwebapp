@@ -1,0 +1,27 @@
+.login-container {
+        background-image: url("/images/login_background.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        background-size: cover;
+    }
+    
+.center-captcha {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.login-container {
+  background: #eee;
+}
+
+.login-card {
+  width: 380px;
+}
+
+.login-avatar {
+    width: 128px;
+    height: 128px;
+    margin: auto;
+    border-radius: 100%;
+}

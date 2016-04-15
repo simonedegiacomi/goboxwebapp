@@ -2,10 +2,10 @@
 
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function(Clipboard, Previewer) {
+.controller('HomeCtrl', function(Clipboard, Previewer, $state) {
 
     // Set the default function to call when a file is double clicked
-    Clipboard.setOpenAction(function(file) {
+    Clipboard.setOpenAction(function(file, $event) {
         
         // If the file is a directory, show that directory
         if (file.isDirectory) {
@@ -16,7 +16,7 @@ angular.module('goboxWebapp')
         } else {
             
             // Otherwise show the preview
-            Previewer.show(file);
+            Previewer.show($event, file);
         }
     });
 

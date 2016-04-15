@@ -1,6 +1,6 @@
 'use strict';
 
-/**
+/** 
  * @author Degiacomi Simone
  * @name goboxWebappApp
  * @description
@@ -11,11 +11,13 @@
 angular
     .module('goboxWebapp', [
         'ngAnimate',
+        'ngImgCrop',
         'ui.router',
         'ngMaterial',
         'ngMessages',
         'ngFileUpload',
         'vcRecaptcha',
+        'ngSanitize',
         'com.2fdevs.videogular',
         'com.2fdevs.videogular.plugins.controls',
         'com.2fdevs.videogular.plugins.overlayplay',
@@ -117,71 +119,12 @@ angular
             connected: true,
         }
     })
-
-    // All this states are now simple filters. The folter in this case sow the files
-    // in a grid view. all the preview are dialogs, except for the music that will use
-    // a some background manager that insert a toolbar a the bottom of the page
-    // .state('home.images', {
-    //     url: '/images',
-    //     views: {
-    //         'main@home': {
-    //             templateUrl: 'views/home.images.html',
-    //             controller: 'ImagesCtrl'
-    //         }
-    //     },
-    //     access: {
-    //         restricted: true,
-    //         connected: true,
-    //     }
-    // })
-
-    // .state('home.videos', {
-    //     url: '/videos',
-    //     views: {
-    //         'main@home': {
-    //             templateUrl: 'views/home.videos.html',
-    //             controller: 'VideosCtrl'
-    //         }
-    //     },
-    //     access: {
-    //         restricted: true,
-    //         connected: true,
-    //     }
-    // })
-
-    // .state('home.music', {
-    //     url: '/music',
-    //     views: {
-    //         'main@home': {
-    //             templateUrl: 'views/home.music.html',
-    //             controller: 'MusicCtrl'
-    //         }
-    //     },
-    //     access: {
-    //         restricted: true,
-    //         connected: true,
-    //     }
-    // })
-
-    // .state('home.documents', {
-    //     url: '/documents',
-    //     views: {
-    //         'main@home': {
-    //             templateUrl: 'views/home.videos.html',
-    //             controller: 'DocumentsCtrl'
-    //         }
-    //     },
-    //     access: {
-    //         restricted: true,
-    //         connected: true,
-    //     }
-    // })
     
     .state('home.recent', {
         url: '/recent',
         views: {
             'main@home': {
-                templateUrl: 'states/home/recent/recent.js',
+                templateUrl: 'states/home/recent/recent.html',
                 controller: 'RecentCtrl'
             }
         },
@@ -193,10 +136,10 @@ angular
 
 
     .state('home.trash', {
-        url: '/recent',
+        url: '/trash',
         views: {
             'main@home': {
-                templateUrl: 'states/home/trash/trash.js',
+                templateUrl: 'states/home/trash/trash.html',
                 controller: 'TrashCtrl'
             }
         },
@@ -265,6 +208,7 @@ angular
         // when the state change
         switch (newState) {
             case 'ready':
+                
                 // If now the GoBoxClient is ready let the user see his files
                 if (angular.isDefined(lastToState.state))
                     $state.go(lastToState.state, lastToState.params);
@@ -272,13 +216,14 @@ angular
                     $state.go('home.files', {
                         id: 1
                     });
+                    
                 break;
             case 'noStorage':
                 retryConnect();
                 break;
             case 'error':
                 // If the initialization has failed, show the error
-                $state.go('home.error');
+                //$state.go('home.error');
                 break;
         }
     });
@@ -375,6 +320,7 @@ angular
             });
 
         }, function(response) {
+            
             $state.go('login');
         });
 
