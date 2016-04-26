@@ -9,37 +9,30 @@ angular.module('goboxWebapp')
 
     // constructor
     var GoBoxAuth = function() {
-
         this._valid = false;
     };
 
     GoBoxAuth.prototype.setUsername = function(username) {
-
         this._username = username;
     };
 
     GoBoxAuth.prototype.getUsername = function() {
-
         return this._username;
     };
 
     GoBoxAuth.prototype.setEmail = function(email) {
-
         this._email = email;
     };
 
     GoBoxAuth.prototype.getEmail = function() {
-
         return this.email;
     };
 
     GoBoxAuth.prototype.setPassword = function(password) {
-
         this._password = password;
     };
 
     GoBoxAuth.prototype.getPassword = function() {
-
         return this._password;
     };
 
@@ -92,6 +85,7 @@ angular.module('goboxWebapp')
      */
     GoBoxAuth.prototype.logout = function() {
 
+        this._valid = false;
         delete this._token;
         delete this._username;
         delete this._password;
@@ -130,10 +124,18 @@ angular.module('goboxWebapp')
     /**
      * Check if a the session is still valid
      */
-    GoBoxAuth.prototype.check = function() {
+    GoBoxAuth.prototype.isLogged = function() {
         
         // Prepare the promise
         var future = $q.defer();
+        
+        // If the auth is already verified
+        if (this._valid) {
+            
+            // Resolve immediately the promise
+            future.resolve(true);
+            return future.promise;
+        }
 
         // Prepare the request
         var request = {
@@ -183,11 +185,6 @@ angular.module('goboxWebapp')
         });
 
         return future.promise;
-    };
-
-    // Check if this is usefull or not
-    GoBoxAuth.prototype.isValid = function() {
-        return this._valid;
     };
 
     /**
