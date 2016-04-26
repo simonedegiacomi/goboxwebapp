@@ -54,20 +54,17 @@ angular.module('goboxWebapp')
 
             // Prepare the storag info listener
             ws.on('storageInfo', function(info) {
-
                 self.notifyState(info.connected ? GoBoxState.READY : GoBoxState.NO_STORAGE);
             });
         });
 
         // Websocket closed
         ws.on('close', function() {
-
             self.notifyState('error');
         });
 
         // Websocket error
         ws.on('error', function() {
-
             self.notifyState('error');
         });
 
@@ -94,10 +91,10 @@ angular.module('goboxWebapp')
     this.reset = function() {
 
         // Close the websocket
-        self.ws.close();
+        this._ws.close();
 
         // Change the state of the client
-        self.notifyState(GoBoxState.NOT_INITIALIZED);
+        this.notifyState(GoBoxState.NOT_INITIALIZED);
     };
 
     // Switch to the direct connection.
@@ -109,19 +106,17 @@ angular.module('goboxWebapp')
         if (mode == GoBoxMode.BRIDGE) {
             
             // Set the default base url
-            self._base = Env.Base;
+            this._base = Env.Base;
             
             // And change the flag
-            self._mode = mode;
-            // Complete the promise
-            future.resolve();
+            this._mode = mode;
             
+            future.resolve();
             return future;
         }
 
         // Make the request to get the token and the address
         $http.get(Env.base + 'api/directConnection').then(function(response) {
-
             var data = response.data;
             
             // Create the address
@@ -167,15 +162,15 @@ angular.module('goboxWebapp')
     };
     
     this.getConnectionMode = function () {
-        
-        return self._mode;
+        if (this._lastState != GoBoxState.READY)
+            return;
+        return this._mode;
     };
 
     /**
      * Set the sync event listener
      */
     this.setSyncListener = function(listener) {
-
         this._syncListener = listener;
     };
 
@@ -199,7 +194,6 @@ angular.module('goboxWebapp')
     };
 
     this.setAuth = function(newAuth) {
-
         this._auth = newAuth;
     };
 
@@ -268,7 +262,6 @@ angular.module('goboxWebapp')
      * Add a listener for the incoming event from the storage
      */
     this.onStateChange = function(listener) {
-
         this._stateListeners.push(listener);
     };
 
@@ -298,7 +291,6 @@ angular.module('goboxWebapp')
      * Return the state of this client
      */
     this.getState = function() {
-
         return this._lastState;
     };
 
@@ -477,9 +469,16 @@ angular.module('goboxWebapp')
         var future = $q.defer();
 
         self._do(function() {
+            
+            var req = {
+                father: {
+                    ID: file.getFatherId()
+                },
+                name: file.getName()
+            };
 
             // Make the query
-            self._ws.query('createFolder', file).then(function(res) {
+            self._ws.query('createFolder', req).then(function(res) {
                 if (res.created) {
 
                     // Invalidate the query of the father
@@ -505,7 +504,7 @@ angular.module('goboxWebapp')
         // Prepare the promise
         var future = $q.defer();
 
-        self._do(function() {
+        this._do(function() {
 
             // Make the query
             self._ws.query('trashFile', fileToTrash).then(function(res) {
