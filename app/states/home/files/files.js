@@ -7,6 +7,8 @@ angular.module('goboxWebapp')
 
 .controller('FileListCtrl', function($scope, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard, Previewer) {
 
+console.log("FILES");
+
     // Attach the clipboard to the scope
     $scope.Clipboard = Clipboard;
 
@@ -74,6 +76,7 @@ angular.module('goboxWebapp')
     ToolbarManager.showTools(true);
 
     // Finally refresh the toolbar
+    ToolbarManager.setVisibility(true);
     ToolbarManager.apply();
 
     // Functions of the fab buttons

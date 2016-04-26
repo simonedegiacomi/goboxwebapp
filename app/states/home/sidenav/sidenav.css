@@ -1,5 +1,5 @@
 .my-sidenav {
-    background-image: url('images/sidenav-background.png');
+    background: #0288D1 !important;
     background-repeat: no-repeat;
     background-position: center;
 }

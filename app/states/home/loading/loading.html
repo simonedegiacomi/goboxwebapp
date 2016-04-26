@@ -1,3 +1,25 @@
-<md-content>
-    <md-progress-circular flex class="center md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+<style>
+    .loading_card {
+        max-width: 800px;
+    }
+</style>
+<md-content layout-align="center center" layout-fill layout="row">
+    <md-card class="loading_card">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <md-title>Connecting to your storage</md-title>
+            </div>
+        </md-toolbar>
+        <md-card-content>
+            <md-content layout="row">
+                <md-content>
+                    <md-progress-circular flex class="center md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+                </md-content>
+                <md-content layout="column">
+                    <md-title>Connecting to your storage</md-title>
+                    <p>Check your Storage connection or go to the support page to.<br> If ypu haven't configured your storage yet, install the GoBoxClient</p>
+                </md-content>
+            </md-content>
+        </md-card-content>
+    </md-card>
 </md-content>

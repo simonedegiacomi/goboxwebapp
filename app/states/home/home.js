@@ -3,7 +3,7 @@
 angular.module('goboxWebapp')
 
 .controller('HomeCtrl', function(Clipboard, Previewer, $state) {
-
+    
     // Set the default function to call when a file is double clicked
     Clipboard.setOpenAction(function(file, $event) {
         

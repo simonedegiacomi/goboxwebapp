@@ -24,10 +24,19 @@ angular
         'com.2fdevs.videogular.plugins.buffering'
     ])
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, StateRule) {
 
     /**
      * Route config
+     * 
+     * The data field contains extra stuff used by this application, not by ui-router.
+     * If in the data object the object with the key access is present, this means that
+     * the access to that state is restriced by 2 rules:
+     * - logged: If the user should or must (not) be logged
+     * - clientReady: this indicate if the GoBoxClient can or must (not) be ready.
+     * 
+     * NB: If the clientReady property is set to must and the logged property is set
+     * to can or must not, the clientReady rule is ignored
      */
     $stateProvider
     // This state is active only when the user is not logged
@@ -35,9 +44,10 @@ angular
         url: '/login',
         templateUrl: 'states/login/login.html',
         controller: 'LoginCtrl',
-        access: {
-            restricted: false,
-            connected: false,
+        data: {
+            access: {
+                logged: StateRule.MUST_NOT // The user must not be logged
+            }
         }
     })
 
@@ -45,7 +55,13 @@ angular
     .state('public_file', {
         url: '/public_file/:hostName/:id',
         templateUrl: 'states/publicfile/publicfile.html',
-        controller: 'PublicFileCtrl'
+        controller: 'PublicFileCtrl',
+        data: {
+            access: {
+                logged: StateRule.CAN,
+                clientReady: StateRule.CAN
+            }
+        }
     })
 
     // This is the main state. When the user is logged this state is alway on.
@@ -66,9 +82,11 @@ angular
                 controller: 'ToolbarCtrl'
             }
         },
-        access: {
-            restricted: true,
-            connected: false,
+        data: {
+            access: {
+                logged: StateRule.MUST, // The client must be ready
+                clientReady: StateRule.MUST // The user must be logged
+            }
         }
     })
 
@@ -83,9 +101,8 @@ angular
                 controller: 'FileListCtrl'
             }
         },
-        access: {
-            restricted: true,
-            connected: true,
+        params: {
+            id: '1'
         }
     })
 
@@ -97,10 +114,6 @@ angular
                 templateUrl: 'states/home/share/share.html',
                 controller: 'ShareCtrl',
             }
-        },
-        access: {
-            restricted: true,
-            connected: true,
         }
     })
 
@@ -113,13 +126,9 @@ angular
                 templateUrl: 'states/home/filter/filter.html',
                 controller: 'FilterCtrl'
             }
-        },
-        access: {
-            restricted: true,
-            connected: true,
         }
     })
-    
+
     .state('home.recent', {
         url: '/recent',
         views: {
@@ -127,10 +136,6 @@ angular
                 templateUrl: 'states/home/recent/recent.html',
                 controller: 'RecentCtrl'
             }
-        },
-        access: {
-            restricted: true,
-            connected: true
         }
     })
 
@@ -142,13 +147,10 @@ angular
                 templateUrl: 'states/home/trash/trash.html',
                 controller: 'TrashCtrl'
             }
-        },
-        access: {
-            restricted: true,
-            connected: true
         }
     })
-    
+
+    // This state show the setting page
     .state('home.settings', {
         url: '/settings',
         views: {
@@ -157,178 +159,104 @@ angular
                 controller: 'SettingsCtrl'
             }
         },
-        access: {
-            restricted: true,
-            connected: false,
-        }
-    })
-
-    // This show the error message relative to the conneciton. Not sure
-    // if this is a view...
-    .state('home.error', {
-        url: '/error',
-        views: {
-            'main@home': {
-                templateUrl: 'states/home/error/error.html',
-                controller: 'ErrorCtrl'
+        data: {
+            access: {
+                clientReady: StateRule.CAN // The user can change settings even if
+                    // the client is not ready (but must be logged!).
             }
-        },
-        access: {
-            restricted: true,
-            connected: false,
-            preventLoop: true
         }
     })
 
-    .state('home.loading', {
+    // This state show the loading page with some information and istruction
+    .state('loading', {
         url: '/loading',
-        views: {
-            'main@home': {
-                templateUrl: 'states/home/loading/loading.html',
-                controller: 'LoadingCtrl'
+        controller: 'LoadingCtrl',
+        templateUrl: 'states/home/loading/loading.html',
+        data: {
+            access: {
+                logged: StateRule.MUST, // The user must be logged
+                clientReady: StateRule.MUST_NOT // The client must not be ready
             }
-        },
-        access: {
-            restricted: true,
-            connected: false,
-            preventLoop: true
         }
     });
 
-    $urlRouterProvider.otherwise("/login");
+    // The default state is the file list of the root
+    $urlRouterProvider.otherwise("/files");
 })
 
-.run(function($rootScope, GoBoxClient, $state, $timeout) {
+.run(function($rootScope, GoBoxClient, GoBoxState, $state, $timeout, StateRule) {
 
-    // This object contains the last state params before the state has changed
-    // not by the user
-    var lastToState = {};
-
-    GoBoxClient.onStateChange(function(newState) {
-        // when the state change
-        switch (newState) {
-            case 'ready':
-                
-                // If now the GoBoxClient is ready let the user see his files
-                if (angular.isDefined(lastToState.state))
-                    $state.go(lastToState.state, lastToState.params);
-                else
-                    $state.go('home.files', {
-                        id: 1
-                    });
-                    
-                break;
-            case 'noStorage':
-                retryConnect();
-                break;
-            case 'error':
-                // If the initialization has failed, show the error
-                //$state.go('home.error');
-                break;
-        }
-    });
-
+    // Configure routing policy
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
-        // TODO: clean this unredable code!
-        var access = toState.access;
-        
-        if(!angular.isDefined(access)) {
+
+        // If the login doesn't matter, let the user to the next state
+        if (toState.data.access.logged == StateRule.CAN) {
             return;
         }
-        
-        // Check if the user is authorized to access the next state
-        if (access.restricted == GoBoxClient.isLogged()) {
 
-            // If the next state is an error or loading state, i must not check the
-            // GoBoxClient state, otherwise i'll fall in a loop
-            if (access.preventLoop) {
+        GoBoxClient.getAuth().isLogged().then(function(logged) {
 
-                // Is at least the GoBoxClient trying to connect? Maybe (s)he
-                // typed the loading or error state url
-                if (GoBoxClient.getState() == 'notInitialized') {
-                    // Init
-                    GoBoxClient.init();
-                    // And show the loading state
-                    $state.go('home.loading');
-                }
+            // If the user is logged but the next state doesn't want it
+            if (logged && toState.data.access.logged == StateRule.MUST_NOT) {
+
+                // Go to the root file list
+                event.preventDefault();
+                $state.go('home.files');
                 return;
             }
 
-            if (toState.name == 'login')
-                return;
+            // If the user is not logged, but the state wants it
+            if (!logged && toState.data.access.logged == StateRule.MUST) {
 
-            if (!access.connected)
-                return;
-
-            // Ok, now i know that the user is logged, check if the GoBoxClient
-            // is ready.
-            switch (GoBoxClient.getState()) {
-                case 'ready':
-                    // Let the user go to the state (s)he wants
-                    break;
-                case 'error':
-                case 'noStorage':
-                    // Error view
-                    event.preventDefault();
-                    $state.go('home.error');
-                    break;
-
-                default:
-                    // No error? not ready? this means that the user needs to wait
-                    event.preventDefault();
-
-                    // Wait, let me save the 'toStateParams' before change the state
-                    // so i can redirect the user to the state he wants
-                    lastToState.state = toState.name;
-                    lastToState.params = toStateParams;
-
-                    $state.go('home.loading');
-                    break;
-            }
-            return;
-        }
-
-        // If is not authorized to ACCESS (this doesn't mean that is not loggged!)
-        // the next state, prevent the next state
-        event.preventDefault();
-        if (GoBoxClient.isLogged()) {
-
-            // If the user is logged and it was going to the 'login' state,
-            // redirect him to the home and show the root folder
-            $state.go('home.files', {
-                id: 1
-            });
-            return;
-        }
-
-        /**
-         * Check if there is an old session in the cookie
-         */
-        // TODO: Move the logic of this code to a service
-
-        GoBoxClient.getAuth().check().then(function(valid) {
-
-            if (!valid) {
-                // Redirect to the login
+                // Redirect to login
+                event.preventDefault();
                 $state.go('login');
                 return;
             }
 
-            // And redirect to the home
-            $state.go(toState, toStateParams, {
-                reload: true
-            });
+            // If the client state doesn't matter, go to the next state
+            if (toState.data.access.clientReady == StateRule.CAN) {
+                return;
+            }
 
-        }, function(response) {
-            
-            $state.go('login');
+            // If the client is not ready, but the next state wants it
+            if (!GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST) {
+
+                // Go to the loading state
+                event.preventDefault();
+                $state.go('loading');
+
+                // And try to connect
+                GoBoxClient.init().then(function() {
+
+                    // Connected! go to the home
+                    $state.go('home.files');
+                }, function() {
+
+                    // Not ready... retry soon
+                    $timeout(function() {
+                        $state.go('home.files');
+                    }, 5000);
+                });
+                return;
+            }
+
+            // If the client is ready but the state doesn't want it
+            if (GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST_NOT) {
+
+                // Redirect to the home
+                event.preventDefault();
+                $state.go('home.files');
+                return;
+            }
         });
 
     });
+})
 
-    function retryConnect() {
-        $timeout(function() {
-            GoBoxClient.init();
-        }, 5000);
-    }
+.config(function($mdThemingProvider) {
+    // Theme configuration
+    $mdThemingProvider.theme('default')
+        .primaryPalette('light-blue')
+        .accentPalette('deep-orange');
 });

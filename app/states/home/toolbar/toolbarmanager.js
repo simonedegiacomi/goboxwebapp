@@ -7,6 +7,9 @@ angular.module('goboxWebapp')
     // Listener for the toolbar config changes
     var listeners = [];
     
+    // Dafult show the toolbar
+    this._visibility = true;
+    
     // Call all the listeners
     function notify () {
         for(var i in listeners)
@@ -15,29 +18,24 @@ angular.module('goboxWebapp')
     
     // Set the type of title
     this.setTitle = function (titleConfig) {
-        
         this._titleconfig = titleConfig;
     };
     
     // Show the search icon
     this.showSearch = function (show) {
-        
         this._search = show;
     };
     
     this.getShowSearch = function () {
-        
         return this._search;
     };
     
     // Show the tools icon
     this.showTools = function (show) {
-        
         this._tools = show;
     };
     
     this.getShowTools = function () {
-        
         return this._tools;
     };
     
@@ -56,7 +54,14 @@ angular.module('goboxWebapp')
     
     // Register a new listener for the changes
     this.onChange = function (callback) {
-        
         listeners.push(callback);
+    };
+    
+    this.setVisibility = function (visibility) {
+        this._visibility = visibility;
+    };
+    
+    this.getVisibility = function () {
+        return this.visibility;
     };
 });

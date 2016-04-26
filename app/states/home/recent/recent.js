@@ -19,6 +19,7 @@ angular.module('goboxWebapp')
     });
     ToolbarManager.showSearch(true);
     ToolbarManager.showTools(false);
+    ToolbarManager.setVisibility(true)
     ToolbarManager.apply();
     
 });

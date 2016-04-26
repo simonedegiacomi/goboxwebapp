@@ -96,11 +96,11 @@ angular.module('goboxWebapp')
         auth.register($scope.reCaptcha.response).then(function(registered) {
 
             // Registered, now login
-            self.login();
+            self.login(user);
         }, function(error) {
 
             $scope.loading = false;
-            $mdToast.showSimple("Sorry, there was a problem...");
+            $mdToast.showSimple(error.data);
         });
     };
 

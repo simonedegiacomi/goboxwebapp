@@ -16,6 +16,7 @@ angular.module('goboxWebapp')
     });
     ToolbarManager.showSearch(true);
     ToolbarManager.showTools(false);
+    ToolbarManager.setVisibility(true);
     ToolbarManager.apply();
 
     $scope.unshare = function(file, evt) {

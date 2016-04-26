@@ -35,6 +35,7 @@ angular.module('goboxWebapp')
     // Configure the toolbar with the info of the toolbar manager
     function configFromManager() {
         
+        $scope.showToolbar = ToolbarManager.getVisibility();
         $scope.showTools = ToolbarManager.getShowTools();
         $scope.showSearchLink = ToolbarManager.getShowSearch();
         $scope.title = ToolbarManager.getTitle();

@@ -34,10 +34,10 @@ angular.module('goboxWebapp')
         icon: 'delete',
         state: 'home.trash',
         divider: true
-    }, {
-        name: 'Search',
-        icon: 'search',
-        state: "home.filter({kind: 'any'})",
+    // }, {
+    //     name: 'Search',
+    //     icon: 'search',
+    //     state: "home.filter({kind: 'any'})",
     }, {
         name: 'Music',
         icon: 'library_music',
@@ -55,10 +55,10 @@ angular.module('goboxWebapp')
         icon: 'video_library',
         state: "home.filter({kind: 'video'})",
         divider: true
-    }, {
-        name: 'Settings',
-        icon: 'settings',
-        state: 'home.settings'
+    // }, {
+    //     name: 'Settings',
+    //     icon: 'settings',
+    //     state: 'home.settings'
     }];
     
     // Item on the menu at the top of the sidenav
