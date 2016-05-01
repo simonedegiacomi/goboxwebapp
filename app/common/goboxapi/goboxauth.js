@@ -28,19 +28,11 @@ angular.module('goboxWebapp')
         return this.email;
     };
 
-    GoBoxAuth.prototype.setPassword = function(password) {
-        this._password = password;
-    };
-
-    GoBoxAuth.prototype.getPassword = function() {
-        return this._password;
-    };
-
     /**
      * Query the server and try to login. If the informations are correct
      * a new token is saved in this object. This function return a new promise.
      */
-    GoBoxAuth.prototype.login = function() {
+    GoBoxAuth.prototype.login = function(password, keepLogged) {
 
         // Create the new promise
         var future = $q.defer();
@@ -48,8 +40,9 @@ angular.module('goboxWebapp')
         // Create the request body
         var request = {
             username: this._username,
-            password: this._password,
+            password: password,
             type: 'C',
+            keepLogged: keepLogged | false,
             cookie: true
         };
 
@@ -97,7 +90,7 @@ angular.module('goboxWebapp')
     /**
      * Create a new user
      */
-    GoBoxAuth.prototype.register = function(reCaptcha) {
+    GoBoxAuth.prototype.register = function(password, reCaptcha) {
 
         // Create a ne wpromise
         var future = $q.defer();
@@ -105,7 +98,7 @@ angular.module('goboxWebapp')
         // Prepare the request body
         var request = {
             username: this._username,
-            password: this._password,
+            password: password,
             email: this._email,
             reCaptcha: reCaptcha
         };

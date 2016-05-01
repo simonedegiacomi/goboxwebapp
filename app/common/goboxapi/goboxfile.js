@@ -28,12 +28,12 @@ angular.module('goboxWebapp')
             file[key] = json[key];
             
         // Wrap the path
-        if(json.path)
+        if(angular.isDefined(json.path))
             for(var i in json.path)
                 file.path[i] = GoBoxFile.wrap(json.path[i]);
             
         // Finally wrap also his children
-        if(json.children)
+        if(angular.isDefined(json.children))
             for(var i in json.children)
                 file.children[i] = GoBoxFile.wrap(json.children[i]);
                 
@@ -53,11 +53,9 @@ angular.module('goboxWebapp')
         if(this._cachedPath == undefined) {
             
             // Angular loop reason
-            // TODO: Document this
             var temp = this._cachedPath = [];
             Array.prototype.push.apply(temp, this.path);
-            if(this.ID != 1)
-                temp.push(this);
+            temp.push(this);
         }
         return this._cachedPath;
     };
@@ -88,10 +86,6 @@ angular.module('goboxWebapp')
     
     GoBoxFile.prototype.setIsDirectory = function (value) {
         this.isDirectory = value;  
-    };
-    
-    GoBoxFile.prototype.isDirectory = function () {
-        return angular.isDefined(this.isDirectory) ? this.isDirectory : false;
     };
     
     GoBoxFile.prototype.hasChild = function (child) {

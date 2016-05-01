@@ -1,101 +1,101 @@
-<style>
-    .center-card {
-        position: relative;
-        margin: 0;
-    }
-    
-    .cropArea {
-        overflow: hidden;
-        width: 500px;
-        height: 350px;
-    }
-</style>
+<md-content layout-align="center" layout-fill layout="row">
+    <md-content layout="column" class="setting-card" layout-fill flex>
 
-<md-content layout="column" layout-fill>
+        <!-- Card to alert the user if the Storage is not connected -->
+        <md-card ng-hide="clientReady">
+            <md-toolbar class="md-toolbar-tools md-warn">
+                <md-title>Storage not connected</md-title>
+            </md-toolbar>
+            <md-card-content>
+                <p>This client is not connected to your storage, but you can change the account settings anyway. If you want to go to connect and your files click the button below</p>
+                <md-button ui-sref="home.files">Connect</md-button>
+            </md-card-content>
+        </md-card>
 
-    <!-- Password Change -->
-    <md-card>
-        <md-toolbar class="md-toolbar-tools">
-            <md-title>Change Password</md-title>
-        </md-toolbar>
+        <!-- Password Change -->
+        <md-card>
+            <md-toolbar class="md-toolbar-tools">
+                <md-title>Change Password</md-title>
+            </md-toolbar>
 
-        <md-card-content>
-            <p>Change the password of your account</p>
-            <div layout="column">
-                <div layout="row">
-                    <md-input-container flex="auto">
-                        <label>Old Password</label>
-                        <input type="password" ng-model="password.old">
-                    </md-input-container>
-
-                    <md-input-container flex="auto">
-                        <label>New Password</label>
-                        <input type="password" ng-model="password.new">
-                    </md-input-container>
-                </div>
-                <div layout="row">
-                    <span flex></span>
-                    <md-button class="md-raised md-warn" ng-click="password.change()">Change</md-button>
-                </div>
-            </div>
-            <md-progress-circular ng-if="password.loading" class="md-hue-2" md-mode="indeterminate" md-diameter="20px"></md-progress-circular>
-        </md-card-content>
-    </md-card>
-
-    <!-- Change user image -->
-    <md-card>
-        <md-toolbar class="md-toolbar-tools">
-            <md-title>Change Account Image</md-title>
-        </md-toolbar>
-
-        <md-card-content ngf-drop ng-model="image.file" ngf-pattern="image/*">
-            <p>Upload a new file to use as Account image. Drop Here a new image o click the upload button</p>
-            <md-button ngf-select ng-model="image.file" accept="image/*" class="md-primary">Choose File</md-button>
-            <md-content ng-show="image.file">
-                <img-crop class="cropArea" image="image.file  | ngfDataUrl" result-image="image.croppedDataUrl" ng-init="image.croppedDataUrl=''"></img-crop>
-                <div layout="row">
-                    <span flex></span>
-                    <md-button ng-hide="image.loading" ng-click="image.uploadImage(image.croppedDataUrl)" class="md-primary md-raised">UPLOAD</md-button>
-                    <md-progress-circular ng-show="image.loading" class="md-hue-2" md-mode="indeterminate" md-diameter="20px"></md-progress-circular>
-                </div>
-
-
-            </md-content>
-        </md-card-content>
-    </md-card>
-
-    <!-- Sessions management -->
-    <md-card class="md-w hiteframe-12dp">
-        <md-toolbar class="md-toolbar-tools">
-            <md-title>Account Sessions</md-title>
-        </md-toolbar>
-
-        <md-card-content>
-            <md-content style="max-height: 500px;">
-                <md-subheader class="md-primary" style="background-color: #eee;">
+            <md-card-content>
+                <p>Change the password of your account</p>
+                <div layout="column">
                     <div layout="row">
-                        <div flex="90"><span flex>Device Agent</span></div>
-                        <div flex="10"><span>Unauthorize</span></div>
-                    </div>
-                </md-subheader>
+                        <md-input-container flex="auto">
+                            <label>Old Password</label>
+                            <input type="password" ng-model="password.old">
+                        </md-input-container>
 
-                <md-list>
-                    <md-list-item ng-repeat="session in account.sessions">
-                        <div layout="row" flex>
-                            <div flex="90">
-                                <span flex>{{session.userAgent}} - {{session.lastUse}}</span>
-                            </div>
-                            <div flex="10">
-                                <md-button class="md-icon-button" ng-click="account.disableSession(session)">
-                                    <md-tooltip>Delete</md-tooltip>
-                                    <md-icon>delete</md-icon>
-                                </md-button>
-                            </div>
+                        <md-input-container flex="auto">
+                            <label>New Password</label>
+                            <input type="password" ng-model="password.new">
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <span flex></span>
+                        <md-button class="md-raised md-warn" ng-click="password.change()">Change</md-button>
+                    </div>
+                </div>
+                <md-progress-circular ng-if="password.loading" class="md-hue-2" md-mode="indeterminate" md-diameter="20px"></md-progress-circular>
+            </md-card-content>
+        </md-card>
+
+        <!-- Change user image -->
+        <md-card>
+            <md-toolbar class="md-toolbar-tools">
+                <md-title>Change Account Image</md-title>
+            </md-toolbar>
+
+            <md-card-content ngf-drop ng-model="image.file" ngf-pattern="image/*">
+                <p>Upload a new file to use as Account image. Drop Here a new image o click the upload button</p>
+                <md-button ngf-select ng-model="image.file" accept="image/*" class="md-primary">Choose File</md-button>
+                <md-content ng-show="image.file">
+                    <img-crop class="cropArea" image="image.file  | ngfDataUrl" result-image="image.croppedDataUrl" ng-init="image.croppedDataUrl=''"></img-crop>
+                    <div layout="row">
+                        <span flex></span>
+                        <md-button ng-hide="image.loading" ng-click="image.uploadImage(image.croppedDataUrl)" class="md-primary md-raised">UPLOAD</md-button>
+                        <md-progress-circular ng-show="image.loading" class="md-hue-2" md-mode="indeterminate" md-diameter="20px"></md-progress-circular>
+                    </div>
+
+
+                </md-content>
+            </md-card-content>
+        </md-card>
+
+        <!-- Sessions management -->
+        <md-card class="md-w hiteframe-12dp">
+            <md-toolbar class="md-toolbar-tools">
+                <md-title>Account Sessions</md-title>
+            </md-toolbar>
+
+            <md-card-content>
+                <md-content style="max-height: 500px;">
+                    <md-subheader class="md-primary" style="background-color: #eee;">
+                        <div layout="row">
+                            <div flex="90"><span flex>Device Agent</span></div>
+                            <div flex="10"><span>Unauthorize</span></div>
                         </div>
-                    </md-list-item>
-                    <md-divider></md-divider>
-                </md-list>
-            </md-content>
-        </md-card-content>
-    </md-card>
+                    </md-subheader>
+
+                    <md-list>
+                        <md-list-item ng-repeat="session in account.sessions">
+                            <div layout="row" flex>
+                                <div flex="90">
+                                    <span flex>{{session.userAgent}} - {{session.lastUse}}</span>
+                                </div>
+                                <div flex="10">
+                                    <md-button class="md-icon-button" ng-click="account.disableSession(session)">
+                                        <md-tooltip>Delete</md-tooltip>
+                                        <md-icon>delete</md-icon>
+                                    </md-button>
+                                </div>
+                            </div>
+                        </md-list-item>
+                        <md-divider></md-divider>
+                    </md-list>
+                </md-content>
+            </md-card-content>
+        </md-card>
+    </md-content>
 </md-content>

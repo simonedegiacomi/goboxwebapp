@@ -24,6 +24,7 @@ angular.module('goboxWebapp')
 
     // When the client start, the base is the main server
     this._base = Env.base;
+    this._fileTransferBase = Env.baseTransfer;
 
     var self = this;
 
@@ -38,7 +39,6 @@ angular.module('goboxWebapp')
         // If the client is inizialize or an initialization is already
         // running, return
         if (this._state == GoBoxState.READY || this._state == GoBoxState.PENDING) {
-            future.reject();
             return future.promise;
         }
 
@@ -58,22 +58,35 @@ angular.module('goboxWebapp')
                 if(info.connected) {
                     self._state = GoBoxState.READY;
                     future.resolve(GoBoxState.READY);
-                } else {
-                    self._state = GoBoxState.NOT_INITIALIZED;
-                    future.reject(GoBoxState.NO_STORAGE);
+                    return;
                 }
+                
+                if (self._state != GoBoxState.READY) {
+                    self._state = GoBoxState.NOT_INITIALIZED;
+                    future.reject();
+                }
+                
             });
         });
 
-        // Websocket closed
-        this._ws.on('close', function() {
+        function errorOrClose () {
+            if (self._state != GoBoxState.READY) {
+                return;
+            }
+            
             self._state = GoBoxState.NOT_INITIALIZED;
-        });
+            
+            if(self._disconnectListener) {
+                self._disconnectListener();
+            }
+            
+        }
+
+        // Websocket closed
+        this._ws.on('close', errorOrClose);
 
         // Websocket error
-        this._ws.on('error', function() {
-            this._state = GoBoxState.NOT_INITIALIZED;
-        });
+        this._ws.on('error', errorOrClose);
 
         // New storage event
         this._ws.on('syncEvent', function(data) {
@@ -115,13 +128,14 @@ angular.module('goboxWebapp')
         if (mode == GoBoxMode.BRIDGE) {
 
             // Set the default base url
-            this._base = Env.Base;
+            this._fileTransferBase = Env.baseTransfer;
 
             // And change the flag
             this._mode = mode;
 
+            console.log("Switched to: ", Env.base);
             future.resolve();
-            return future;
+            return future.promise;
         }
 
         // Make the request to get the token and the address
@@ -133,7 +147,7 @@ angular.module('goboxWebapp')
             var finalPort = data.port;
 
             // Create the url
-            var directBaseUrl = 'https://' + finalAddress + ':' + finalPort;
+            var directBaseUrl = 'https://' + finalAddress + ':' + finalPort + '/';
 
             // Prepare the request
             var req = {
@@ -142,16 +156,18 @@ angular.module('goboxWebapp')
 
             // Make the requst
             $http({
-                url: directBaseUrl + '/directLogin',
+                url: directBaseUrl + 'directLogin',
                 data: req,
-                method: 'POST'
+                method: 'POST',
+                withCredentials: true
             }).then(function() {
 
                 // Wow, it works! change the flag
                 self._mode = mode;
 
                 // And the download base url
-                self._base = directBaseUrl;
+                self._fileTransferBase = directBaseUrl;
+                console.log("Switched to: ", directBaseUrl);
                 future.resolve(directBaseUrl);
             }, function(error) {
 
@@ -165,13 +181,15 @@ angular.module('goboxWebapp')
     };
 
     this.getConnectionMode = function() {
-        if (this._lastState != GoBoxState.READY)
-            return;
         return this._mode;
     };
     
     this.isReady = function () {
         return this._state == GoBoxState.READY;
+    };
+
+    this.setOnDisconnectListener = function (listener) {
+        this._disconnectListener = listener;
     };
 
     /**
@@ -367,13 +385,13 @@ angular.module('goboxWebapp')
         };
 
         this._ws.query('recent', req).then(function(res) {
-            if (res.error)
-                future.reject();
-            else {
-
-                // Wrap the files
-                return GoBoxFile.wrap(res.files);
+            if (res.success) {
+                var events = res.events;
+                future.resolve(GoBoxFile.wrap(res.files));
+                future.resolve();
+                return;
             }
+            future.reject();
         });
         return future.promise;
     };
@@ -392,13 +410,11 @@ angular.module('goboxWebapp')
         };
 
         this._ws.query('trashedFiles', req).then(function(res) {
-            if (res.error)
-                future.reject();
-            else {
-
-                // Wrap the files
-                return GoBoxFile.wrap(res.files);
+            if (res.success) {
+                future.resolve(GoBoxFile.wrap(res.files));
+                return;
             }
+            future.reject();
         });
 
         return future.promise;
@@ -423,7 +439,7 @@ angular.module('goboxWebapp')
             if (res.created) {
 
                 // Invalidate the query of the father
-                self._caches.remove(file.getFatherID);
+                self._caches.remove(file.getFatherId());
 
                 future.resolve();
             }
@@ -439,23 +455,28 @@ angular.module('goboxWebapp')
      * This function talk with the storage and remove the file
      * or directory. If it's a directory also all the children are removed
      */
-    this.trash = function(fileToTrash) {
+    this.trash = function(fileToTrash, recover) {
 
         // Prepare the promise
         var future = $q.defer();
 
-        // Make the query
-        this._ws.query('trashFile', fileToTrash).then(function(res) {
+        // Prepare the request
+        var req = {
+            toTrash: !recover,
+            file: {
+                ID: fileToTrash.getId()
+            }
+        };
 
+        // Make the query
+        this._ws.query('trashFile', req).then(function(res) {
             if (res.success) {
 
                 // Update the cache
                 self._caches.remove(fileToTrash.getId());
-
                 future.resolve();
             }
             else {
-
                 future.reject();
             }
         });
@@ -512,27 +533,6 @@ angular.module('goboxWebapp')
     };
 
     /**
-     * Recover a trashed file
-     */
-    this.recover = function(fileToRecover) {
-
-        // Prepare the promise
-        var future = $q.defer();
-
-        this._ws.query('recover', fileToRecover).then(function(response) {
-
-            if (response.success) {
-
-                future.resolve();
-            }
-            else {
-                future.reject();
-            }
-        });
-        return future.promise;
-    };
-
-    /**
      * Copy or cut the specified file.
      * If it's a directory this is applied also to his children
      */
@@ -540,13 +540,15 @@ angular.module('goboxWebapp')
 
         // Prepare the promise
         var future = $q.defer();
-
+        console.log("Making query for", file);
         // Make the query
         this._ws.query('copyOrCutFile', {
-
-            // TODO: change in the storage
-            file: file,
-            newFather: newFather,
+            file: {
+                ID: file.getId()
+            },
+            newFather: {
+                ID: newFather.getId()
+            },
             cut: cut
         }).then(function(result) {
 
@@ -556,7 +558,7 @@ angular.module('goboxWebapp')
                 self._caches.remove(newFather.id);
 
                 if (cut)
-                    self._caches.remove(file.getFatherID());
+                    self._caches.remove(file.getFatherId());
 
                 future.resolve();
             }
@@ -596,7 +598,9 @@ angular.module('goboxWebapp')
 
         // Prepare the query
         var query = {
-            file: file,
+            file: {
+                ID: file.getId()
+            },
             newName: newName
         };
 
@@ -657,11 +661,23 @@ angular.module('goboxWebapp')
      * Get the private download link
      */
     this.getDownloadLink = function(file) {
-        return self._base + "api/transfer/fromStorage?ID=" + file.getId();
+        return this._fileTransferBase + "fromStorage?ID=" + file.getId();
     };
 
     this.getPreviewLink = function(file) {
-        return self.getDownloadLink(file) + "&preview=true";
+        return this.getDownloadLink(file) + "&preview=true";
+    };
+    
+    this.getLinks = function (file, sharingHost) {
+        var hostName = sharingHost || this._auth.getUsername();
+        var base = sharingHost ? Env.baseTransfer : this._fileTransferBase;
+        var links = {};
+        
+        links.raw = base + "fromStorage?ID=" + file.getId() + "&host=" + hostName;
+        links.preview = links.raw + "&preview=true";
+        links.publicPage = this._base + "webapp/#/public_file/" + hostName + "/" + file.getId();
+        
+        return links;
     };
 
     /**
@@ -672,7 +688,7 @@ angular.module('goboxWebapp')
 
         var req = {
             share: angular.isDefined(unShare) ? unShare : true,
-            id: file.getId()
+            ID: file.getId()
         };
 
         this._ws.query('share', req).then(function(res) {
@@ -697,24 +713,26 @@ angular.module('goboxWebapp')
         // Create the logic representation of the new file
         var gbFile = new GoBoxFile(file.name);
 
-        // Set his father id
-        gbFile.setFatherId(fatherId);
-
-        // And the other informations
-        gbFile.setIsDirectory(false);
-        gbFile.setMime(file.type);
+        var req = {
+            name: file.name,
+            father: {
+                ID: fatherId
+            }
+        };
 
         // Make the request
         Upload.http({
 
             // TODO: absoluty find a better way. Maybe chage the request to a multipart reuqest
-            url: Env.base + 'api/transfer/toStorage?json=' + encodeURI(JSON.stringify(gbFile)),
-            data: file
+            url: this._fileTransferBase + 'toStorage?json=' + encodeURI(JSON.stringify(req)),
+            data: file,
+            "Content-Type": file.type != '' ? file.type : 'application/octet-stream',
         }).then(function(response) {
 
             future.resolve();
         }, function(response) {
-
+            
+            console.log(response);
             future.reject();
         }, function(evt) {
 
