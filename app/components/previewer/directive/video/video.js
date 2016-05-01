@@ -1,14 +1,16 @@
 angular.module('goboxWebapp')
 
-.directive('videoPreview', function() {
+.directive('videoPreview', function(GoBoxClient) {
 
    function videoCtrl($scope, $sce) {
 
-      var preview = $scope.preview;
+      $scope.links = $scope.links || GoBoxClient.getLinks($scope.file);
+
+      $scope.trustedLink = $sce.trustAsResourceUrl($scope.links.raw);
 
       $scope.player = {
          src: {
-            src: $sce.trustAsResourceUrl(preview.link),
+            src: $sce.trustAsResourceUrl($scope.links.raw),
             type: "video/mp4"
          }
       };
@@ -21,7 +23,8 @@ angular.module('goboxWebapp')
       restrict: 'E',
       controller: videoCtrl,
       scope: {
-         preview: '=preview'
+         file: '=file',
+         links: '=links'
       }
    };
 });

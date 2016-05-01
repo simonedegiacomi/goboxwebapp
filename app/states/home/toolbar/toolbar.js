@@ -2,7 +2,7 @@
 
 angular.module('goboxWebapp')
 
-.controller('ToolbarCtrl', function($scope, $timeout, Clipboard, ToolbarManager) {
+.controller('ToolbarCtrl', function($scope, $timeout, Clipboard, ToolbarManager, Preferences) {
 
     // Tools of the toolbar
     $scope.tools = [{
@@ -28,13 +28,12 @@ angular.module('goboxWebapp')
     }, {
         tooltip: 'Share',
         icon: 'share',
-        show: Clipboard.isSingleFileSelected,
+        single: true,
         action: Clipboard.shareFile
     }];
 
     // Configure the toolbar with the info of the toolbar manager
     function configFromManager() {
-        
         $scope.showToolbar = ToolbarManager.getVisibility();
         $scope.showTools = ToolbarManager.getShowTools();
         $scope.showSearchLink = ToolbarManager.getShowSearch();
@@ -56,15 +55,24 @@ angular.module('goboxWebapp')
     // Add a listener to the toolbar
     Clipboard.addListener(function() {
         
-        $timeout(function() {
-            
-            // Update the download link
-            if(Clipboard.isSingleFileSelected())
-                $scope.download = Clipboard.getDownloadLink();
-            else
-                $scope.download = undefined;
-        });
+        // Update the download link
+        if(Clipboard.isSingleFileSelected())
+            $scope.download = Clipboard.getDownloadLink();
+        else
+            $scope.download = undefined;
     });
 
+    var setSwitchIcon = function () {
+        $scope.switchListViewIcon = Preferences.listView == 'list' ? 'view_module' : 'list';
+    };
+
+    $scope.switchListView = function () {
+        Preferences.listView = Preferences.listView == 'list' ? 'grid' : 'list';  
+        setSwitchIcon();
+        console.log("called");
+    };
+    
+    setSwitchIcon();
+    
     configFromManager();
 });

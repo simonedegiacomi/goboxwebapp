@@ -27,7 +27,9 @@ angular.module('goboxWebapp')
         // Method to cancel an upload
         $scope.cancel = UploadManager.cancel;
         
-        $scope.close = $mdDialog.close;
+        $scope.close = function () {
+            $mdDialog.hide();
+        };
     }
 
 });

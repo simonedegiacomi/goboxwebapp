@@ -1,17 +1,23 @@
 angular.module('goboxWebapp')
 
-.directive('easyConnectionBox', function ($mdToast, $mdDialog, GoBoxClient) {
+.directive('easyConnectionBox', function ($mdToast, $mdDialog, GoBoxClient, GoBoxMode) {
     
     
     function boxCtrl ($scope) {
         
-        $scope.mode = GoBoxClient.getConnectionMode();
+        var connection = {
+            mode: GoBoxMode.BRIDGE,
+            ready: false
+        };
+        
+        $scope.connection = connection;
         
         $scope.switchTo = function (mode) {
             
             GoBoxClient.switch(mode).then(function () {
                 
-                $scope.mode = GoBoxClient.getConnectionMode();
+                connection.mode = GoBoxClient.getConnectionMode();
+                console.log(GoBoxClient.getConnectionMode());
                 $mdToast.showSimple("Switched to " + mode + "!");
             }, function (address) {
                 
@@ -19,8 +25,9 @@ angular.module('goboxWebapp')
                 $mdDialog.show({
                     templateUrl: 'components/easyconnectionbox/switchdialog.html',
                     controller: ErrDialogCtrl,
+                    clickOutsideToClose: true,
                     locals: {
-                        url: address + '/test'
+                        url: address + 'test'
                     }
                 }).then(function () {
                     

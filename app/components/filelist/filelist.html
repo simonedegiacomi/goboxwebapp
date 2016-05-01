@@ -1,12 +1,32 @@
+<style>
+    .file-tile {
+        display: inline-block;
+        max-width: 100%;
+        width: 100%;
+        background-position: center center;
+        background-size: cover;
+    }
+    
+    .selected-tile {
+        background-color: blue;
+    }
+    
+    md-grid-tile {
+        transition: all 300ms ease-out 50ms;
+    }
+    
+</style>
+
+
 <md-content>
 
     <!-- List layout -->
-    <md-content ng-if="config.mode == 'list'" flex>
+    <md-content ng-if="Preferences.listView == 'list'" flex>
         <md-subheader class="md-primary" style="background-color: #eee;">
             <div layout="row">
-                <div flex="10" >Icon</div>
-                
-                
+                <div flex="10">Icon</div>
+
+
                 <div flex="50">
                     <span ng-click="order.toggle('name')">Name </span>
                     <span class="sort" ng-if="order.what == 'name'" ng-class="{reverse: order.reverse}"></span>
@@ -21,10 +41,10 @@
                 </div>
             </div>
         </md-subheader>
-        
+
         <!--scroll-listener on-scroll-end="console.log('ok')"-->
-        
-        <md-list ng-if="config.mode == 'list'">
+
+        <md-list ng-if="Preferences.listView == 'list'">
 
             <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" file="file" ng-click="click(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding selected">
 
@@ -32,12 +52,12 @@
                 <div flex="10">
                     <!-- Icon -->
                     <md-icon ng-hide="file.selected">{{file | iconFilter}}</md-icon>
-                    
+
                     <!-- File selection -->
                     <md-checkbox ng-show="file.selected" ng-model="file.selected" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
                 </div>
                 <!-- File name -->
-                <div flex="50">{{file.getName()}}</div>
+                <div flex="50" class="short-text">{{file.getName()}}</div>
                 <!-- File size -->
                 <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
                 <!-- Last update date -->
@@ -46,15 +66,31 @@
             </md-list-item>
         </md-list>
     </md-content>
-    
+
     <!-- Cards layout -->
-    <md-content layout-padding ng-if="config.mode == 'grid'">
-        <md-grid-list md-cols-gt-md="12" md-cols-sm="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-gt-sm="8px" md-gutter="4px">
-            <md-grid-tile ng-repeat="file in files">
-                <md-card>
+    <md-content layout-padding ng-if="Preferences.listView == 'grid'">
+
+        
+        <md-grid-list md-cols="8" md-cols-sm="12" md-cols-md="16" md-cols-gt-md="20"  md-row-height="3rem" md-gutter="16px">
+            <md-grid-tile class="md-whiteframe-3dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1" md-colspan="4">
+                <md-icon>{{file | iconFilter}}</md-icon>
                     {{file.getName()}}
-                </md-card>
+                    <span flex></span>
             </md-grid-tile>
         </md-grid-list>
+
+        <md-grid-list md-cols="8" md-cols-sm="12" md-cols-md="16" md-cols-gt-md="20" md-row-height="4:3" md-gutter="16px">
+
+            <md-grid-tile  ng-repeat="file in files" class="md-whiteframe-4dp" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="3" md-colspan="4">
+                <img layout-fill ng-src="{{file | preview}}" class="file-tile">
+                <md-grid-tile-footer ng-class="{ 'selected-tile': file.selected }">
+                    <div class="short-text" layout="row" layout-align="space-between center">
+                        <md-icon>{{file | iconFilter}}</md-icon>
+                        <h3>{{file.getName()}}</h3>
+                    </div>
+                </md-grid-tile-footer>
+            </md-grid-tile>
+        </md-grid-list>
+
     </md-content>
 </md-content>

@@ -1,5 +1,5 @@
 <!-- Toolbar -->
-<md-toolbar ng-show="showToolbar" class="md-toolbar-tools">
+<md-toolbar ng-if="showToolbar" class="md-toolbar-tools">
     
     <!-- Button to open the sidenav in small display -->
     <md-button hide-gt-sm class="md-icon-button" ng-click="toggleSidenav()">
@@ -9,8 +9,14 @@
     <!-- Title -->
     <md-title ng-switch="title.mode" flex>
         <path-pwd ng-switch-when="pwd" path="currentFile.getPath()"></path-pwd>
-        <span ng-switch-when="title">{{title.str}}</span>
+        <span ng-switch-when="title" class="short-text">{{title.str}}</span>
     </md-title>
+
+    <!-- View mode -->
+    <md-button ng-click="switchListView()" class="md-icon-button">
+        <md-tooltip>Switch view type</md-tooltip>
+        <md-icon>{{switchListViewIcon}}</md-icon>
+    </md-button>
 
     <!-- Download button -->
     <md-button ng-show="download" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button">
@@ -50,7 +56,6 @@
             <!-- Tools -->
             <md-menu-item ng-repeat="tool in tools" ng-if="tool.show()">
                 <md-button ng-click="tool.action()">
-                    <md-tooltip>{{tool.tooltip}}</md-tooltip>
                     <md-icon>{{tool.icon}}</md-icon>
                     {{tool.tooltip}}
                 </md-button>
@@ -59,7 +64,6 @@
             <md-menu-item ng-if="showSearchLink">
                 <!-- Search button link -->
                 <md-button href="#/search/any/">
-                    <md-tooltip>Search</md-tooltip>
                     <md-icon>search</md-icon>
                     <span>Search</span>
                 </md-button>

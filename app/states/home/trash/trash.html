@@ -1,11 +1,22 @@
-<md-content layout="column" layout-fill>
-    
-    <md-button ng-click="emptyTrash()">Empty Trash</md-button>
-    
+<md-content ng-show="files.length <= 0">
+    <md-card>
+        <md-toolbar>
+            <md-title class="md-toolbar-tools">Nofile in the trash</md-title>
+        </md-toolbar>
+
+        <md-card-content>
+            <p>You trash is empty</p>
+        </md-card-content>
+    </md-card>
+</md-content>
+
+<md-content layout="column" ng-show="files.length > 0" layout-fill>
     <md-subheader class="md-primary" style="background-color: #eee;">
-        <span flex="80">File Name</span>
-        <span flex="10">Recover</span>
-        <span flex="10">Delete</span>
+        <div layout="row">
+            <div flex="80">File Name</div>
+            <div flex="10">Recover</div>
+            <div flex="10">Delete</div>
+        </div>
     </md-subheader>
     <md-content layout-padding>
         <md-list>
@@ -23,3 +34,11 @@
         </md-list>
     </md-content>
 </md-content>
+
+<!-- Fab box -->
+<div class="fab-box">
+    <md-button aria-label="menu" class="md-fab md-warn" ng-click="emptyTrash()">
+        <md-tooltip md-direction="down">Empty trash</md-tooltip>
+        <md-icon>delete_sweep</md-icon>
+    </md-button>
+</div>

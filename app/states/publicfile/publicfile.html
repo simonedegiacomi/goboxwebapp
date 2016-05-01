@@ -2,11 +2,13 @@
     
     <!-- Loading card -->
     <md-card ng-show="fileState == 'loading'">
-        Loading
+        <md-card-content>
+            Loading
+        </md-card-content>
     </md-card>
     
     <!-- File card -->
-    <md-card ng-show="fileState == 'available'" style="width: 400px;">
+    <md-card ng-if="fileState == 'available'" style="width: 400px;">
         
         <!-- Toolbar of the card -->
         <md-toolbar>
@@ -17,18 +19,20 @@
         
         <!-- Content of the card -->
         <md-card-content>
-            <!-- Photo of the host -->
-            <img ng-src="/api/user/image/{{hostName}}">
-            
             <!-- Preview -->
-            <preview preview="preview"></preview>
-            
+            <preview file="file" links="links"></preview>
         </md-card-content>
+        
+        <md-card-actions layout="row">
+            <md-button class="md-primary md-raised">Download</md-button>
+        </md-card-actions>
         
     </md-card>
     
     <!-- Not available -->
     <md-card ng-show="fileState == 'notAvailable'">
-        File not available
+        <md-card-content>
+            File not available
+        </md-card-content>
     </md-card>
 </md-container>

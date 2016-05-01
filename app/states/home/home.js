@@ -16,9 +16,8 @@ angular.module('goboxWebapp')
                 id: file.getId()
             });
         } else {
-            
-            // Otherwise show the preview
-            Previewer.show($event, file);
+            var links = GoBoxClient.getLinks(file);
+            Previewer.show(file, links);
         }
     });
 

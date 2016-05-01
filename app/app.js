@@ -18,10 +18,7 @@ angular
         'ngFileUpload',
         'vcRecaptcha',
         'ngSanitize',
-        'com.2fdevs.videogular',
-        'com.2fdevs.videogular.plugins.controls',
-        'com.2fdevs.videogular.plugins.overlayplay',
-        'com.2fdevs.videogular.plugins.buffering'
+        'ngClipboard'
     ])
 
 .config(function($stateProvider, $urlRouterProvider, StateRule) {
@@ -139,7 +136,6 @@ angular
         }
     })
 
-
     .state('home.trash', {
         url: '/trash',
         views: {
@@ -171,7 +167,7 @@ angular
     .state('loading', {
         url: '/loading',
         controller: 'LoadingCtrl',
-        templateUrl: 'states/home/loading/loading.html',
+        templateUrl: 'states/loading/loading.html',
         data: {
             access: {
                 logged: StateRule.MUST, // The user must be logged
@@ -181,10 +177,14 @@ angular
     });
 
     // The default state is the file list of the root
-    $urlRouterProvider.otherwise("/files");
+    $urlRouterProvider.otherwise("/login");
 })
 
 .run(function($rootScope, GoBoxClient, GoBoxState, $state, $timeout, StateRule) {
+
+    GoBoxClient.setOnDisconnectListener(function() {
+        $state.go('loading');
+    });
 
     // Configure routing policy
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
@@ -213,40 +213,47 @@ angular
                 $state.go('login');
                 return;
             }
-
-            // If the client state doesn't matter, go to the next state
-            if (toState.data.access.clientReady == StateRule.CAN) {
+            
+            if(!logged && toState.data.access.logged == StateRule.MUST_NOT) {
                 return;
             }
-
-            // If the client is not ready, but the next state wants it
-            if (!GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST) {
-
-                // Go to the loading state
-                event.preventDefault();
-                $state.go('loading');
-
-                // And try to connect
-                GoBoxClient.init().then(function() {
-
-                    // Connected! go to the home
-                    $state.go('home.files');
-                }, function() {
-
-                    // Not ready... retry soon
-                    $timeout(function() {
-                        $state.go('home.files');
-                    }, 5000);
-                });
-                return;
-            }
-
+            
             // If the client is ready but the state doesn't want it
             if (GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST_NOT) {
 
                 // Redirect to the home
                 event.preventDefault();
                 $state.go('home.files');
+                return;
+            }
+
+            // If the client is not ready, but the next state wants it
+            if (!GoBoxClient.isReady()) {
+
+                var init = function () {
+                    GoBoxClient.init().then(function() {
+
+                        // Connected! go to the home
+                        $state.go('home.files');
+                    }, function() {
+
+                        // Not ready... retry soon
+                        $timeout(function() {
+                            console.log("retry");
+                            init();
+                        }, 5000);
+                    });
+                };
+
+                // Try to connect
+                init();
+                
+                if (toState.data.access.clientReady == StateRule.MUST) {
+                    // Go to the loading state
+                    event.preventDefault();
+                    $state.go('loading');
+                }
+                
                 return;
             }
         });
@@ -256,7 +263,12 @@ angular
 
 .config(function($mdThemingProvider) {
     // Theme configuration
-    $mdThemingProvider.theme('default')
-        .primaryPalette('light-blue')
-        .accentPalette('deep-orange');
-});
+    // $mdThemingProvider.theme('default')
+    //     .primaryPalette('light-blue')
+    //     .accentPalette('deep-orange');
+})
+
+
+.config(['ngClipProvider', function(ngClipProvider) {
+    ngClipProvider.setPath("bower_components/zeroclipboard/dist/ZeroClipboard.swf");
+}]);

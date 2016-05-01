@@ -4,17 +4,17 @@
             <md-title>Security issue</md-title>
         </div>
     </md-toolbar>
-    <md-dialog-content>
-        <md-content md-padding md-wrap>
+    <md-dialog-content md-padding>
+        <md-content>
             <p>The direct connection to {{url}} is failed.</p>
             <p>This is due to the self signed certificate of the storage</p>
             <p>You can insert a different ip, change the certificate with a new trusted by you or open a new window, check the certificate and accept this unsigned</p>
-            
-            <md-button ng-click="open()">Accept self signed certificate</md-button>
+
+            <md-button ng-click="open()" class="md-warn">Accept self signed certificate</md-button>
         </md-content>
     </md-dialog-content>
     <md-dialog-actions>
-        <md-button ng-click="close()">Stay in bridge</md-button>
-        <md-button ng-click="done()">Done</md-button>
+        <md-button ng-click="close()" class="md-accent">Stay in bridge</md-button>
+        <md-button ng-click="done()" class="md-accent md-raised">Done</md-button>
     </md-dialog-actions>
 </md-dialog>

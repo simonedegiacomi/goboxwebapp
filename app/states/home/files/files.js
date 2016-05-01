@@ -5,9 +5,7 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FileListCtrl', function($scope, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard, Previewer) {
-
-console.log("FILES");
+.controller('FileListCtrl', function($scope, $state, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard, Previewer) {
 
     // Attach the clipboard to the scope
     $scope.Clipboard = Clipboard;
@@ -34,14 +32,15 @@ console.log("FILES");
                 else {
 
                     // Otherwise set as dir the father of the file
-                    var path = detailedFile.getPath();
-                    var father = path[path.length - 1];
+                    // var path = detailedFile.getPath();
+                    // var father = path[path.length - 1];
 
-                    // Set it to the scope
-                    $scope.dir = father;
+                    // // Set it to the scope
+                    // $scope.dir = father;
 
-                    // And in the clipboard
-                    Clipboard.setCurrentFather(father);
+                    // // And in the clipboard
+                    // Clipboard.setCurrentFather(father);
+                    $state.go('home.files', {id:detailedFile.getFatherId()});
 
                     // And open the previewer
                     Previewer.show(detailedFile);
@@ -126,6 +125,8 @@ console.log("FILES");
         // Get the holded files
         var files = Clipboard.getHoldFiles();
         
+        console.log("Files, ", files);
+        
         // For each file...
         angular.forEach(files, function(file) {
             
@@ -138,10 +139,5 @@ console.log("FILES");
                 $mdToast.showSimple("Sorry, there was an error with " + file.getName());
             });
         });
-    };
-
-    // Show the files as listb
-    $scope.fileListConfig = {
-        mode: 'list'
     };
 });

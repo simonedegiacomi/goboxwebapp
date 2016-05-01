@@ -56,10 +56,9 @@ angular.module('goboxWebapp')
 
         // Prepare the auth object
         auth.setUsername(user.name);
-        auth.setPassword(user.password);
 
         // Login using the API
-        auth.login().then(function(logged) {
+        auth.login(user.password, user.keepLogged).then(function(logged) {
             //Stop the spinner
             $scope.loading = false;
 
@@ -87,13 +86,12 @@ angular.module('goboxWebapp')
 
         // Prepare auth object
         auth.setUsername(user.name);
-        auth.setPassword(user.password);
         auth.setEmail(user.email);
 
         var self = this;
 
         // Register
-        auth.register($scope.reCaptcha.response).then(function(registered) {
+        auth.register(user.password, $scope.reCaptcha.response).then(function(registered) {
 
             // Registered, now login
             self.login(user);

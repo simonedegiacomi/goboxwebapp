@@ -1,6 +1,5 @@
-<md-content layout-align="center" layout-fill layout="row">
-    <md-content layout="column" class="setting-card" layout-fill flex>
-
+<md-content div layout="column" layout-align="center center" flex>
+    <md-content style="max-width: 800px;">
         <!-- Card to alert the user if the Storage is not connected -->
         <md-card ng-hide="clientReady">
             <md-toolbar class="md-toolbar-tools md-warn">
@@ -8,8 +7,10 @@
             </md-toolbar>
             <md-card-content>
                 <p>This client is not connected to your storage, but you can change the account settings anyway. If you want to go to connect and your files click the button below</p>
-                <md-button ui-sref="home.files">Connect</md-button>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button ui-sref="home.files" class="md-raised md-primary">Connect</md-button>
+            </md-card-actions>
         </md-card>
 
         <!-- Password Change -->
@@ -70,6 +71,7 @@
             </md-toolbar>
 
             <md-card-content>
+                <p>This the list of all the active session of your account</p>
                 <md-content style="max-height: 500px;">
                     <md-subheader class="md-primary" style="background-color: #eee;">
                         <div layout="row">

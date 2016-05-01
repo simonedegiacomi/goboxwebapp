@@ -62,6 +62,6 @@ angular.module('goboxWebapp')
     };
     
     this.getVisibility = function () {
-        return this.visibility;
+        return this._visibility;
     };
 });

@@ -10,7 +10,7 @@
  */
 angular.module('goboxWebapp')
 
-.service('Clipboard', function($q, $mdToast, $mdDialog, GoBoxFile, GoBoxClient) {
+.service('Clipboard', function($q, $mdToast, $mdDialog, GoBoxFile, GoBoxClient, LinkDialog) {
 
     // Current folder
     var currentFather;
@@ -140,8 +140,8 @@ angular.module('goboxWebapp')
 
         // Prepare the dialog
         var dialog = $mdDialog.confirm()
-            .title('Delete ?' + files.length > 1 ? 'files' : 'file')
-            .textContent('Are you sure you want to delete ' + files.length > 1 ? (files.length + ' files') : files[0].name  + ' ?')
+            .title("Move to Trash")
+            .textContent('Are you sure you want to delete ' + files.length  + (files.length > 1 ? ' files?' : ' file?'))
             .ariaLabel('Delete File')
             .ok('Delete')
             .cancel('Don\'t Delete');
@@ -197,17 +197,10 @@ angular.module('goboxWebapp')
         var file = files[0];
 
         // Use the client object to share the file
-        GoBoxClient.share(file, true).then(function(url) {
+        GoBoxClient.share(file, true).then(function() {
             
             // Show an alert with the link to the shared file
-            var alert = $mdDialog.alert()
-                .clickOutsideToClose(true)
-                .title('Shared file Link')
-                .textContent('The public link of the file is: ' + url)
-                .ariaLabel('File shared')
-                .ok('Ok');
-            
-            $mdDialog.show(alert);
+            LinkDialog.show(file);
         }, function() {
             $mdToast.showSimple("Sorry, can't share " + file.getName());
         });

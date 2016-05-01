@@ -1,19 +1,10 @@
 angular.module('goboxWebapp')
 
-.directive('musicPreview', function($sce) {
+.directive('musicPreview', function($sce, GoBoxClient) {
 
-   function musicCtrl($scope) {
+   function musicCtrl($scope, $sce) {
 
-      var preview = $scope.preview;
-
-
-
-      $scope.player = {
-         src: {
-            src: $sce.trustAsResourceUrl(preview.link),
-            type: "audio/mpeg"
-         }
-      };
+      $scope.trustedLink = $sce.trustAsResourceUrl($scope.links.raw);
    }
 
    // Return the object that described the directive
@@ -22,7 +13,8 @@ angular.module('goboxWebapp')
       restrict: 'E',
       controller: musicCtrl,
       scope: {
-         preview: '=preview'
+         file: '=file',
+         links: '=links'
       }
    };
 });

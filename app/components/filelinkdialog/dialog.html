@@ -1,0 +1,24 @@
+<md-dialog>
+    <md-toolbar class="md-toolbar-tools">
+        <span>{{file.getName()}} - Shared link</span>
+        <span flex></span>
+        <md-button ng-click="close()" class="md-icon-button">
+            <md-tooltip>Close</md-tooltip>
+            <md-icon>close</md-icon>
+        </md-button>
+    </md-toolbar>
+    <md-dialog-content layout="column">
+        <p>Use the link below to share '{{file.getName()}}':</p>
+        <a ng-href="{{links.publicPage}}" >{{links.publicPage}}</a>
+        
+        <!-- Con un'altro colore -->
+        <div>
+            <p>Raw file link:</p>
+            <a ng-href="{{links.shareRaw}}">{{links.shareRaw}}</a>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button class="md-primary">Close</md-button>
+        <md-button clip-copy="links.publicPage" class="md-primary md.raised">Copy to Clipboard</md-button>
+    </md-dialog-actions>
+</md-dialog>

@@ -1,9 +1,9 @@
 angular.module('goboxWebapp')
 
-.directive('imagePreview', function () {
+.directive('imagePreview', function (GoBoxClient) {
    
-   function imageCtrl () {
-       
+   function imageCtrl ($scope) {
+       $scope.links = $scope.links || GoBoxClient.getLinks($scope.file);
    }
    
    // Return the object that described the directive
@@ -12,7 +12,8 @@ angular.module('goboxWebapp')
        restrict: 'E',
        controller: imageCtrl,
        scope: {
-           preview: '=preview'
+           file: '=file',
+           links: '=links'
        }
    };
 });

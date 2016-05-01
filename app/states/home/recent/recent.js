@@ -3,8 +3,8 @@ angular.module('goboxWebapp')
 .controller('RecentCtrl', function ($scope, GoBoxClient, $state, ToolbarManager) {
     
     // Request the files
-    GoBoxClient.getRecentFiles().then(function(files) {
-        $scope.files = files;
+    GoBoxClient.getRecentFiles().then(function(events) {
+        $scope.events = events;
     });
     
     $scope.show = function (file) {

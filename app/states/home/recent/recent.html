@@ -1,19 +1,32 @@
-<md-content layout="column" layout-fill>
-    
+<md-content ng-show="files.length <= 0">
+    <md-card>
+        <md-toolbar>
+            <md-title class="md-toolbar-tools">No recent files</md-title>
+        </md-toolbar>
+
+        <md-card-content>
+            <p>It seems that you haven't open any files!</p>
+        </md-card-content>
+    </md-card>
+</md-content>
+<md-content ng-show="files.length > 0" layout="column" layout-fill>
+
     <md-subheader class="md-primary" style="background-color: #eee;">
-        <span flex="80">File Name</span>
-        <span flex="10">Download</span>
-        <span flex="10">Find</span>
+        <div layout="row">
+            <div flex="80">File Name</div>
+            <div flex="10">Download</div>
+            <div flex="10">Find</div>
+        </div>
     </md-subheader>
     <md-content layout-padding>
         <md-list>
-            <md-list-item ng-repeat="file in files">
-                <span flex>{{file.getName()}}</span>
-                <md-button ng-href="{{file | downloadLink}}" class="md-icon-button">
+            <md-list-item ng-repeat="event in events">
+                <span flex>{{event.file.getName()}}</span>
+                <md-button ng-href="{{event.file | downloadLink}}" class="md-icon-button">
                     <md-icon>lock</md-icon>
                     <md-tooltip>Unshare</md-tooltip>
                 </md-button>
-                <md-button ng-click="show(file)" class="md-icon-button">
+                <md-button ng-click="show(event.file)" class="md-icon-button">
                     <md-icon>pageview</md-icon>
                     <md-tooltip>Show file</md-tooltip>
                 </md-button>

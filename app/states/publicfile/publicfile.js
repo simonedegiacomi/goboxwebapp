@@ -2,32 +2,27 @@
 
 angular.module('goboxWebapp')
 
-.controller('PublicFileCtrl', function ($scope, $stateParams, $http, Env, GoBoxClient) {
+.controller('PublicFileCtrl', function ($scope, $stateParams, $http, Env, GoBoxClient, GoBoxFile) {
     
     $scope.fileState = 'loading';
     
     var host = $scope.hostName = $stateParams.hostName;
     var fileId = $stateParams.id;
     
-    $http.get(Env.Base + '/api/info?host=' + host + '&ID=' + fileId).then(function (response) {
+    $http.get('/api/info?host=' + host + '&ID=' + fileId).then(function (response) {
         
         if(!response.data.found) {
-            
             $scope.fileState = 'notAvailable';
             return;
         }
         
         $scope.fileState = 'available';
-        var file = response.data.file;
+        var file = GoBoxFile.wrap(response.data.file);
         
         $scope.file = file;
-        $scope.preview = {
-            file: file,
-            link: GoBoxClient.getDownloadLink(file)
-        };
+        $scope.links = GoBoxClient.getLinks(file, host);
         
     }, function () {
-        
         $scope.fileState = 'notAvailable';
     });
     

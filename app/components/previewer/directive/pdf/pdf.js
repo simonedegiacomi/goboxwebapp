@@ -1,9 +1,9 @@
 angular.module('goboxWebapp')
 
-.directive('pdfPreview', function () {
+.directive('pdfPreview', function (GoBoxClient) {
    
-   function pdfCtrl () {
-       
+   function pdfCtrl ($scope, $sce) {
+       $scope.trustedLink = $sce.trustAsResourceUrl($scope.links.raw);
    }
    
    // Return the object that described the directive
@@ -12,7 +12,8 @@ angular.module('goboxWebapp')
        restrict: 'E',
        controller: pdfCtrl,
        scope: {
-           preview: '=preview'
+           file: '=file',
+           links: '=links'
        }
    };
 });

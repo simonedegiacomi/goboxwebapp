@@ -1,16 +1,15 @@
-<md-content layout="row" layout-fill flex>
+<md-content layout="row" layout-fill>
 
     <!-- Sidenav on the left -->
     <md-sidenav ui-view="sidenav" ng-show="clientReady" class="md-sidenav-left md-whiteframe-4dp" md-component-id="sidenav" md-is-locked-open="$mdMedia('gt-sm')" layout="column"></md-sidenav>
 
     <!-- Content and toolbard on the center -->
-    <md-content layout="column" flex layout-fill>
+    <md-content layout="column" style="width: 100%">
         <!-- Toolbar -->
-        <md-content ui-view="toolbar"></md-content>
+        <div ui-view="toolbar"></div>
 
         <!-- Main content -->
-        <md-content ui-view="main" flex layout-fill></md-content>
+        <md-content ui-view="main" flex></md-content>
     </md-content>
-
 
 </md-content>

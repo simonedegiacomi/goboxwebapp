@@ -4,7 +4,9 @@ angular.module('goboxWebapp')
 
 .controller('SettingsCtrl', function($scope, $mdToast, GoBoxClient, ToolbarManager, Upload, Env) {
 
-    
+    // Hide toolbar
+    ToolbarManager.setVisibility(false);
+    ToolbarManager.apply();
 
     // This object contains the functions for the password change
     var password = $scope.password = {};
