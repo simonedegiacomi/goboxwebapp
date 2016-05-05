@@ -3,18 +3,15 @@
         display: inline-block;
         max-width: 100%;
         width: 100%;
+        max-height: 100%;
         background-position: center center;
         background-size: cover;
     }
     
     .selected-tile {
-        background-color: blue;
+        background-color: blue !important;
+        color: white;
     }
-    
-    md-grid-tile {
-        transition: all 300ms ease-out 50ms;
-    }
-    
 </style>
 
 
@@ -46,7 +43,7 @@
 
         <md-list ng-if="Preferences.listView == 'list'">
 
-            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" file="file" ng-click="click(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding selected">
+            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" ng-click="click(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding" >
 
                 <!-- Icon or checkbox-->
                 <div flex="10">
@@ -68,29 +65,40 @@
     </md-content>
 
     <!-- Cards layout -->
-    <md-content layout-padding ng-if="Preferences.listView == 'grid'">
+    <md-content style="background: #EEEEEE;" layout-padding ng-if="Preferences.listView == 'grid'">
 
-        
-        <md-grid-list md-cols="8" md-cols-sm="12" md-cols-md="16" md-cols-gt-md="20"  md-row-height="3rem" md-gutter="16px">
-            <md-grid-tile class="md-whiteframe-3dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1" md-colspan="4">
-                <md-icon>{{file | iconFilter}}</md-icon>
-                    {{file.getName()}}
-                    <span flex></span>
+        <md-grid-list md-cols-xs="8" md-cols-sm="12" md-cols-md="16" md-cols-lg="20" md-cols-xl="32" md-row-height="3rem" md-gutter="32px">
+            <md-grid-tile ng-class="{ 'selected-tile': file.selected }" style="background: #FFFFFF;" layout-align="start center" class="md-whiteframe-1dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1"
+            md-colspan="4">
+                <md-icon layout-margin>folder</md-icon>
+                <span flex>{{file.getName()}}</span>
             </md-grid-tile>
         </md-grid-list>
 
-        <md-grid-list md-cols="8" md-cols-sm="12" md-cols-md="16" md-cols-gt-md="20" md-row-height="4:3" md-gutter="16px">
+        <md-grid-list md-cols-xs="2" md-cols-sm="3" md-cols-md="4" md-cols-lg="5" md-cols-xl="8" md-row-height="1:1" md-gutter="32px">
 
-            <md-grid-tile  ng-repeat="file in files" class="md-whiteframe-4dp" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="3" md-colspan="4">
-                <img layout-fill ng-src="{{file | preview}}" class="file-tile">
-                <md-grid-tile-footer ng-class="{ 'selected-tile': file.selected }">
-                    <div class="short-text" layout="row" layout-align="space-between center">
-                        <md-icon>{{file | iconFilter}}</md-icon>
-                        <h3>{{file.getName()}}</h3>
+            <md-grid-tile ng-repeat="file in files" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
+                <md-content layout-fill layout="column" layout-align="space-between stretch" style="background: #EEEEEE;">
+                    <img flex="80" ng-src="{{file | thumbnail}}" default-thumbnail class="file-tile">
+                    <div ng-class="{ 'selected-tile': file.selected }" flex="20" layout="row" layout-align="space-between center" class="short-text" style="background: #EEEEEE;">
+                        <md-icon layout-margin>{{file | iconFilter}}</md-icon>
+                        <span flex>{{file.getName()}}</span>
                     </div>
-                </md-grid-tile-footer>
-            </md-grid-tile>
+                </md-content>
+
         </md-grid-list>
+
+
+
+        <!--<md-grid-list md-cols-xs="2" md-cols-gt-xs="3" md-cols-sm="4" md-cols-gt-sm="5" md-cols-md="6" md-cols-gt-md="7" md-cols-lg="8" md-cols-gt-lg="9" md-cols-xl="10" md-row-height="1:1" md-gutter="16px">
+
+            <md-grid-tile ng-repeat="file in files" class="md-whiteframe-2dp" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
+                <img layout-fill ng-src="{{file | thumbnail}}" default-thumbnail class="file-tile">
+                <md-grid-tile-footer flex ng-class="{ 'selected-tile': file.selected }" class="short-text" layout="row" layout-margin layout-padding layout-align="start center">
+                    <md-icon layout-margin>{{file | iconFilter}}</md-icon>
+                    <span flex>{{file.getName()}}</span>
+                </md-grid-tile-footer>
+        </md-grid-list>-->
 
     </md-content>
 </md-content>

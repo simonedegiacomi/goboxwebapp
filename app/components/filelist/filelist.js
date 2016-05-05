@@ -32,7 +32,7 @@ angular.module('goboxWebapp')
                 lastClick = Date.now();
                 lastClickedFile = file;
                 
-                Clipboard.singleClick(file, false);
+                Clipboard.singleClick(file);
             }
         };
         
@@ -44,6 +44,10 @@ angular.module('goboxWebapp')
                 this.reverse = this.what == newWhat ? !this.reverse : false;
                 this.what = newWhat;
             }
+        };
+        
+        $scope.getSelectedFiles = function () {
+            return Clipboard.getSelectedFiles();  
         };
     };
 

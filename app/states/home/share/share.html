@@ -1,25 +1,27 @@
 <md-content layout="column">
 
     <md-content ng-show="share.files.length <= 0">
-        
+
         <md-card>
             <md-toolbar>
                 <md-title class="md-toolbar-tools">No Shared Files</md-title>
             </md-toolbar>
-            
+
             <md-card-content>
-                <p>You haven't shared any file yet. Go to the file list or find something
-                with the search tool ad press the 'Share' Button. This will create an unique url
-                that anyone can open!</p>
+                <p>You haven't shared any file yet. Go to the file list or find something with the search tool ad press the 'Share' Button. This will create an unique url that anyone can open!</p>
             </md-card-content>
         </md-card>
-        
+
     </md-content>
 
     <md-subheader ng-hide="share.files.length <= 0" class="md-primary" style="background-color: #eee;">
         <div layout="row">
-            <div flex="80">
+            <div flex="10"></div>
+            <div flex="60">
                 <span>File Name</span>
+            </div>
+            <div flex="10">
+                <span>Link</span>
             </div>
             <div flex="10">
                 <span>Unshare</span>
@@ -32,15 +34,28 @@
     <md-content layout-padding>
         <md-list>
             <md-list-item ng-repeat="file in share.files">
-                <span flex>{{file.getName()}}</span>
-                <md-button ng-click="unshare(file, $event)" class="md-icon-button">
-                    <md-icon>lock</md-icon>
-                    <md-tooltip>Unshare</md-tooltip>
-                </md-button>
-                <md-button ng-click="show(file)" class="md-icon-button">
-                    <md-icon>pageview</md-icon>
-                    <md-tooltip>Show file</md-tooltip>
-                </md-button>
+                <div flex="10">
+                    <md-icon>{{file | iconFilter}}</md-icon>
+                </div>
+                <span flex="60">{{file.getName()}}</span>
+                <div flex="10">
+                    <md-button ng-click="getPublicLink(file)" class="md-icon-button">
+                        <md-icon>share</md-icon>
+                        <md-tooltip>Unshare</md-tooltip>
+                    </md-button>
+                </div>
+                <div flex="10">
+                    <md-button ng-click="unshare(file, $event)" class="md-icon-button">
+                        <md-icon>lock</md-icon>
+                        <md-tooltip>Unshare</md-tooltip>
+                    </md-button>
+                </div>
+                <div flex="10">
+                    <md-button ng-click="show(file)" class="md-icon-button">
+                        <md-icon>pageview</md-icon>
+                        <md-tooltip>Show file</md-tooltip>
+                    </md-button>
+                </div>
             </md-list-item>
         </md-list>
     </md-content>

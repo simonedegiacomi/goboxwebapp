@@ -2,7 +2,7 @@
 
 angular.module('goboxWebapp')
 
-.controller('ShareCtrl', function($scope, $state, $mdDialog, $mdToast, GoBoxClient, ToolbarManager) {
+.controller('ShareCtrl', function($scope, $state, $mdDialog, $mdToast, GoBoxClient, ToolbarManager, LinkDialog) {
 
     $scope.share = {};
 
@@ -45,6 +45,10 @@ angular.module('goboxWebapp')
         $state.go('home.files', {
             id: file.getId()
         });
+    };
+    
+    $scope.getPublicLink = function (file) {
+        LinkDialog.show(file);
     };
 
 });

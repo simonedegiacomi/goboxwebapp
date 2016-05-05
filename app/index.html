@@ -11,6 +11,7 @@
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="bower_components/ng-img-crop/compile/minified/ng-img-crop.css" />
+    <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -42,6 +43,15 @@
     <script src="bower_components/ng-img-crop/compile/minified/ng-img-crop.js"></script>
     <script src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
     <script src="bower_components/ng-clip/src/ngClip.js"></script>
+    <script src="bower_components/videogular/videogular.js"></script>
+    <script src="bower_components/videogular-controls/vg-controls.js"></script>
+    <script src="bower_components/videogular-buffering/vg-buffering.js"></script>
+    <script src="bower_components/videogular-poster/vg-poster.js"></script>
+    <script src="bower_components/videogular-overlay-play/vg-overlay-play.js"></script>
+    <script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
+    <script src="bower_components/konva/konva.min.js"></script>
+    <script src="bower_components/angular-pintura/angular-pintura.js"></script>
+    <script src="bower_components/angular-pintura/angular-pintura.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -60,6 +70,7 @@
     <script type="text/javascript" src="common/goboxapi/goboxauth.js"></script>
     <script type="text/javascript" src="common/goboxapi/goboxfile.js"></script>
     <script type="text/javascript" src="common/goboxapi/goboxclient.js"></script>
+    <script type="text/javascript" src="common/goboxapi/synceventkind.js"></script>
     <script type="text/javascript" src="common/goboxapi/kind.js"></script>
     <script type="text/javascript" src="common/goboxapi/mode.js"></script>
 
@@ -94,7 +105,10 @@
     <script type="text/javascript" src="components/scrolllistener/scrolllistener.js"></script>
 
     <!-- Filter url preview -->
-    <script type="text/javascript" src="filters/preview.js"></script>
+    <script type="text/javascript" src="filters/thumbnail.js"></script>
+    
+    <!-- Default thumbnail directive -->
+    <script type="text/javascript" src="directives/defaultthumbnail.js"></script>
 
     <!-- Filter icon file -->
     <script type="text/javascript" src="filters/iconfilter.js"></script>

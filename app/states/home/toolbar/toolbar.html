@@ -1,22 +1,22 @@
+<style>
+    .ng-hide.ng-hide-animate {
+        display: none !important;
+    }
+</style>
+
 <!-- Toolbar -->
-<md-toolbar ng-if="showToolbar" class="md-toolbar-tools">
-    
+<md-toolbar ng-show="showToolbar" class="md-toolbar-tools">
+
     <!-- Button to open the sidenav in small display -->
     <md-button hide-gt-sm class="md-icon-button" ng-click="toggleSidenav()">
         <md-icon>menu</md-icon>
     </md-button>
 
     <!-- Title -->
-    <md-title ng-switch="title.mode" flex>
+    <md-title ng-switch="title.mode" class="short-text" flex>
         <path-pwd ng-switch-when="pwd" path="currentFile.getPath()"></path-pwd>
-        <span ng-switch-when="title" class="short-text">{{title.str}}</span>
+        <span ng-switch-when="title">{{title.str}}</span>
     </md-title>
-
-    <!-- View mode -->
-    <md-button ng-click="switchListView()" class="md-icon-button">
-        <md-tooltip>Switch view type</md-tooltip>
-        <md-icon>{{switchListViewIcon}}</md-icon>
-    </md-button>
 
     <!-- Download button -->
     <md-button ng-show="download" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button">
@@ -25,9 +25,15 @@
     </md-button>
 
     <!-- All the other tools -->
-    <md-button ng-repeat="tool in tools" ng-show="showTools && tool.show()" ng-click="tool.action()" class="md-icon-button" hide show-gt-sm>
+    <md-button ng-repeat="tool in tools" ng-hide ng-show="showTools && tool.show()" ng-click="tool.action()" class="md-icon-button" hide show-gt-sm>
         <md-tooltip>{{tool.tooltip}}</md-tooltip>
         <md-icon>{{tool.icon}}</md-icon>
+    </md-button>
+
+    <!-- View mode -->
+    <md-button ng-click="switchListView()" class="md-icon-button">
+        <md-tooltip>Switch view type</md-tooltip>
+        <md-icon>{{switchListViewIcon}}</md-icon>
     </md-button>
 
     <!-- Search button link -->

@@ -2,12 +2,10 @@
     <md-content>
         <img ng-src="{{links.preview}}">
     </md-content>
-    <md-content layout="row">
+    <md-content layout="column" layout-align="center center" layout-padding>
+        <img ng-src="{{links.thumbnail}}" width="100%">
         <md-content>{{file.getName()}}</md-content>
-
-
         <audio controls>
-            <img ng-src="{{links.preview}}">
             <source preload="auto" src="{{trustedLink}}" type="audio/mpeg">
         </audio>
 

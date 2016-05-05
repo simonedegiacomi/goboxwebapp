@@ -15,52 +15,32 @@ angular.module('goboxWebapp')
 
     var dirId = $stateParams.id;
 
-    // Function that retrieve the info about the file using the GoBoxClient
-    function loadDir() {
+    GoBoxClient.getInfo(dirId).then(function(detailedFile) {
+        $timeout(function() {
 
-        GoBoxClient.getInfo(dirId).then(function(detailedFile) {
-            $timeout(function() {
+            if (detailedFile.isDirectory) {
 
-                if (detailedFile.isDirectory) {
+                // Set the current directory
+                $scope.dir = detailedFile;
 
-                    // Set the current directory
-                    $scope.dir = detailedFile;
-                    
-                    // And update the clipboard
-                    Clipboard.setCurrentFather(detailedFile);
-                }
-                else {
-
-                    // Otherwise set as dir the father of the file
-                    // var path = detailedFile.getPath();
-                    // var father = path[path.length - 1];
-
-                    // // Set it to the scope
-                    // $scope.dir = father;
-
-                    // // And in the clipboard
-                    // Clipboard.setCurrentFather(father);
-                    $state.go('home.files', {id:detailedFile.getFatherId()});
-
-                    // And open the previewer
-                    Previewer.show(detailedFile);
-                }
+                // And update the clipboard
+                Clipboard.setCurrentFather(detailedFile);
 
                 // Refresh the toolbar
                 ToolbarManager.apply();
+                return;
+            }
+
+            // Otherwise set as dir the father of the file
+            $state.go('home.files', {
+                id: detailedFile.getFatherId()
             });
+
+            // And open the previewer
+            Previewer.show(detailedFile);
         });
-    }
-
-    // Get the info now
-    loadDir();
-
-    // Register the listener for the sync events
-    GoBoxClient.setSyncListener(function() {
-
-        // When a new event arrive, reload the info of this file
-        loadDir();
     });
+
 
     // Configure the toolbar
     // The title is the path
@@ -94,22 +74,20 @@ angular.module('goboxWebapp')
 
         // Show the dialog
         $mdDialog.show(dialog).then(function(result) {
-            
+
             if (result.length <= 0)
                 return;
-            
+
             // Create the new folder
             var newFolder = new GoBoxFile(result);
             newFolder.setIsDirectory(true);
             newFolder.setFatherId($stateParams.id);
-            
+
             // Call the API method to create the effective directory
             GoBoxClient.createFolder(newFolder).then(function() {
-                
                 $mdToast.showSimple("Directory " + result + " Created");
-                loadDir();
             }, function() {
-                
+
                 // Ops... something wrong
                 $mdToast.showSimple("Sorry, can't create the folder");
             });
@@ -118,26 +96,26 @@ angular.module('goboxWebapp')
 
     // Paste fab button
     $scope.paste = function() {
-        
+
         // Checkif the action is copy or cut
         var cut = Clipboard.getState() == 'cut';
-        
+
         // Get the holded files
         var files = Clipboard.getHoldFiles();
         
-        console.log("Files, ", files);
-        
         // For each file...
         angular.forEach(files, function(file) {
-            
+
             // Call the client method
             GoBoxClient.copyOrCut(file, $scope.dir, cut).then(function() {
-                
+
                 $mdToast.showSimple("File " + file.getName() + " moved");
             }, function() {
-                
+
                 $mdToast.showSimple("Sorry, there was an error with " + file.getName());
             });
         });
+        
+        Clipboard.clear();
     };
 });

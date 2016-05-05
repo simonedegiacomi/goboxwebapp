@@ -18,7 +18,12 @@ angular
         'ngFileUpload',
         'vcRecaptcha',
         'ngSanitize',
-        'ngClipboard'
+        'ngClipboard',
+        'com.2fdevs.videogular',
+		'com.2fdevs.videogular.plugins.controls',
+		'com.2fdevs.videogular.plugins.overlayplay',
+		'com.2fdevs.videogular.plugins.poster',
+		'ngPintura'
     ])
 
 .config(function($stateProvider, $urlRouterProvider, StateRule) {
@@ -186,6 +191,13 @@ angular
         $state.go('loading');
     });
 
+    var lastWantedState = {
+        name: 'home.files',
+        params: {
+            id: 1
+        }
+    };
+
     // Configure routing policy
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
 
@@ -230,11 +242,20 @@ angular
             // If the client is not ready, but the next state wants it
             if (!GoBoxClient.isReady()) {
 
+                // Save this state if is not the loading, so when the client is connected
+                // the user see the state that he want now
+                if (toState.name != 'loading') {
+                    lastWantedState.name = toState.name;
+                    lastWantedState.params = toState.params;
+                }
+                console.log(lastWantedState);
+                console.log(toState);
+
                 var init = function () {
                     GoBoxClient.init().then(function() {
 
                         // Connected! go to the home
-                        $state.go('home.files');
+                        $state.go(lastWantedState.name, lastWantedState.params);
                     }, function() {
 
                         // Not ready... retry soon

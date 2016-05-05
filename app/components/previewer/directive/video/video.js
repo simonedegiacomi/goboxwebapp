@@ -5,14 +5,16 @@ angular.module('goboxWebapp')
    function videoCtrl($scope, $sce) {
 
       $scope.links = $scope.links || GoBoxClient.getLinks($scope.file);
-
-      $scope.trustedLink = $sce.trustAsResourceUrl($scope.links.raw);
+      var videoUrl = $scope.links.raw;
 
       $scope.player = {
-         src: {
-            src: $sce.trustAsResourceUrl($scope.links.raw),
-            type: "video/mp4"
-         }
+         sources: [
+            {
+               src: $sce.trustAsResourceUrl(videoUrl),
+               type: 'video/mp4'
+            }
+         ],
+         theme: "bower_components/videogular-themes-default/videogular.css"
       };
 
    }

@@ -4,32 +4,54 @@ angular.module('goboxWebapp')
 
 .controller('ToolbarCtrl', function($scope, $timeout, Clipboard, ToolbarManager, Preferences) {
 
+    $scope.showToolbar = false;
+
     // Tools of the toolbar
     $scope.tools = [{
         tooltip: 'Copy',
         icon: 'content_copy',
-        show: Clipboard.isFilesSecelted,
-        action: Clipboard.copyFile
+        show: function() {
+            return Clipboard.isFilesSecelted();
+        },
+        action: function() {
+            Clipboard.copyFile();
+        }
     }, {
         tooltip: 'Cut',
         icon: 'content_cut',
-        show: Clipboard.isFilesSecelted,
-        action: Clipboard.cutFile
+        show: function() {
+            return Clipboard.isFilesSecelted();
+        },
+        action: function() {
+            Clipboard.cutFile();
+        }
     }, {
         tooltip: 'Delete',
         icon: 'delete',
-        show: Clipboard.isFilesSecelted,
-        action: Clipboard.tashFiles
+        show: function() {
+            return Clipboard.isFilesSecelted();
+        },
+        action: function() {
+            Clipboard.tashFiles();
+        }
     }, {
         tooltip: 'Rename',
         icon: 'mode_edit',
-        show: Clipboard.isSingleFileSelected,
-        action: Clipboard.renameFile
+        show: function() {
+            return Clipboard.isSingleFileSelected();
+        },
+        action: function() {
+            Clipboard.renameFile();
+        }
     }, {
         tooltip: 'Share',
         icon: 'share',
-        single: true,
-        action: Clipboard.shareFile
+        single: function() {
+            return Clipboard.isSingleFileSelected();
+        },
+        action: function() {
+            Clipboard.shareFile();
+        }
     }];
 
     // Configure the toolbar with the info of the toolbar manager
@@ -54,25 +76,22 @@ angular.module('goboxWebapp')
 
     // Add a listener to the toolbar
     Clipboard.addListener(function() {
-        
+
         // Update the download link
-        if(Clipboard.isSingleFileSelected())
+        if (Clipboard.isSingleFileSelected())
             $scope.download = Clipboard.getDownloadLink();
         else
             $scope.download = undefined;
     });
 
-    var setSwitchIcon = function () {
+    var setSwitchIcon = function() {
         $scope.switchListViewIcon = Preferences.listView == 'list' ? 'view_module' : 'list';
     };
 
-    $scope.switchListView = function () {
-        Preferences.listView = Preferences.listView == 'list' ? 'grid' : 'list';  
+    $scope.switchListView = function() {
+        Preferences.listView = Preferences.listView == 'list' ? 'grid' : 'list';
         setSwitchIcon();
-        console.log("called");
     };
-    
+
     setSwitchIcon();
-    
-    configFromManager();
 });

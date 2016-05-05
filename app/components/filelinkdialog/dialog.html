@@ -7,14 +7,14 @@
             <md-icon>close</md-icon>
         </md-button>
     </md-toolbar>
-    <md-dialog-content layout="column">
+    <md-dialog-content layout="column" layout-padding>
         <p>Use the link below to share '{{file.getName()}}':</p>
         <a ng-href="{{links.publicPage}}" >{{links.publicPage}}</a>
         
         <!-- Con un'altro colore -->
         <div>
             <p>Raw file link:</p>
-            <a ng-href="{{links.shareRaw}}">{{links.shareRaw}}</a>
+            <a ng-href="{{links.raw}}">{{links.raw}}</a>
         </div>
     </md-dialog-content>
     <md-dialog-actions layout="row">

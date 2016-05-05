@@ -17,6 +17,7 @@ angular.module('goboxWebapp')
 
     // Selected files
     var files = [];
+    var selectedFiles = 0;
 
     // Hold files, when the copy or cut button is pressed
     var holdFiles = [];
@@ -38,6 +39,7 @@ angular.module('goboxWebapp')
 
     // Register a new listener
     this.addListener = function(callback) {
+        console.log(callback);
         listeners.push(callback);
     };
 
@@ -49,17 +51,19 @@ angular.module('goboxWebapp')
     // Change the current file
     this.setCurrentFather = function(father) {
         currentFather = father;
+        files = father.children;
     };
 
     // Single click event. UPdate the selected file list and call the listeners.
     // It should be called with the value of the ctrl key button
     this.singleClick = function(file) {
-
-        if (file.selected)
-            files.splice(files.indexOf(file), 1);
-        else
-            files.push(file);
         file.selected = !file.selected;
+        if (file.selected) {
+            selectedFiles++;
+        }
+        else {
+            selectedFiles--;
+        }
         notify();
     };
 
@@ -74,21 +78,22 @@ angular.module('goboxWebapp')
     };
 
     this.getSelectedFiles = function() {
-        return files;
+        return files.filter(function(file) {
+            return file.selected;
+        });
     };
 
     this.clear = function() {
-        for (var i in files)
-            files[i].selected = false;
-        files = [];
+        files.forEach(function(file) {
+            file.selected = false;
+        });
+        selectedFiles = 0;
     };
 
     this.holdState = function(newState) {
         state = newState;
-        for (var i in files)
-            files[i].selected = false;
+        this.clear();
         holdFiles = files;
-        files = [];
     };
 
     this.getState = function() {
@@ -96,24 +101,22 @@ angular.module('goboxWebapp')
     };
 
     this.clearState = function() {
-        holdFiles = [];
+        this.clear();
         state = null;
     };
 
     this.getHoldFiles = function() {
-        return holdFiles;
+        return holdFiles.filter(function(file) {
+            return file.selected;
+        });
     };
 
     this.isSingleFileSelected = function() {
-        var count = 0;
-        for (var i = 0; i < files.length && count <= 2; i++)
-            if (files[i].selected)
-                count++;
-        return count == 1;
+        return selectedFiles == 1;
     };
 
     this.isFilesSecelted = function() {
-        return files.length > 0;
+        return selectedFiles > 0;
     };
 
     this.getDownloadLink = function() {
@@ -122,7 +125,7 @@ angular.module('goboxWebapp')
             return null;
         return {
             name: fileToDownload.getName(),
-            url: GoBoxClient.getDownloadLink(fileToDownload)
+            url: GoBoxClient.getLinks(fileToDownload).raw
         };
     };
 
@@ -136,38 +139,40 @@ angular.module('goboxWebapp')
         $mdToast.showSimple("Hold in clipboard");
     };
 
+
     this.tashFiles = function() {
+
+        var filesToTrash = this.getSelectedFiles();
 
         // Prepare the dialog
         var dialog = $mdDialog.confirm()
             .title("Move to Trash")
-            .textContent('Are you sure you want to delete ' + files.length  + (files.length > 1 ? ' files?' : ' file?'))
+            .textContent('Are you sure you want to delete ' + filesToTrash.length + (filesToTrash.length > 1 ? ' files?' : ' file?'))
             .ariaLabel('Delete File')
             .ok('Delete')
             .cancel('Don\'t Delete');
 
         // Show the dialog
         $mdDialog.show(dialog).then(function(newName) {
-            
+
             // Delete each file
-            for (var i in files) {
-                
-                GoBoxClient.trash(files[i]).then(function() {
-                    
-                    $mdToast.showSimple("File " + files[i].getName() + " deleted!");
+            filesToTrash.forEach(function(fileToDelete) {
+                GoBoxClient.trash(fileToDelete).then(function() {
+                    $mdToast.showSimple("File " + fileToDelete.getName() + " deleted!");
                 }, function() {
-                    
-                    $mdToast.showSimple("Sorry, can't delete " + files[i].getName());
+
+                    $mdToast.showSimple("Sorry, can't delete " + fileToDelete.getName());
                 });
-            }
+            });
         });
 
+        this.clear();
     };
 
     this.renameFile = function() {
 
         // Get  the file to rename
-        var fileToRename = files[0];
+        var fileToRename = this.getSelectedFiles()[0];
 
         // Create the dialog
         var dialog = $mdDialog.prompt()
@@ -189,20 +194,24 @@ angular.module('goboxWebapp')
                 $mdToast.showSimple(("Canot rename the file"));
             });
         });
+        
+        this.clear();
     };
 
     this.shareFile = function() {
 
         // Take the first selected file
-        var file = files[0];
+        var file = this.getSelectedFiles()[0];
 
         // Use the client object to share the file
         GoBoxClient.share(file, true).then(function() {
-            
+
             // Show an alert with the link to the shared file
             LinkDialog.show(file);
         }, function() {
             $mdToast.showSimple("Sorry, can't share " + file.getName());
         });
+        
+        this.clear();
     };
 });

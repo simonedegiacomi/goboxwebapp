@@ -8,7 +8,7 @@
  */
 angular.module('goboxWebapp')
 
-.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, GoBoxMode, Upload) {
+.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, GoBoxMode, Upload, SyncEventKind) {
 
     // State of the client
     this._state = GoBoxState.NOT_INITIALIZED;
@@ -25,6 +25,8 @@ angular.module('goboxWebapp')
     // When the client start, the base is the main server
     this._base = Env.base;
     this._fileTransferBase = Env.baseTransfer;
+    
+    this._syncListeners = [];
 
     var self = this;
 
@@ -90,18 +92,36 @@ angular.module('goboxWebapp')
 
         // New storage event
         this._ws.on('syncEvent', function(data) {
-
+            
             // Wrap the changed file
             var changedFile = GoBoxFile.wrap(data.file);
+            
+            switch (data.kind) {
+                case SyncEventKind.NEW_FILE:
+                case SyncEventKind.EDIT_FILE:
+                case SyncEventKind.RECOVER_FILE:
+                    self._caches.get(changedFile.getFatherId()).children.push(changedFile);
+                    break;
 
-            // Invalidate the cache
-            self._caches.remove(changedFile.getId(), changedFile);
-
-            // Invalidate also the cache of the father
-            self._caches.remove(changedFile.getFatherId(), changedFile);
-
+                case SyncEventKind.CUT_FILE:
+                case SyncEventKind.TRASH_FILE:
+                case SyncEventKind.REMOVE_FILE:
+                    var children = self._caches.get(changedFile.getFatherId()).children;
+                    for (var i in children) {
+                        console.log("deleting");
+                        if (children[i].getId() == changedFile.getId()) {
+                            children.splice(i, 1);
+                            break;
+                        }
+                    }
+                    break;
+                
+            }
+            
             // Call the sync listener
-            self._syncListener(changedFile, data.kind);
+            for (var i in self._syncListeners){
+                self._syncListeners[i](changedFile, data.kind);
+            }
         });
         
         return future.promise;
@@ -195,8 +215,8 @@ angular.module('goboxWebapp')
     /**
      * Set the sync event listener
      */
-    this.setSyncListener = function(listener) {
-        this._syncListener = listener;
+    this.addSyncListener = function(listener) {
+        this._syncListeners.push(listener);
     };
 
     this.getAuth = function() {
@@ -385,13 +405,17 @@ angular.module('goboxWebapp')
         };
 
         this._ws.query('recent', req).then(function(res) {
-            if (res.success) {
-                var events = res.events;
-                future.resolve(GoBoxFile.wrap(res.files));
-                future.resolve();
+            if (!res.success) {
+                future.reject();
                 return;
             }
-            future.reject();
+            var events = res.events;
+            events.forEach(function(event) {
+                var poorFile = event.file;
+                event.file = GoBoxFile.wrap(poorFile);
+            });
+            future.resolve(events);
+            return;
         });
         return future.promise;
     };
@@ -437,15 +461,10 @@ angular.module('goboxWebapp')
         // Make the query
         this._ws.query('createFolder', req).then(function(res) {
             if (res.created) {
-
-                // Invalidate the query of the father
-                self._caches.remove(file.getFatherId());
-
                 future.resolve();
+                return;
             }
-            else {
-                future.reject();
-            }
+            future.reject();
         });
 
         return future.promise;
@@ -471,14 +490,10 @@ angular.module('goboxWebapp')
         // Make the query
         this._ws.query('trashFile', req).then(function(res) {
             if (res.success) {
-
-                // Update the cache
-                self._caches.remove(fileToTrash.getId());
                 future.resolve();
+                return;
             }
-            else {
-                future.reject();
-            }
+            future.reject();
         });
 
         return future.promise;
@@ -553,19 +568,10 @@ angular.module('goboxWebapp')
         }).then(function(result) {
 
             if (result.success) {
-
-                // Update cache
-                self._caches.remove(newFather.id);
-
-                if (cut)
-                    self._caches.remove(file.getFatherId());
-
                 future.resolve();
+                return;
             }
-            else {
-
-                future.reject();
-            }
+            future.reject();
         });
 
         return future.promise;
@@ -607,17 +613,10 @@ angular.module('goboxWebapp')
         this._ws.query('rename', query).then(function(res) {
 
             if (res.success) {
-
-                // Invalidate the caches
-                self._caches.remove(file.getId());
-
-                // And also the cache of the file
-                self._caches.remove(file.getFatherId());
-
                 future.resolve();
+                return;
             }
-            else
-                future.reject();
+            future.reject();
         });
         return future.promise;
     };
@@ -656,25 +655,28 @@ angular.module('goboxWebapp')
         });
         return future.promise;
     };
-
-    /**
-     * Get the private download link
-     */
-    this.getDownloadLink = function(file) {
-        return this._fileTransferBase + "fromStorage?ID=" + file.getId();
-    };
-
-    this.getPreviewLink = function(file) {
-        return this.getDownloadLink(file) + "&preview=true";
-    };
     
+    /**
+     * @ngdoc method
+     * @ngname getLinks
+     * @description
+     * This method return a new onjct that containt 3 different links of the specified file.
+     * Raw: Raw link tot he file
+     * Thumbnail: Link of the thumbnail image of the file
+     * Public Page: Link of the public page of the file.
+     * 
+     * @param {Object} file File of which get the link
+     * @param {String} sharingHost If the file you pass as first argument is not on your storage
+     * or is public, specify in as sharingHost the name of the host. When you specify
+     * the host only the bridge mode link will be generater
+     */
     this.getLinks = function (file, sharingHost) {
         var hostName = sharingHost || this._auth.getUsername();
         var base = sharingHost ? Env.baseTransfer : this._fileTransferBase;
         var links = {};
         
         links.raw = base + "fromStorage?ID=" + file.getId() + "&host=" + hostName;
-        links.preview = links.raw + "&preview=true";
+        links.thumbnail = links.raw + "&preview=true";
         links.publicPage = this._base + "webapp/#/public_file/" + hostName + "/" + file.getId();
         
         return links;
