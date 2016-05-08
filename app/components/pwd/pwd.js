@@ -9,7 +9,7 @@ angular.module('goboxWebapp')
     
     var ctrl = function ($scope) {
         $scope.getLink = function (file) {
-            return $state.href('home.files', { id: file.getId() });
+            return $state.href('home.files', { id: file.ID });
         };
     };
     

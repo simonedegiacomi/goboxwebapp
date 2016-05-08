@@ -1,24 +1,29 @@
-<!-- Main content of the view -->
-<file-list files="dir.children"></file-list>
-
-
+<md-content layout="column" flex>
+    <file-list flex files="dir.children"></file-list>
+</md-content>
 <!-- Fabs -->
-<ul class="fab-box">
-    
+<div class="fab-box" layout="column" layout-align="end end">
+
     <!-- Paste -->
-    <li ng-if="Clipboard.getHoldFiles().length > 0">
-        <md-button ng-click="paste()" aria-label="menu" class="md-fab md-warn">
-            <md-tooltip md-direction="left">Paste</md-tooltip>
-            <md-icon>content_paste</md-icon>
-        </md-button>
-    </li>
-    
+    <!--<li ng-if="Clipboard.getHoldFiles().length > 0">-->
+    <!--    <md-button ng-click="paste()" aria-label="menu" class="md-fab md - warn">-->
+    <!--        <md-tooltip md-direction="left">Paste</md-tooltip>-->
+    <!--        <md-icon>content_paste</md-icon>-->
+    <!--    </md-button>-->
+    <!--</li>-->
+
     <!-- New Folder -->
-    <li>
-        <md-button aria-label="menu" class="md-fab md-warn" ng-click="newFolder($event)">
-            <md-tooltip md-direction="down">Create New Folder</md-tooltip>
-            <md-icon>create_new_folder</md-icon>
-        </md-button>
-    </li>
-    </li>
-</ul>
+    <!--<li>-->
+    <md-button aria-label="menu" class="md-fab md-warn" ng-click="newFolder($event)">
+        <md-tooltip md-direction="down">Create New Folder</md-tooltip>
+        <md-icon>create_new_folder</md-icon>
+    </md-button>
+    <!--</li>-->
+
+    <md-toolbar class="md-toolbar-tools md-whiteframe-z2">
+        <md-button>YEEE</md-button>
+        <span flex class="short-text">TESTo0000000000</span>
+        <md-button>YEEE</md-button>
+        <md-button>YEEE</md-button>
+    </md-toolbar>
+</div>

@@ -15,90 +15,73 @@
 </style>
 
 
-<md-content>
-
-    <!-- List layout -->
-    <md-content ng-if="Preferences.listView == 'list'" flex>
-        <md-subheader class="md-primary" style="background-color: #eee;">
-            <div layout="row">
-                <div flex="10">Icon</div>
+<!-- List layout -->
+<md-content layout="column" flex ng-show="Preferences.listView == 'list'">
+    <md-subheader class="md-primary" style="background-color: #eee;">
+        <div layout="row">
+            <div flex="10">Icon</div>
 
 
-                <div flex="50">
-                    <span ng-click="order.toggle('name')">Name </span>
-                    <span class="sort" ng-if="order.what == 'name'" ng-class="{reverse: order.reverse}"></span>
-                </div>
-                <div flex="15">
-                    <span ng-click="order.toggle('size')" hide show-gt-sm>Size </span>
-                    <span class="sort" ng-if="order.what == 'size'" ng-class="{reverse: order.reverse}"></span>
-                </div>
-                <div flex="25">
-                    <span ng-click="order.toggle('date')" hide show-gt-md>Date </span>
-                    <span class="sort" ng-if="order.what == 'date'" ng-class="{reverse: order.reverse}"></span>
-                </div>
+            <div flex="50">
+                <span ng-click="order.toggle('name')">Name </span>
+                <span class="sort" ng-if="order.what == 'name'" ng-class="{reverse: order.reverse}"></span>
             </div>
-        </md-subheader>
+            <div flex="15">
+                <span ng-click="order.toggle('size')" hide show-gt-sm>Size </span>
+                <span class="sort" ng-if="order.what == 'size'" ng-class="{reverse: order.reverse}"></span>
+            </div>
+            <div flex="25">
+                <span ng-click="order.toggle('date')" hide show-gt-md>Date </span>
+                <span class="sort" ng-if="order.what == 'date'" ng-class="{reverse: order.reverse}"></span>
+            </div>
+        </div>
+    </md-subheader>
 
-        <!--scroll-listener on-scroll-end="console.log('ok')"-->
-
-        <md-list ng-if="Preferences.listView == 'list'">
-
-            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" ng-click="click(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding" >
+    <md-content flex>
+        <md-list>
+            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" on-long-press="press()" ng-click="$evalAsync(click(file, $event))" ng-dblclick="double(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
 
                 <!-- Icon or checkbox-->
                 <div flex="10">
                     <!-- Icon -->
-                    <md-icon ng-hide="file.selected">{{file | iconFilter}}</md-icon>
+                    <md-icon ng-hide="file.selected">{{::file | iconFilter}}</md-icon>
 
                     <!-- File selection -->
                     <md-checkbox ng-show="file.selected" ng-model="file.selected" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
                 </div>
                 <!-- File name -->
-                <div flex="50" class="short-text">{{file.getName()}}</div>
+                <div flex="50" class="short-text">{{::file.name}}</div>
                 <!-- File size -->
-                <div flex="15" hide show-gt-sm>{{file.getSize()}}</div>
+                <div flex="15" hide show-gt-sm>{{::file.size}}</div>
                 <!-- Last update date -->
-                <div flex flex="25" hide show-gt-md>{{file.getLastUpdate() | date:"MM/dd/yy 'at' h:mma"}}</div>
+                <div flex flex="25" hide show-gt-md>{{::file.getLastUpdate() | date:"MM/dd/yy 'at' h:mma"}}</div>
 
             </md-list-item>
         </md-list>
     </md-content>
+</md-content>
+<!-- Cards layout -->
+<md-content ng-show="Preferences.listView == 'grid'" style="background: #EEEEEE;" layout-padding>
 
-    <!-- Cards layout -->
-    <md-content style="background: #EEEEEE;" layout-padding ng-if="Preferences.listView == 'grid'">
+    <md-grid-list md-cols-xs="8" md-cols-sm="12" md-cols-md="16" md-cols-lg="20" md-cols-xl="32" md-row-height="3rem" md-gutter="32px">
+        <md-grid-tile ng-class="{ 'selected-tile': file.selected }" style="background: #FFFFFF;" layout-align="start center" class="md-whiteframe-1dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1"
+        md-colspan="4">
+            <md-icon layout-margin>folder</md-icon>
+            <span flex>{{::file.name}}</span>
+        </md-grid-tile>
+    </md-grid-list>
 
-        <md-grid-list md-cols-xs="8" md-cols-sm="12" md-cols-md="16" md-cols-lg="20" md-cols-xl="32" md-row-height="3rem" md-gutter="32px">
-            <md-grid-tile ng-class="{ 'selected-tile': file.selected }" style="background: #FFFFFF;" layout-align="start center" class="md-whiteframe-1dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1"
-            md-colspan="4">
-                <md-icon layout-margin>folder</md-icon>
-                <span flex>{{file.getName()}}</span>
-            </md-grid-tile>
-        </md-grid-list>
+    <md-grid-list md-cols-xs="2" md-cols-sm="3" md-cols-md="4" md-cols-lg="5" md-cols-xl="8" md-row-height="1:1" md-gutter="32px">
 
-        <md-grid-list md-cols-xs="2" md-cols-sm="3" md-cols-md="4" md-cols-lg="5" md-cols-xl="8" md-row-height="1:1" md-gutter="32px">
+        <md-grid-tile ng-repeat="file in files" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
+            <md-content layout-fill layout="column" layout-align="space-between stretch" style="background: #EEEEEE;">
+                <img flex="80" ng-src="{{::file | thumbnail}}" default-thumbnail class="file-tile">
+                <div ng-class="{ 'selected-tile': file.selected }" flex="20" layout="row" layout-align="space-between center" class="short-text" style="background: #EEEEEE;">
+                    <md-icon layout-margin>{{::file | iconFilter}}</md-icon>
+                    <span flex>{{::file.name}}</span>
+                </div>
+            </md-content>
 
-            <md-grid-tile ng-repeat="file in files" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
-                <md-content layout-fill layout="column" layout-align="space-between stretch" style="background: #EEEEEE;">
-                    <img flex="80" ng-src="{{file | thumbnail}}" default-thumbnail class="file-tile">
-                    <div ng-class="{ 'selected-tile': file.selected }" flex="20" layout="row" layout-align="space-between center" class="short-text" style="background: #EEEEEE;">
-                        <md-icon layout-margin>{{file | iconFilter}}</md-icon>
-                        <span flex>{{file.getName()}}</span>
-                    </div>
-                </md-content>
+    </md-grid-list>
 
-        </md-grid-list>
-
-
-
-        <!--<md-grid-list md-cols-xs="2" md-cols-gt-xs="3" md-cols-sm="4" md-cols-gt-sm="5" md-cols-md="6" md-cols-gt-md="7" md-cols-lg="8" md-cols-gt-lg="9" md-cols-xl="10" md-row-height="1:1" md-gutter="16px">
-
-            <md-grid-tile ng-repeat="file in files" class="md-whiteframe-2dp" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
-                <img layout-fill ng-src="{{file | thumbnail}}" default-thumbnail class="file-tile">
-                <md-grid-tile-footer flex ng-class="{ 'selected-tile': file.selected }" class="short-text" layout="row" layout-margin layout-padding layout-align="start center">
-                    <md-icon layout-margin>{{file | iconFilter}}</md-icon>
-                    <span flex>{{file.getName()}}</span>
-                </md-grid-tile-footer>
-        </md-grid-list>-->
-
-    </md-content>
 </md-content>

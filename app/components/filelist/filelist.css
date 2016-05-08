@@ -6,10 +6,6 @@
     padding: 0px !important;
 }
     
-// .selected-file {
-//     background-color: #267ED5 !important;
-// }
-    
 .sort:after {
     content: '\25b2';
 }

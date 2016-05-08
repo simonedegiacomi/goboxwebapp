@@ -2,10 +2,10 @@
 <html>
 
 <head>
+    <link rel="manifest" href="progressivewebapp.json">
     <meta charset="utf-8">
-    <title></title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
+    <title>GoBox</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
@@ -13,19 +13,26 @@
     <link rel="stylesheet" href="bower_components/ng-img-crop/compile/minified/ng-img-crop.css" />
     <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
     <!-- endbower -->
+        
+
     <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
+    <!-- build:css(.tmp) styles/mainb.css -->
+    <link rel="stylesheet" href="states/home/files/files.css" />
+    <link rel="stylesheet" href="states/home/settings/settings.css" type="text/css" />
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="components/filelist/filelist.css" />
+    <link rel="stylesheet" href="states/login/login.css" type="text/css" />
+    <link rel="stylesheet" href="states/home/sidenav/sidenav.css"/>
+    <link rel="stylesheet" href="states/loading/loading.css" type="text/css" />
     <!-- endbuild -->
 
     <!-- Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Google reCaptcha -->
-    <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 </head>
 
 <body ng-app="goboxWebapp">
 
-    <div ui-view layout-fill></div>
+    <md-content ui-view layout-fill ></md-content>
 
 
     <!-- build:js(.) scripts/vendor.js -->
@@ -54,18 +61,13 @@
     <script src="bower_components/angular-pintura/angular-pintura.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
+
+<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
+
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
-
-    <!-- endbuild -->
-
-    <!-- Main app.js -->
-    <script src="app.js"></script>
-    <link rel="stylesheet" href="style.css" type="text/css" />
-
-    <!-- My ws wrapper -->
+    <script type="text/javascript" src="bower_components/ng-file-upload/ng-file-upload-shim.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
     <script type="text/javascript" src="common/myws/myws.js"></script>
-
-    <!-- GoBox angular API -->
     <script type="text/javascript" src="common/goboxapi/clientstate.js"></script>
     <script type="text/javascript" src="common/goboxapi/goboxauth.js"></script>
     <script type="text/javascript" src="common/goboxapi/goboxfile.js"></script>
@@ -73,124 +75,44 @@
     <script type="text/javascript" src="common/goboxapi/synceventkind.js"></script>
     <script type="text/javascript" src="common/goboxapi/kind.js"></script>
     <script type="text/javascript" src="common/goboxapi/mode.js"></script>
-
-    <!-- State rule -->
     <script type="text/javascript" src="common/staterule/staterule.js"></script>
-
-    <!-- Directive file list -->
-    <script src="components/filelist/filelist.js"></script>
-    <link rel="stylesheet" href="components/filelist/filelist.css" />
-    <link rel="stylesheet" href="states/login/login.css" type="text/css" />
-    <link rel="stylesheet" href="states/home/sidenav/sidenav.css" type="text/css" />
-
-    <!-- Connection info dialog -->
+    <script type="text/javascript" src="components/filelist/filelist.js"></script>
     <script type="text/javascript" src="components/connectioninfo/info.js"></script>
-
-    <!-- Connecton box -->
     <script type="text/javascript" src="components/easyconnectionbox/easyconnectionbox.js"></script>
-
-    <!-- Directive pwd -->
-    <script src="components/pwd/pwd.js"></script>
-
-    <!-- Upload manager -->
-    <script src="components/upload/uploadmanager.js"></script>
-
-    <!-- Directive Upload box -->
-    <script src="components/upload/uploadbox.js"></script>
-
-    <!-- Upload dialog -->
+    <script type="text/javascript" src="components/pwd/pwd.js"></script>
+    <script type="text/javascript" src="components/upload/uploadmanager.js"></script>
+    <script type="text/javascript" src="components/upload/uploadbox.js"></script>
     <script type="text/javascript" src="components/upload/uploaddialog.js"></script>
-
-    <!-- Directive Scroll listener -->
     <script type="text/javascript" src="components/scrolllistener/scrolllistener.js"></script>
-
-    <!-- Filter url preview -->
     <script type="text/javascript" src="filters/thumbnail.js"></script>
-    
-    <!-- Default thumbnail directive -->
     <script type="text/javascript" src="directives/defaultthumbnail.js"></script>
-
-    <!-- Filter icon file -->
     <script type="text/javascript" src="filters/iconfilter.js"></script>
-
-    <!-- Filter download link -->
     <script type="text/javascript" src="filters/downloadlink.js"></script>
-
-    <!-- Component clipboard -->
     <script type="text/javascript" src="components/clipboard/clipboard.js"></script>
-
-    <!-- Preview components -->
-    <!-- Previewer component (service) -->
     <script type="text/javascript" src="components/previewer/previewer.js"></script>
-
-    <!-- Preview directive -->
     <script type="text/javascript" src="components/previewer/directive/preview.js"></script>
-
-    <!-- Image preview -->
     <script type="text/javascript" src="components/previewer/directive/image/image.js"></script>
-
-    <!-- Music preview -->
     <script type="text/javascript" src="components/previewer/directive/music/music.js"></script>
-
-    <!-- Video preview -->
     <script type="text/javascript" src="components/previewer/directive/video/video.js"></script>
-
-    <!-- PDF preview -->
     <script type="text/javascript" src="components/previewer/directive/pdf/pdf.js"></script>
-
-    <!-- End preview Components -->
-
-    <!-- Environment -->
     <script type="text/javascript" src="env.js"></script>
-
-    <!-- States -->
-
-    <!-- Login state -->
     <script type="text/javascript" src="states/login/login.js"></script>
-
-    <!-- Public file state -->
     <script type="text/javascript" src="states/publicfile/publicfile.js"></script>
-
-    <!-- Home (root) state -->
     <script type="text/javascript" src="states/home/home.js"></script>
-
-    <!-- Root toolbar -->
-    <script type="text/javascript" src="states/home/toolbar/toolbar.js"></script>
-
-    <!-- And also the toolbar manager -->
-    <script type="text/javascript" src="states/home/toolbar/toolbarmanager.js"></script>
-
-    <!-- Root sidenav -->
+    <script type="text/javascript" src="states/home/toolbar/toolbarctrl.js"></script>
+    <script type="text/javascript" src="states/home/toolbar/toolbarconf.js"></script>
     <script type="text/javascript" src="states/home/sidenav/sidenav.js"></script>
-
-    <!-- Files state -->
     <script type="text/javascript" src="states/home/files/files.js"></script>
-    <link rel="stylesheet" href="states/home/files/files.css" />
-
-    <!-- Shared state -->
     <script type="text/javascript" src="states/home/share/share.js"></script>
-
-    <!-- Filter state -->
     <script type="text/javascript" src="states/home/filter/filter.js"></script>
-
-    <!-- Recent files state -->
     <script type="text/javascript" src="states/home/recent/recent.js"></script>
-
-    <!-- Trash state -->
     <script type="text/javascript" src="states/home/trash/trash.js"></script>
-
-    <!-- Settings state -->
     <script type="text/javascript" src="states/home/settings/settings.js"></script>
-    <link rel="stylesheet" href="states/home/settings/settings.css" type="text/css" />
-
-    <!-- Loading state -->
     <script type="text/javascript" src="states/loading/loading.js"></script>
-    
-    <!-- Shared link dialog -->
     <script type="text/javascript" src="components/filelinkdialog/filelinkdialog.js"></script>
-    
     <script type="text/javascript" src="components/preferences/preferences.js"></script>
 
+    <!-- endbuild -->
 </body>
 
 </html>

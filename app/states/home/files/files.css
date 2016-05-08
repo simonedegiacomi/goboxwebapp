@@ -1,6 +1,7 @@
 .fab-box {
-    position: fixed;
-    right: 25px;
+    position: absolute;
+    right: 15px;
+    left: 15px;
     bottom: 15px;
     list-style-type: none;
 }

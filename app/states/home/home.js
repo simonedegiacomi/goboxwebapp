@@ -2,7 +2,8 @@
 
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($scope, Clipboard, Previewer, GoBoxClient, $state, $timeout) {
+.controller('HomeCtrl', function($rootScope, $scope, $mdSidenav, Clipboard, Previewer, GoBoxClient, $state, $timeout) {
+
 
     $scope.clientReady = GoBoxClient.isReady();
 
@@ -13,7 +14,7 @@ angular.module('goboxWebapp')
         if (file.isDirectory) {
 
             $state.go('home.files', {
-                id: file.getId()
+                id: file.ID
             });
         }
         else {
@@ -27,5 +28,14 @@ angular.module('goboxWebapp')
             // just refresh
         });
     });
+    
+    
+    $rootScope.closeSidenav = function () {
+        $mdSidenav('sidenav').close();
+    };
+    
+    $rootScope.openSidenav = function () {
+        $mdSidenav('sidenav').open();
+    };
 
 });

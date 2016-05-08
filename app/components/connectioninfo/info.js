@@ -35,7 +35,7 @@ angular.module('goboxWebapp')
                     intervalPromise = undefined;
                 }
             }
-        }
+        };
 
         // Show the dialog
         promise = $mdDialog.show(dialog);

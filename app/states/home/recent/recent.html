@@ -1,5 +1,4 @@
-
-<md-content layout="column" flex scroll-listener on-scroll-end="onPageEnd()">
+<md-content layout="column" flex >
     <md-content ng-show="events.length <= 0">
         <md-card>
             <md-toolbar>
@@ -16,23 +15,23 @@
         <md-subheader class="md-primary" style="background-color: #eee;">
             <div layout="row">
                 <div flex="10"></div>
-                <div flex="20">Event</div>
-                <div flex="40">File Name</div>
-                <div flex="20">Date</div>
+                <div flex="15" hide show-gt-sm>Event</div>
+                <div flex>File Name</div>
+                <div flex="20" hide show-gt-sm>Date</div>
                 <div flex="10">Find</div>
             </div>
         </md-subheader>
-        <md-content layout-padding flex layout-margin>
+        <md-content flex>
             <md-list>
-                <md-list-item ng-repeat="event in events" layout="row">
-                    <div flex="10">
-                        <md-icon>{{alias[event.kind].icon}}</mdicon>
+                <md-list-item layout-padding ng-repeat="event in events" layout="row">
+                    <div flex="10" >
+                        <md-icon>{{::alias[event.kind].icon}}</mdicon>
                     </div>
-                    <div flex="20">{{alias[event.kind].name}}</div>
-                    <div flex="40">{{event.file.name}}</div>
-                    <div flex="20">{{event.date | date}}</div>
+                    <div flex="15" hide show-gt-sm>{{::alias[event.kind].name}}</div>
+                    <div flex="grow" class="short-text">{{::event.file.name}}</div>
+                    <div flex="20" hide show-gt-sm>{{::event.date | date}}</div>
                     <div flex="10">
-                        <md-button ng-click="show(event.file)" class="md-icon-button">
+                        <md-button ng-click="::show(event.file)" class="md-icon-button">
                             <md-icon>pageview</md-icon>
                             <md-tooltip>Show file</md-tooltip>
                         </md-button>

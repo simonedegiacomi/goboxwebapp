@@ -1,30 +1,13 @@
-<style>
-    .loading_card {
-        max-width: 800px;
-    }
-</style>
-<md-content layout-align="center center" layout-fill layout="row">
-    <md-card class="loading_card">
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h3>Connecting to your Storage</h3>
-            </div>
-        </md-toolbar>
-        <md-card-content>
-            <md-content layout="row" layout-xs="column" layout-align="center center">
-                <md-content>
-                    <md-progress-circular flex class="center md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
-                </md-content>
-                <md-content layout="column">
-                    <md-title>Connecting to your storage</md-title>
-                    <p>Check your Storage connection or go to the support page to.
-                        <br> If you haven't configured your storage yet, install the GoBoxClient</p>
-                    <p>If you need it, you can change your account settings even if the Storage is not connected:</p>
-                </md-content>
+<md-content layout-align="space-around center" layout-fill layout="row">
+    <md-progress-circular ng-hide="error" class="md-primary md-hue-3" md-mode="indeterminate" md-diameter="128"></md-progress-circular>
+    <md-card ng-show="error">
+        <md-card-content layout-padding>
+            <h3>Something is not working...</h3>
+            <p>Cannot connect to your Storage, Please check your storage configuration.</p>
+            <p>If you need to change your password, use this button go open your settings</p>
+            <md-content layout="row" layout-align="center center">
+                <md-button class="md-primary md-raised" ui-sref="home.settings">Settings</md-button>
             </md-content>
         </md-card-content>
-        <md-card-actions layout="row" layout-align="end center">
-            <md-button ui-sref="home.settings" class="md-raised md-primary">Settings</md-button>
-        </md-card-actions>
     </md-card>
 </md-content>

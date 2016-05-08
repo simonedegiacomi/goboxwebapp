@@ -13,15 +13,15 @@ angular.module('goboxWebapp')
     };
 
     GoBoxAuth.prototype.setUsername = function(username) {
-        this._username = username;
+        this.username = username;
     };
 
     GoBoxAuth.prototype.getUsername = function() {
-        return this._username;
+        return this.username;
     };
 
     GoBoxAuth.prototype.setEmail = function(email) {
-        this._email = email;
+        this.email = email;
     };
 
     GoBoxAuth.prototype.getEmail = function() {
@@ -39,7 +39,7 @@ angular.module('goboxWebapp')
 
         // Create the request body
         var request = {
-            username: this._username,
+            username: this.username,
             password: password,
             type: 'C',
             keepLogged: keepLogged | false,
@@ -80,7 +80,7 @@ angular.module('goboxWebapp')
 
         this._valid = false;
         delete this._token;
-        delete this._username;
+        delete this.username;
         delete this._password;
 
         // Tell the server to invalidate the session
@@ -97,7 +97,7 @@ angular.module('goboxWebapp')
 
         // Prepare the request body
         var request = {
-            username: this._username,
+            username: this.username,
             password: password,
             email: this._email,
             reCaptcha: reCaptcha
@@ -142,7 +142,7 @@ angular.module('goboxWebapp')
         $http(request).then(function(response) {
             
             self._valid = true;
-            self._username = response.data.username;
+            self.username = response.data.username;
             self._id = response.data.id;
             future.resolve(true);
         }, function(error) {

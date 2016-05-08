@@ -109,7 +109,7 @@ angular.module('goboxWebapp')
                     var children = self._caches.get(changedFile.getFatherId()).children;
                     for (var i in children) {
                         console.log("deleting");
-                        if (children[i].getId() == changedFile.getId()) {
+                        if (children[i].ID == changedFile.ID) {
                             children.splice(i, 1);
                             break;
                         }
@@ -348,7 +348,7 @@ angular.module('goboxWebapp')
                 var wrappedFile = GoBoxFile.wrap(detailedFile.file);
 
                 // Update the cache
-                self._caches.put(wrappedFile.getId(), wrappedFile);
+                self._caches.put(wrappedFile.ID, wrappedFile);
                 future.resolve(wrappedFile);
             });
         }
@@ -483,7 +483,7 @@ angular.module('goboxWebapp')
         var req = {
             toTrash: !recover,
             file: {
-                ID: fileToTrash.getId()
+                ID: fileToTrash.ID
             }
         };
 
@@ -559,10 +559,10 @@ angular.module('goboxWebapp')
         // Make the query
         this._ws.query('copyOrCutFile', {
             file: {
-                ID: file.getId()
+                ID: file.ID
             },
             newFather: {
-                ID: newFather.getId()
+                ID: newFather.ID
             },
             cut: cut
         }).then(function(result) {
@@ -605,7 +605,7 @@ angular.module('goboxWebapp')
         // Prepare the query
         var query = {
             file: {
-                ID: file.getId()
+                ID: file.ID
             },
             newName: newName
         };
@@ -675,9 +675,9 @@ angular.module('goboxWebapp')
         var base = sharingHost ? Env.baseTransfer : this._fileTransferBase;
         var links = {};
         
-        links.raw = base + "fromStorage?ID=" + file.getId() + "&host=" + hostName;
+        links.raw = base + "fromStorage?ID=" + file.ID + "&host=" + hostName;
         links.thumbnail = links.raw + "&preview=true";
-        links.publicPage = this._base + "webapp/#/public_file/" + hostName + "/" + file.getId();
+        links.publicPage = this._base + "webapp/#/public_file/" + hostName + "/" + file.ID;
         
         return links;
     };
@@ -690,7 +690,7 @@ angular.module('goboxWebapp')
 
         var req = {
             share: angular.isDefined(unShare) ? unShare : true,
-            ID: file.getId()
+            ID: file.ID
         };
 
         this._ws.query('share', req).then(function(res) {

@@ -3,3 +3,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+body {
+    overflow-y: hidden;
+}
+
+.ng-hide.ng-hide-animate {
+    display: none !important;
+}

@@ -2,7 +2,9 @@
 
 angular.module('goboxWebapp')
 
-.controller('LoadingCtrl', function() {
+.controller('LoadingCtrl', function($scope, $timeout) {
 
-    
+    $timeout(function () {
+        $scope.error = true;
+    }, 5000);
 });

@@ -1,70 +1,60 @@
 angular.module('goboxWebapp')
 
-.controller('TrashCtrl', function ($scope, GoBoxClient, $mdToast, $mdDialog, ToolbarManager) {
-    
+.controller('TrashCtrl', function($scope, GoBoxClient, $mdToast, $mdDialog, Toolbar) {
+
     // Request the files
-    function updateTrashList() {
-        GoBoxClient.getTrashedFiles().then(function(files) {
-            $scope.files = files;
-        });
-    }
-    
-    updateTrashList();
-    
-    $scope.recover = function (fileToRecover) {
-        
+    GoBoxClient.getTrashedFiles().then(function(files) {
+        $scope.files = files;
+    });
+
+    $scope.recover = function(fileToRecover) {
+
         // Call the method of the client
-        GoBoxClient.trash(fileToRecover, true).then(function () {
+        GoBoxClient.trash(fileToRecover, true).then(function() {
             $mdToast.showSimple("File " + fileToRecover.name + " recovered");
-            updateTrashList();
-        }, function () {
+        }, function() {
             $mdToast.showSimple("Sorry, cannot recover " + fileToRecover.name);
         });
     };
-    
-    $scope.delete = function (filetoDelete) {
+
+    $scope.delete = function(filetoDelete) {
 
         var dialog = $mdDialog.prompt()
             .title("Remove file")
             .textContent("You can't undo this action")
             .ok("DELETE")
             .cancel("Keep in Trash");
-            
-        $mdDialog(dialog).then(function () {
-            
-            GoBoxClient.delete(filetoDelete).then(function () {
+
+        $mdDialog(dialog).then(function() {
+
+            GoBoxClient.delete(filetoDelete).then(function() {
                 $mdToast.showSimple("File removed from the trash");
-                updateTrashList();
-            }, function () {
+            }, function() {
                 $mdToast.showSimple("The file cannot be removed from the trash");
             });
         });
     };
-    
-    $scope.emptyTrash = function () {
+
+    $scope.emptyTrash = function() {
         var dialog = $mdDialog.confirm()
             .title("Empty trash")
             .textContent("You can't undo this action")
             .ok("Empty trash")
             .cancel("Keep the Trash");
-            
-        $mdDialog.show(dialog).then(function () {
-            GoBoxClient.emptyTrash().then(function () {
+
+        $mdDialog.show(dialog).then(function() {
+            GoBoxClient.emptyTrash().then(function() {
                 $mdToast.showSimple("Done");
-                updateTrashList();
-            }, function () {
+            }, function() {
                 $mdToast.showSimple("Cannot empty the trash");
-                updateTrashList();
             });
         });
     };
+
+     // Config toolbar
+    Toolbar.title.mode = 'title';
+    Toolbar.title.str = 'Trash';
+    Toolbar.buttons.switchView.visible = false;
+    Toolbar.buttons.search.visible = false;
     
-    ToolbarManager.setTitle({
-        mode: 'title',
-        str: 'Trashed Files'
-    });
-    ToolbarManager.showSearch(true);
-    ToolbarManager.showTools(false);
-    ToolbarManager.setVisibility(true);
-    ToolbarManager.apply();
 });

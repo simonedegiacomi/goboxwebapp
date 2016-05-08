@@ -5,7 +5,9 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FileListCtrl', function($scope, $state, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, ToolbarManager, Clipboard, Previewer) {
+.controller('FileListCtrl', function($scope, $state, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, Toolbar, Clipboard, Previewer) {
+
+    $scope.closeSidenav();
 
     // Attach the clipboard to the scope
     $scope.Clipboard = Clipboard;
@@ -26,8 +28,6 @@ angular.module('goboxWebapp')
                 // And update the clipboard
                 Clipboard.setCurrentFather(detailedFile);
 
-                // Refresh the toolbar
-                ToolbarManager.apply();
                 return;
             }
 
@@ -40,23 +40,11 @@ angular.module('goboxWebapp')
             Previewer.show(detailedFile);
         });
     });
-
-
-    // Configure the toolbar
-    // The title is the path
-    ToolbarManager.setTitle({
-        mode: 'pwd'
-    });
-
-    // Show search button and tools
-    ToolbarManager.showSearch(true);
-
-    // And also the tool
-    ToolbarManager.showTools(true);
-
-    // Finally refresh the toolbar
-    ToolbarManager.setVisibility(true);
-    ToolbarManager.apply();
+    
+    // Config toolbar
+    Toolbar.title.mode = 'pwd';
+    Toolbar.buttons.switchView.visible = true;
+    Toolbar.buttons.search.visible = true;
 
     // Functions of the fab buttons
     // New folder fab button
@@ -118,4 +106,5 @@ angular.module('goboxWebapp')
         
         Clipboard.clear();
     };
+
 });

@@ -20,10 +20,10 @@ angular
         'ngSanitize',
         'ngClipboard',
         'com.2fdevs.videogular',
-		'com.2fdevs.videogular.plugins.controls',
-		'com.2fdevs.videogular.plugins.overlayplay',
-		'com.2fdevs.videogular.plugins.poster',
-		'ngPintura'
+        'com.2fdevs.videogular.plugins.controls',
+        'com.2fdevs.videogular.plugins.overlayplay',
+        'com.2fdevs.videogular.plugins.poster',
+        'ngPintura'
     ])
 
 .config(function($stateProvider, $urlRouterProvider, StateRule) {
@@ -200,6 +200,7 @@ angular
 
     // Configure routing policy
     $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
+        
 
         // If the login doesn't matter, let the user to the next state
         if (toState.data.access.logged == StateRule.CAN) {
@@ -225,11 +226,11 @@ angular
                 $state.go('login');
                 return;
             }
-            
-            if(!logged && toState.data.access.logged == StateRule.MUST_NOT) {
+
+            if (!logged && toState.data.access.logged == StateRule.MUST_NOT) {
                 return;
             }
-            
+
             // If the client is ready but the state doesn't want it
             if (GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST_NOT) {
 
@@ -248,10 +249,8 @@ angular
                     lastWantedState.name = toState.name;
                     lastWantedState.params = toState.params;
                 }
-                console.log(lastWantedState);
-                console.log(toState);
 
-                var init = function () {
+                var init = function() {
                     GoBoxClient.init().then(function() {
 
                         // Connected! go to the home
@@ -268,28 +267,19 @@ angular
 
                 // Try to connect
                 init();
-                
+
                 if (toState.data.access.clientReady == StateRule.MUST) {
                     // Go to the loading state
                     event.preventDefault();
                     $state.go('loading');
                 }
-                
+
                 return;
             }
         });
 
     });
 })
-
-.config(function($mdThemingProvider) {
-    // Theme configuration
-    // $mdThemingProvider.theme('default')
-    //     .primaryPalette('light-blue')
-    //     .accentPalette('deep-orange');
-})
-
-
 .config(['ngClipProvider', function(ngClipProvider) {
     ngClipProvider.setPath("bower_components/zeroclipboard/dist/ZeroClipboard.swf");
 }]);

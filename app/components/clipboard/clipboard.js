@@ -13,11 +13,11 @@ angular.module('goboxWebapp')
 .service('Clipboard', function($q, $mdToast, $mdDialog, GoBoxFile, GoBoxClient, LinkDialog) {
 
     // Current folder
-    var currentFather;
+    this.currentFather = undefined;
 
     // Selected files
     var files = [];
-    var selectedFiles = 0;
+    this.selectedFiles = 0;
 
     // Hold files, when the copy or cut button is pressed
     var holdFiles = [];
@@ -39,18 +39,12 @@ angular.module('goboxWebapp')
 
     // Register a new listener
     this.addListener = function(callback) {
-        console.log(callback);
         listeners.push(callback);
-    };
-
-    // Return the current file
-    this.getCurrenFather = function() {
-        return currentFather;
     };
 
     // Change the current file
     this.setCurrentFather = function(father) {
-        currentFather = father;
+        this.currentFather = father;
         files = father.children;
     };
 
@@ -58,12 +52,7 @@ angular.module('goboxWebapp')
     // It should be called with the value of the ctrl key button
     this.singleClick = function(file) {
         file.selected = !file.selected;
-        if (file.selected) {
-            selectedFiles++;
-        }
-        else {
-            selectedFiles--;
-        }
+        this.selectedFiles += file.selected ? 1 : -1;
         notify();
     };
 
@@ -77,17 +66,12 @@ angular.module('goboxWebapp')
         open = action;
     };
 
-    this.getSelectedFiles = function() {
-        return files.filter(function(file) {
-            return file.selected;
-        });
-    };
 
     this.clear = function() {
         files.forEach(function(file) {
             file.selected = false;
         });
-        selectedFiles = 0;
+        this.selectedFiles = 0;
     };
 
     this.holdState = function(newState) {
@@ -111,13 +95,6 @@ angular.module('goboxWebapp')
         });
     };
 
-    this.isSingleFileSelected = function() {
-        return selectedFiles == 1;
-    };
-
-    this.isFilesSecelted = function() {
-        return selectedFiles > 0;
-    };
 
     this.getDownloadLink = function() {
         var fileToDownload = files[0];

@@ -67,6 +67,9 @@ angular.module('goboxWebapp')
         icon: 'info',
         action: function($event) {
             
+            // Hide sidenav is small display
+            $scope.closeSidenav();
+            
             // Open a dialog
             ConnectionInfoDialog.open($event);
         }

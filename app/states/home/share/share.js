@@ -2,7 +2,7 @@
 
 angular.module('goboxWebapp')
 
-.controller('ShareCtrl', function($scope, $state, $mdDialog, $mdToast, GoBoxClient, ToolbarManager, LinkDialog) {
+.controller('ShareCtrl', function($scope, $state, $mdDialog, $mdToast, GoBoxClient, Toolbar, LinkDialog) {
 
     $scope.share = {};
 
@@ -10,14 +10,11 @@ angular.module('goboxWebapp')
         $scope.share.files = files;
     });
     
-    ToolbarManager.setTitle({
-        mode: 'title',
-        str: 'Shared Files'
-    });
-    ToolbarManager.showSearch(true);
-    ToolbarManager.showTools(false);
-    ToolbarManager.setVisibility(true);
-    ToolbarManager.apply();
+    // Config toolbar
+    Toolbar.title.mode = 'title';
+    Toolbar.title.str = 'Share';
+    Toolbar.buttons.switchView.visible = false;
+    Toolbar.buttons.search.visible = true;
 
     $scope.unshare = function(file, evt) {
         
@@ -50,5 +47,7 @@ angular.module('goboxWebapp')
     $scope.getPublicLink = function (file) {
         LinkDialog.show(file);
     };
+    
+    
 
 });

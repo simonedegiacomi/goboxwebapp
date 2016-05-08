@@ -1,6 +1,6 @@
 angular.module('goboxWebapp')
 
-.controller('RecentCtrl', function ($scope, GoBoxClient, $state, ToolbarManager) {
+.controller('RecentCtrl', function ($scope, GoBoxClient, $state, Toolbar) {
     
     // Request the files
     GoBoxClient.getRecentFiles().then(function(events) {
@@ -13,14 +13,11 @@ angular.module('goboxWebapp')
         });
     };
     
-    ToolbarManager.setTitle({
-        mode: 'title',
-        str: 'Recent Files'
-    });
-    ToolbarManager.showSearch(true);
-    ToolbarManager.showTools(false);
-    ToolbarManager.setVisibility(true)
-    ToolbarManager.apply();
+     // Config toolbar
+    Toolbar.title.mode = 'title';
+    Toolbar.title.str = 'Recent Files';
+    Toolbar.buttons.switchView.visible = false;
+    Toolbar.buttons.search.visible = true;
     
     $scope.show = function(file) {
         
@@ -29,9 +26,11 @@ angular.module('goboxWebapp')
         });
     };
     
-    
-    
     $scope.alias = {
+        NEW_FILE: {
+            name: "Create",
+            icon: "add_circle_outline"
+        },
         OPEN_FILE: {
             name: "Open",
             icon: "mouse"
@@ -68,10 +67,6 @@ angular.module('goboxWebapp')
             name: "Unshare",
             icon: "stop_screen_share"
         }
-    };
-    
-    $scope.onPageEnd = function () {
-        console.log("End page");
     };
     
 });

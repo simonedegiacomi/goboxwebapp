@@ -21,7 +21,7 @@
     <md-content layout-padding>
         <md-list>
             <md-list-item ng-repeat="file in files">
-                <span flex>{{file.getName()}}</span>
+                <span flex>{{::file.name}}</span>
                 <md-button ng-click="recover(file)" class="md-icon-button">
                     <md-icon>undo</md-icon>
                     <md-tooltip>Recover</md-tooltip>

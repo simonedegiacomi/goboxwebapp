@@ -2,7 +2,7 @@
 
     <md-toolbar>
         <div class="md-toolbar-tools">
-            <md-title>{{file.getName()}} - Preview</md-title>
+            <md-title>{{::file.name}} - Preview</md-title>
             <span flex></span>
             <md-button ng-click="close()" class="md-icon-button">
                 <md-icon>close</md-icon>
@@ -16,6 +16,6 @@
 
     <md-dialog-actions>
         <md-button ng-click="close()">Close</md-button>
-        <md-button ng-href="{{ links.raw }}" class="md-primary">Download</md-button>
+        <md-button ng-href="{{::links.raw}}" class="md-primary">Download</md-button>
     </md-dialog-actions>
 </md-dialog>

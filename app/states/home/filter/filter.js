@@ -9,7 +9,9 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FilterCtrl', function($state, $scope, $stateParams, GoBoxClient, ToolbarManager) {
+.controller('FilterCtrl', function($state, $scope, $stateParams, GoBoxClient, Toolbar) {
+
+    $scope.closeSidenav();
 
     var search = $scope.search = {
         kind: $stateParams.kind,
@@ -31,13 +33,11 @@ angular.module('goboxWebapp')
         result.start = 0;
     });
 
-    ToolbarManager.setTitle({
-        mode: 'title',
-        str: 'Search'
-    });
-    ToolbarManager.showSearch(false);
-    ToolbarManager.showTools(true);
-    ToolbarManager.apply();
+     // Config toolbar
+    Toolbar.title.mode = 'title';
+    Toolbar.title.str = 'Search';
+    Toolbar.buttons.switchView.visible = true;
+    Toolbar.buttons.search.visible = false;
 
     $scope.fullScroll = function() {
         console.log(result.end);

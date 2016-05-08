@@ -17,40 +17,40 @@
     <md-subheader ng-hide="share.files.length <= 0" class="md-primary" style="background-color: #eee;">
         <div layout="row">
             <div flex="10"></div>
-            <div flex="60">
+            <div flex="grow">
                 <span>File Name</span>
             </div>
             <div flex="10">
                 <span>Link</span>
             </div>
-            <div flex="10">
+            <div flex="10" hide show-gt-sm>
                 <span>Unshare</span>
             </div>
-            <div flex="10">
+            <div flex="10" hide show-gt-sm>
                 <span>Find</span>
             </div>
         </div>
     </md-subheader>
-    <md-content layout-padding>
+    <md-content>
         <md-list>
-            <md-list-item ng-repeat="file in share.files">
+            <md-list-item layout-padding ng-repeat="file in share.files" layout="row">
                 <div flex="10">
                     <md-icon>{{file | iconFilter}}</md-icon>
                 </div>
-                <span flex="60">{{file.getName()}}</span>
+                <span flex="grow" class="short-text">{{file.name}}</span>
                 <div flex="10">
                     <md-button ng-click="getPublicLink(file)" class="md-icon-button">
                         <md-icon>share</md-icon>
-                        <md-tooltip>Unshare</md-tooltip>
+                        <md-tooltip>Share</md-tooltip>
                     </md-button>
                 </div>
-                <div flex="10">
+                <div flex="10" hide show-gt-sm>
                     <md-button ng-click="unshare(file, $event)" class="md-icon-button">
                         <md-icon>lock</md-icon>
                         <md-tooltip>Unshare</md-tooltip>
                     </md-button>
                 </div>
-                <div flex="10">
+                <div flex="10" hide show-gt-sm>
                     <md-button ng-click="show(file)" class="md-icon-button">
                         <md-icon>pageview</md-icon>
                         <md-tooltip>Show file</md-tooltip>

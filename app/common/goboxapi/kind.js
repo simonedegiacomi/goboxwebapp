@@ -26,7 +26,7 @@ angular.module('goboxWebapp')
     fromFile: function(file) {
         if(file.isDirectory)
             return 'folder';
-        return this.fromMime(file.getMime());
+        return this.fromMime(file.mime);
     }
 
 });
