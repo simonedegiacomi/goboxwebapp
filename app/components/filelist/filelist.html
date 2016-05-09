@@ -39,15 +39,15 @@
 
     <md-content flex>
         <md-list>
-            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" on-long-press="press()" ng-click="$evalAsync(click(file, $event))" ng-dblclick="double(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
+            <md-list-item ng-repeat="file in files | orderBy:order.what:order.reverse" on-long-press="press(file)" ng-click="$evalAsync(click(file, $event))" ng-dblclick="double(file, $event)" ng-class="{ 'selected-file': file.selected }" class="no-padding">
 
                 <!-- Icon or checkbox-->
                 <div flex="10">
                     <!-- Icon -->
-                    <md-icon ng-hide="file.selected">{{::file | iconFilter}}</md-icon>
+                    <md-icon ng-hide="Clipboard.selectedFiles > 0">{{::file | iconFilter}}</md-icon>
 
                     <!-- File selection -->
-                    <md-checkbox ng-show="file.selected" ng-model="file.selected" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
+                    <md-checkbox ng-if="Clipboard.selectedFiles > 0" ng-model="file.selected" ng-change="checkBoxClick(file)" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
                 </div>
                 <!-- File name -->
                 <div flex="50" class="short-text">{{::file.name}}</div>
@@ -64,20 +64,22 @@
 <md-content ng-show="Preferences.listView == 'grid'" style="background: #EEEEEE;" layout-padding>
 
     <md-grid-list md-cols-xs="8" md-cols-sm="12" md-cols-md="16" md-cols-lg="20" md-cols-xl="32" md-row-height="3rem" md-gutter="32px">
-        <md-grid-tile ng-class="{ 'selected-tile': file.selected }" style="background: #FFFFFF;" layout-align="start center" class="md-whiteframe-1dp short-text" layout="row" ng-repeat="file in files" ng-click="click(file, $event)" ng-if="file.isDirectory" md-rowspan="1"
-        md-colspan="4">
-            <md-icon layout-margin>folder</md-icon>
+        <md-grid-tile style="background: #FFFFFF;" layout-align="start center" class="md-whiteframe-1dp short-text" layout="row" ng-repeat="file in files" on-long-press="press(file)" ng-click="click(file, $event)"
+        ng-dblclick="double(file, $event)" ng-if="file.isDirectory" md-rowspan="1" md-colspan="4">
+            <md-icon ng-hide="Clipboard.selectedFiles > 0" layout-margin>folder</md-icon>
+            <md-checkbox ng-if="Clipboard.selectedFiles > 0" ng-model="file.selected" ng-change="checkBoxClick(file)" aria-label="Select file" style="margin-bottom: 0px;"></md-checkbox>
             <span flex>{{::file.name}}</span>
         </md-grid-tile>
     </md-grid-list>
 
     <md-grid-list md-cols-xs="2" md-cols-sm="3" md-cols-md="4" md-cols-lg="5" md-cols-xl="8" md-row-height="1:1" md-gutter="32px">
 
-        <md-grid-tile ng-repeat="file in files" ng-click="click(file, $event)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
+        <md-grid-tile ng-repeat="file in files" ng-click="click(file, $event)" ng-dblclick="double(file, $event)" on-long-press="press(file)" ng-if="!file.isDirectory" md-rowspan="1" md-colspan="1">
             <md-content layout-fill layout="column" layout-align="space-between stretch" style="background: #EEEEEE;">
                 <img flex="80" ng-src="{{::file | thumbnail}}" default-thumbnail class="file-tile">
-                <div ng-class="{ 'selected-tile': file.selected }" flex="20" layout="row" layout-align="space-between center" class="short-text" style="background: #EEEEEE;">
-                    <md-icon layout-margin>{{::file | iconFilter}}</md-icon>
+                <div flex="20" layout="row" layout-align="space-between center" class="short-text" style="background: #EEEEEE;">
+                    <md-icon ng-hide="Clipboard.selectedFiles > 0" layout-margin>{{::file | iconFilter}}</md-icon>
+                    <md-checkbox ng-if="Clipboard.selectedFiles > 0" ng-model="file.selected" ng-change="checkBoxClick(file)" aria-label="Select file"></md-checkbox>
                     <span flex>{{::file.name}}</span>
                 </div>
             </md-content>

@@ -12,61 +12,44 @@ angular.module('goboxWebapp')
 
 .service('Clipboard', function($q, $mdToast, $mdDialog, GoBoxFile, GoBoxClient, LinkDialog) {
 
-    // Current folder
+    /**
+     * Current folder
+     */
     this.currentFather = undefined;
 
-    // Selected files
+    /**
+     * Array with the selected files. this array containsalso files that were selected.
+     * Use getSelectedFiles to get only the current selected files
+     */
     var files = [];
+    
+    /**
+     * Action copy o cut, evaluated by the paste method
+     */
+    var action;
+    
+    var holdFiles;
+    
+    /**
+     * Number of selected files
+     */
     this.selectedFiles = 0;
 
-    // Hold files, when the copy or cut button is pressed
-    var holdFiles = [];
+    /**
+     * True if copy or cut was called
+     */
+    this.canPaste = false;
 
-    // Listeners for a click event
-    var listeners = [];
-
-    // Double click listener
-    var open;
-    var state;
-
-    var self = this;
-
-    // Call all the listeners
-    function notify() {
-        for (var i in listeners)
-            listeners[i]();
-    }
-
-    // Register a new listener
-    this.addListener = function(callback) {
-        listeners.push(callback);
-    };
-
-    // Change the current file
+    /**
+     * Change the current father
+     */
     this.setCurrentFather = function(father) {
         this.currentFather = father;
-        files = father.children;
     };
 
-    // Single click event. UPdate the selected file list and call the listeners.
-    // It should be called with the value of the ctrl key button
-    this.singleClick = function(file) {
-        file.selected = !file.selected;
-        this.selectedFiles += file.selected ? 1 : -1;
-        notify();
-    };
-
-    // Double click event, call the open listener
-    this.doubleClick = function(file, $event) {
-        open(file, $event);
-    };
-
-    // Change the open function, the double click listener
-    this.setOpenAction = function(action) {
-        open = action;
-    };
-
-
+    /**
+     * Unselect all the files
+     */
     this.clear = function() {
         files.forEach(function(file) {
             file.selected = false;
@@ -74,49 +57,81 @@ angular.module('goboxWebapp')
         this.selectedFiles = 0;
     };
 
-    this.holdState = function(newState) {
-        state = newState;
-        this.clear();
-        holdFiles = files;
-    };
-
-    this.getState = function() {
-        return state;
-    };
-
-    this.clearState = function() {
-        this.clear();
-        state = null;
-    };
-
-    this.getHoldFiles = function() {
-        return holdFiles.filter(function(file) {
+    /**
+     * Return an array with the selected files
+     */
+    this.getSelectedFiles = function() {
+        return files.filter(function(file) {
             return file.selected;
         });
     };
+    
+    this.toggle = function (file) {
+        console.log("Toggle");
+        if (files.indexOf(file) < 0) {
+            files.push(file);
+        }
+        file.selected = !file.selected;
+        this.selectedFiles += file.selected ? 1 : -1;
+    };
 
 
+    /**
+     * Return the download link of the first selected file
+     */
     this.getDownloadLink = function() {
-        var fileToDownload = files[0];
-        if (!angular.isDefined(fileToDownload))
-            return null;
+        
+        // Assert that at least one file is selected
+        if (this.selectedFiles <= 0)
+            return;
+            
+        var fileToDownload = this.getSelectedFiles()[0];
         return {
-            name: fileToDownload.getName(),
+            name: fileToDownload.name,
             url: GoBoxClient.getLinks(fileToDownload).raw
         };
     };
 
-    this.copyFile = function() {
-        self.holdState('copy');
+    /**
+     * Prepare for the copy action
+     */
+    this.copy = function() {
+        action = 'copy';
+        holdFiles = this.getSelectedFiles();
+        this.canPaste = true;
+        this.clear();
         $mdToast.showSimple("Copied to clipboard");
     };
 
-    this.cutFile = function() {
-        self.holdState('cut');
+    /**
+     * Prepare for the cut action
+     */
+    this.cut = function() {
+        action = 'cut';
+        holdFiles = this.getSelectedFiles();
+        this.canPaste = true;
+        this.clear();
         $mdToast.showSimple("Hold in clipboard");
     };
 
+    this.paste = function () {
+        var self = this;
+        holdFiles.forEach(function(file) {
+            GoBoxClient.copyOrCut(file, self.currentFather, action == 'cut').then(function () {
+                $mdToast.showSimple(file.name + " moved");
+            }, function () {
+                $mdToast.showSimple("cannot move " + file.name);
+            }); 
+        });
+        this.canPaste = false;
+        $this.clear();
+    };
 
+
+    /**
+     * Ask the user and then trash the specified file.
+     * TODO: separe logic from view
+     */
     this.tashFiles = function() {
 
         var filesToTrash = this.getSelectedFiles();
@@ -146,6 +161,10 @@ angular.module('goboxWebapp')
         this.clear();
     };
 
+    /**
+     * Ask the user for the name of the new file
+     * TODO: separe logic from view
+     */
     this.renameFile = function() {
 
         // Get  the file to rename
@@ -175,6 +194,10 @@ angular.module('goboxWebapp')
         this.clear();
     };
 
+    /**
+     * Share the first selected file
+     * TODO: separe logic from view
+     */
     this.shareFile = function() {
 
         // Take the first selected file

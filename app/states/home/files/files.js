@@ -7,17 +7,16 @@ angular.module('goboxWebapp')
 
 .controller('FileListCtrl', function($scope, $state, $timeout, $mdToast, $stateParams, $mdDialog, GoBoxClient, GoBoxFile, Toolbar, Clipboard, Previewer) {
 
+    // Assert that the clipboard is closed on small display
     $scope.closeSidenav();
+    
+    // Clear the clipboard
+    Clipboard.clear();
 
     // Attach the clipboard to the scope
     $scope.Clipboard = Clipboard;
 
-    // Clear the clipboard
-    Clipboard.clear();
-
-    var dirId = $stateParams.id;
-
-    GoBoxClient.getInfo(dirId).then(function(detailedFile) {
+    GoBoxClient.getInfo($stateParams.id).then(function(detailedFile) {
         $timeout(function() {
 
             if (detailedFile.isDirectory) {
@@ -33,7 +32,7 @@ angular.module('goboxWebapp')
 
             // Otherwise set as dir the father of the file
             $state.go('home.files', {
-                id: detailedFile.getFatherId()
+                id: detailedFile.ID
             });
 
             // And open the previewer
@@ -80,31 +79,6 @@ angular.module('goboxWebapp')
                 $mdToast.showSimple("Sorry, can't create the folder");
             });
         });
-    };
-
-    // Paste fab button
-    $scope.paste = function() {
-
-        // Checkif the action is copy or cut
-        var cut = Clipboard.getState() == 'cut';
-
-        // Get the holded files
-        var files = Clipboard.getHoldFiles();
-        
-        // For each file...
-        angular.forEach(files, function(file) {
-
-            // Call the client method
-            GoBoxClient.copyOrCut(file, $scope.dir, cut).then(function() {
-
-                $mdToast.showSimple("File " + file.getName() + " moved");
-            }, function() {
-
-                $mdToast.showSimple("Sorry, there was an error with " + file.getName());
-            });
-        });
-        
-        Clipboard.clear();
     };
 
 });

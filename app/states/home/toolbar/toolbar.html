@@ -13,14 +13,14 @@
     </md-title>
 
     <!-- Download button -->
-    <md-button ng-show="download" ng-href="{{download.url}}" download="{{download.name}}" class="md-icon-button">
+    <md-button ng-show="Clipboard.selectedFiles == 1" ng-href="{{Clipboard.getDownloadLink().url}}" download="{{Clipboard.getDownloadLink().name}}" class="md-icon-button">
         <md-icon>file_download</md-icon>
     </md-button>
-
-    <!-- All the other tools -->
-    <!--<md-button ng-repeat="tool in ::tools" ng-hide ng-show="showTools && tool.show()" ng-click="::tool.action()" class="md-icon-button" hide show-gt-sm>
-        <md-icon>{{::tool.icon}}</md-icon>
-    </md-button>-->
+    
+    <!-- Download button -->
+    <md-button ng-show="Clipboard.selectedFiles == 1" ng-click="Clipboard.shareFile()" class="md-icon-button">
+        <md-icon>share</md-icon>
+    </md-button>
 
     <!-- View mode -->
     <md-button ng-show="conf.buttons.switchView.visible" ng-click="::switchListView()" class="md-icon-button">
@@ -31,41 +31,5 @@
     <md-button href="#/search/any/" ng-show="conf.buttons.search.visible" class="md-icon-button" show-gt-sm>
         <md-icon>search</md-icon>
     </md-button>
-
-    <!-- Menu for small display -->
-    <!--<md-menu md-position-mode="target-right target">-->
-    <!--    <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)" md-menu-origin  hide-gt-sm>-->
-    <!--        <md-icon>more_vert</md-icon>-->
-    <!--    </md-button>-->
-
-    <!--    <md-menu-content width="4">-->
-            <!-- TODO: find a better way to not copy so much code -->
-
-            <!-- Download button -->
-    <!--        <md-menu-item ng-if="downloadUrl">-->
-    <!--            <md-button ng-href="{{downloadUrl}}" download>-->
-    <!--                <md-icon>file_download</md-icon>-->
-    <!--                <span>Download</span>-->
-    <!--            </md-button>-->
-    <!--        </md-menu-item>-->
-
-            <!-- Tools -->
-    <!--        <md-menu-item ng-repeat="tool in ::tools" ng-hide ng-show="tool.show()">-->
-    <!--            <md-button ng-click="::tool.action()">-->
-    <!--                <md-icon>{{::tool.icon}}</md-icon>-->
-    <!--                {{::tool.tooltip}}-->
-    <!--            </md-button>-->
-    <!--        </md-menu-item>-->
-
-    <!--        <md-menu-item ng-if="showSearchLink">-->
-                <!-- Search button link -->
-    <!--            <md-button href="#/search/any/">-->
-    <!--                <md-icon>search</md-icon>-->
-    <!--                <span>Search</span>-->
-    <!--            </md-button>-->
-    <!--        </md-menu-item>-->
-
-    <!--    </md-menu-content>-->
-    <!--</md-menu>-->
 
 </md-toolbar>

@@ -21,9 +21,7 @@ angular
         'ngClipboard',
         'com.2fdevs.videogular',
         'com.2fdevs.videogular.plugins.controls',
-        'com.2fdevs.videogular.plugins.overlayplay',
-        'com.2fdevs.videogular.plugins.poster',
-        'ngPintura'
+        'com.2fdevs.videogular.plugins.overlayplay'
     ])
 
 .config(function($stateProvider, $urlRouterProvider, StateRule) {
