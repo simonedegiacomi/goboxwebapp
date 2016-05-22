@@ -452,9 +452,7 @@ angular.module('goboxWebapp')
         var future = $q.defer();
 
         var req = {
-            father: {
-                ID: file.fatherID
-            },
+            fatherID: file.fatherID,
             name: file.name
         };
 
@@ -558,13 +556,14 @@ angular.module('goboxWebapp')
         console.log("Making query for", file);
         // Make the query
         this._ws.query('copyOrCutFile', {
-            file: {
+            src: {
                 ID: file.ID
             },
-            newFather: {
-                ID: newFather.ID
+            dst: {
+                fatherID: newFather.ID,
+                name: file.name
             },
-            cut: cut
+            copy: !cut
         }).then(function(result) {
 
             if (result.success) {
