@@ -28,8 +28,6 @@ angular.module('goboxWebapp')
     
     this._syncListeners = [];
 
-    var self = this;
-
     /**
      * Initialize the client oepning a new web socket connection to the server
      */
@@ -49,6 +47,8 @@ angular.module('goboxWebapp')
 
         // Open the socket connection
         this._ws = new MyWS(Env.ws);
+        
+        var self = this;
 
         // Add on 'open' listener
         this._ws.on('open', function() {
@@ -97,25 +97,35 @@ angular.module('goboxWebapp')
             var changedFile = GoBoxFile.wrap(data.file);
             
             switch (data.kind) {
-                case SyncEventKind.NEW_FILE:
-                case SyncEventKind.EDIT_FILE:
-                case SyncEventKind.RECOVER_FILE:
-                    self._caches.get(changedFile.getFatherId()).children.push(changedFile);
+                // Appear new file
+                case SyncEventKind.FILE_CREATED:
+                case SyncEventKind.FILE_RECOVERED:
+                    self._caches.get(changedFile.fatherID).children.push(changedFile);
                     break;
-
-                case SyncEventKind.CUT_FILE:
-                case SyncEventKind.TRASH_FILE:
-                case SyncEventKind.REMOVE_FILE:
-                    var children = self._caches.get(changedFile.getFatherId()).children;
+                
+                // File moved
+                case SyncEventKind.FILE_MOVED:
+                case SyncEventKind.FILE_MODIFIED:
+                    var children = self._caches.get(changedFile.fatherID).children;
                     for (var i in children) {
-                        console.log("deleting");
+                       if (children[i].ID == data.before.ID) {
+                           children[i] = changedFile;
+                           break;
+                       }
+                    }
+                    break;
+                
+                // Disappear file
+                case SyncEventKind.FILE_TRASHED:
+                case SyncEventKind.FILE_DELETED:
+                    var children = self._caches.get(changedFile.fatherID).children;
+                    for (var i in children) {
                         if (children[i].ID == changedFile.ID) {
                             children.splice(i, 1);
                             break;
                         }
                     }
                     break;
-                
             }
             
             // Call the sync listener
@@ -173,6 +183,8 @@ angular.module('goboxWebapp')
             var req = {
                 temporaryToken: data.temporaryToken
             };
+            
+            var self = this;
 
             // Make the requst
             $http({
@@ -219,17 +231,6 @@ angular.module('goboxWebapp')
         this._syncListeners.push(listener);
     };
 
-    this.getAuth = function() {
-
-        if (!angular.isDefined(this._auth))
-            this._auth = new GoBoxAuth();
-        return this._auth;
-    };
-
-    this.setAuth = function(newAuth) {
-        this._auth = newAuth;
-    };
-
     /**
      * Close the ws connection and invalidate the session calling
      * the GoBoxAuth logout method
@@ -240,10 +241,7 @@ angular.module('goboxWebapp')
         this._ws.close();
 
         // Invalidate the session
-        this._auth.logout();
-
-        // Delete the auth object
-        delete self._auth;
+        GoBoxAuth.logout();
 
         // Change the state of the client
         this._state = GoBoxState.NOT_INITIALIZED;
@@ -315,7 +313,7 @@ angular.module('goboxWebapp')
         var future = $q.defer();
 
         // Get the cached value
-        var cacheVal = self._caches.get(fileId);
+        var cacheVal = this._caches.get(fileId);
 
         // If the cached value is present
         if (cacheVal != null) {
@@ -333,6 +331,8 @@ angular.module('goboxWebapp')
                 findPath: true,
                 findChildren: true
             };
+
+            var self = this;
 
             // Make the query
             this._ws.query('info', req).then(function(detailedFile) {
@@ -453,9 +453,9 @@ angular.module('goboxWebapp')
 
         var req = {
             father: {
-                ID: file.getFatherId()
+                ID: file.fatherID
             },
-            name: file.getName()
+            name: file.name
         };
 
         // Make the query
@@ -464,7 +464,7 @@ angular.module('goboxWebapp')
                 future.resolve();
                 return;
             }
-            future.reject();
+            future.reject(res.error);
         });
 
         return future.promise;
@@ -671,7 +671,7 @@ angular.module('goboxWebapp')
      * the host only the bridge mode link will be generater
      */
     this.getLinks = function (file, sharingHost) {
-        var hostName = sharingHost || this._auth.getUsername();
+        var hostName = sharingHost || GoBoxAuth.getUsername();
         var base = sharingHost ? Env.baseTransfer : this._fileTransferBase;
         var links = {};
         
@@ -729,6 +729,7 @@ angular.module('goboxWebapp')
             url: this._fileTransferBase + 'toStorage?json=' + encodeURI(JSON.stringify(req)),
             data: file,
             "Content-Type": file.type != '' ? file.type : 'application/octet-stream',
+            withCredentials : true
         }).then(function(response) {
 
             future.resolve();

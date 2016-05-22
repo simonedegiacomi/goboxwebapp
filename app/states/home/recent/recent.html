@@ -1,5 +1,5 @@
 <md-content layout="column" flex >
-    <md-content ng-show="events.length <= 0">
+    <md-content ng-if="RecentCtrl.events.length <= 0">
         <md-card>
             <md-toolbar>
                 <md-title class="md-toolbar-tools">No recent files</md-title>
@@ -10,7 +10,7 @@
             </md-card-content>
         </md-card>
     </md-content>
-    <md-content ng-show="events.length > 0" layout="column" flex>
+    <md-content ng-if="RecentCtrl.events.length > 0" layout="column" flex>
 
         <md-subheader class="md-primary" style="background-color: #eee;">
             <div layout="row">
@@ -21,9 +21,9 @@
                 <div flex="10">Find</div>
             </div>
         </md-subheader>
-        <md-content flex>
+        <md-content flex on-scroll-end="RecentCtrl.getEvents()">
             <md-list>
-                <md-list-item layout-padding ng-repeat="event in events" layout="row">
+                <md-list-item layout-padding ng-repeat="event in RecentCtrl.events" layout="row">
                     <div flex="10" >
                         <md-icon>{{::alias[event.kind].icon}}</mdicon>
                     </div>

@@ -2,9 +2,9 @@
 
 angular.module('goboxWebapp')
 
-.controller('HomeCtrl', function($rootScope, $scope, $mdSidenav, Clipboard, Previewer, GoBoxClient, $state, $timeout) {
+.controller('HomeCtrl', function($mdSidenav, Clipboard, Previewer, GoBoxClient, $state, $timeout) {
 
-    $scope.clientReady = GoBoxClient.isReady();
+    this.clientReady = GoBoxClient.isReady();
 
 
     GoBoxClient.addSyncListener(function() {
@@ -14,18 +14,28 @@ angular.module('goboxWebapp')
     });
 
 
-    $rootScope.closeSidenav = function() {
+    this.closeSidenav = function() {
         $mdSidenav('sidenav').close();
     };
 
-    $rootScope.openSidenav = function() {
+    this.openSidenav = function() {
         $mdSidenav('sidenav').open();
     };
 
-    $rootScope.open = function(file) {
+    this.goTo = function(file) {
         $state.go('home.files', {
             id: file.ID
         });
+    };
+
+    this.open = function(file) {
+        if (file.isDirectory) {
+            $state.go('home.files', {
+                id: file.ID
+            });
+            return;
+        }
+        Previewer.show(file);
     };
 
 });

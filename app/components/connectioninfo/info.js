@@ -63,7 +63,7 @@ angular.module('goboxWebapp')
                     $scope.conn.ping = time;
                 });
             });
-        }, 10);
+        }, 1000);
         
         // Close the dialog
         $scope.close = function() {

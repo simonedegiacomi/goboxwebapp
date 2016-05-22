@@ -1,4 +1,4 @@
-<md-content ng-show="files.length <= 0">
+<md-content ng-if="TrashCtrl.files.length <= 0">
     <md-card>
         <md-toolbar>
             <md-title class="md-toolbar-tools">Nofile in the trash</md-title>
@@ -10,7 +10,7 @@
     </md-card>
 </md-content>
 
-<md-content layout="column" ng-show="files.length > 0" layout-fill>
+<md-content layout="column" ng-if="TrashCtrl.files.length > 0" layout-fill>
     <md-subheader class="md-primary" style="background-color: #eee;">
         <div layout="row">
             <div flex="80">File Name</div>
@@ -20,13 +20,13 @@
     </md-subheader>
     <md-content layout-padding>
         <md-list>
-            <md-list-item ng-repeat="file in files">
+            <md-list-item ng-repeat="file in TrashCtrl.files">
                 <span flex>{{::file.name}}</span>
-                <md-button ng-click="recover(file)" class="md-icon-button">
+                <md-button ng-click="TrashCtrl.recover(file)" class="md-icon-button">
                     <md-icon>undo</md-icon>
                     <md-tooltip>Recover</md-tooltip>
                 </md-button>
-                <md-button ng-click="delete(file)" class="md-icon-button">
+                <md-button ng-click="TrashCtrl.delete(file)" class="md-icon-button">
                     <md-icon>delete_forever</md-icon>
                     <md-tooltip>Delete File</md-tooltip>
                 </md-button>
@@ -37,7 +37,7 @@
 
 <!-- Fab box -->
 <div class="fab-box">
-    <md-button aria-label="menu" class="md-fab md-warn" ng-click="emptyTrash()">
+    <md-button aria-label="menu" class="md-fab md-warn" ng-click="TrashCtrl.emptyTrash()">
         <md-tooltip md-direction="down">Empty trash</md-tooltip>
         <md-icon>delete_sweep</md-icon>
     </md-button>

@@ -2,33 +2,36 @@
 <md-toolbar class="md-toolbar-tools md-whiteframe-z2">
 
     <!-- Button to open the sidenav in small display -->
-    <md-button hide-gt-sm class="md-icon-button" ng-click="::toggleSidenav()">
+    <md-button hide-gt-sm class="md-icon-button" ng-click="ToolbarCtrl.toggleSidenav()">
         <md-icon>menu</md-icon>
     </md-button>
 
     <!-- Title -->
-    <md-title ng-switch="conf.title.mode" class="short-text" flex>
-        <path-pwd ng-switch-when="pwd" path="Clipboard.currentFather.getPath()"></path-pwd>
-        <span ng-switch-when="title">{{conf.title.str}}</span>
+    <md-title ng-switch="ToolbarCtrl.conf.title.mode" class="short-text" flex>
+        <path-pwd ng-switch-when="pwd" path="ToolbarCtrl.Clipboard.currentFather.getPath()"></path-pwd>
+        <span ng-switch-when="title">{{ToolbarCtrl.conf.title.str}}</span>
     </md-title>
 
-    <!-- Download button -->
-    <md-button ng-show="Clipboard.selectedFiles == 1" ng-href="{{Clipboard.getDownloadLink().url}}" download="{{Clipboard.getDownloadLink().name}}" class="md-icon-button">
-        <md-icon>file_download</md-icon>
-    </md-button>
-    
-    <!-- Download button -->
-    <md-button ng-show="Clipboard.selectedFiles == 1" ng-click="Clipboard.shareFile()" class="md-icon-button">
-        <md-icon>share</md-icon>
-    </md-button>
+    <!-- One selected file tools -->
+    <div ng-if="ToolbarCtrl.Clipboard.selectedFiles == 1" layout="row">
+        <!-- Download button -->
+        <md-button ng-href="{{ToolbarCtrl.Clipboard.getDownloadLink().url}}" download="{{ToolbarCtrl.Clipboard.getDownloadLink().name}}" class="md-icon-button">
+            <md-icon>file_download</md-icon>
+        </md-button>
+
+        <!-- Share button -->
+        <md-button ng-click="ToolbarCtrl.Clipboard.shareFile()" class="md-icon-button">
+            <md-icon>share</md-icon>
+        </md-button>
+    </div>
 
     <!-- View mode -->
-    <md-button ng-show="conf.buttons.switchView.visible" ng-click="::switchListView()" class="md-icon-button">
-        <md-icon>{{conf.buttons.switchView.icon}}</md-icon>
+    <md-button ng-if="ToolbarCtrl.conf.buttons.switchView.visible" ng-click="ToolbarCtrl.switchListView()" class="md-icon-button">
+        <md-icon>{{ToolbarCtrl.conf.buttons.switchView.icon}}</md-icon>
     </md-button>
 
     <!-- Search button link -->
-    <md-button href="#/search/any/" ng-show="conf.buttons.search.visible" class="md-icon-button" show-gt-sm>
+    <md-button href="#/search/any/" ng-if="ToolbarCtrl.conf.buttons.search.visible" class="md-icon-button">
         <md-icon>search</md-icon>
     </md-button>
 

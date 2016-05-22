@@ -44,6 +44,7 @@ angular
         url: '/login',
         templateUrl: 'states/login/login.html',
         controller: 'LoginCtrl',
+        controllerAs: 'LoginCtrl',
         data: {
             access: {
                 logged: StateRule.MUST_NOT // The user must not be logged
@@ -56,6 +57,7 @@ angular
         url: '/public_file/:hostName/:id',
         templateUrl: 'states/publicfile/publicfile.html',
         controller: 'PublicFileCtrl',
+        controllerAs: 'PublicFileCtrl',
         data: {
             access: {
                 logged: StateRule.CAN,
@@ -72,14 +74,17 @@ angular
             '': {
                 templateUrl: 'states/home/home.html',
                 controller: 'HomeCtrl',
+                controllerAs: 'HomeCtrl'
             },
             'sidenav@home': {
                 templateUrl: 'states/home/sidenav/sidenav.html',
-                controller: 'SidenavCtrl'
+                controller: 'SidenavCtrl',
+                controllerAs: 'SidenavCtrl'
             },
             'toolbar@home': {
                 templateUrl: 'states/home/toolbar/toolbar.html',
-                controller: 'ToolbarCtrl'
+                controller: 'ToolbarCtrl',
+                controllerAs: 'ToolbarCtrl'
             }
         },
         data: {
@@ -98,7 +103,8 @@ angular
         views: {
             'main@home': {
                 templateUrl: 'states/home/files/files.html',
-                controller: 'FileListCtrl'
+                controller: 'FileListCtrl',
+                controllerAs: 'FileListCtrl'
             }
         },
         params: {
@@ -113,6 +119,7 @@ angular
             'main@home': {
                 templateUrl: 'states/home/share/share.html',
                 controller: 'ShareCtrl',
+                controllerAs: 'ShareCtrl'
             }
         }
     })
@@ -124,7 +131,8 @@ angular
         views: {
             'main@home': {
                 templateUrl: 'states/home/filter/filter.html',
-                controller: 'FilterCtrl'
+                controller: 'FilterCtrl',
+                controllerAs: 'FilterCtrl'
             }
         }
     })
@@ -134,7 +142,8 @@ angular
         views: {
             'main@home': {
                 templateUrl: 'states/home/recent/recent.html',
-                controller: 'RecentCtrl'
+                controller: 'RecentCtrl',
+                controllerAs: 'RecentCtrl'
             }
         }
     })
@@ -144,7 +153,8 @@ angular
         views: {
             'main@home': {
                 templateUrl: 'states/home/trash/trash.html',
-                controller: 'TrashCtrl'
+                controller: 'TrashCtrl',
+                controllerAs: 'T'
             }
         }
     })
@@ -168,7 +178,7 @@ angular
 
     // This state show the loading page with some information and istruction
     .state('loading', {
-        url: '/loading',
+        url: '/loading?first',
         controller: 'LoadingCtrl',
         templateUrl: 'states/loading/loading.html',
         data: {
@@ -183,101 +193,100 @@ angular
     $urlRouterProvider.otherwise("/login");
 })
 
-.run(function($rootScope, GoBoxClient, GoBoxState, $state, $timeout, StateRule) {
+.run(function($rootScope, GoBoxClient, GoBoxAuth,  GoBoxState, $state, $timeout, StateRule) {
 
-    GoBoxClient.setOnDisconnectListener(function() {
-        $state.go('loading');
-    });
-
-    var lastWantedState = {
-        name: 'home.files',
-        params: {
-            id: 1
-        }
-    };
-
-    // Configure routing policy
-    $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
-        
-
-        // If the login doesn't matter, let the user to the next state
-        if (toState.data.access.logged == StateRule.CAN) {
-            return;
-        }
-
-        GoBoxClient.getAuth().isLogged().then(function(logged) {
-
-            // If the user is logged but the next state doesn't want it
-            if (logged && toState.data.access.logged == StateRule.MUST_NOT) {
-
-                // Go to the root file list
-                event.preventDefault();
-                $state.go('home.files');
-                return;
-            }
-
-            // If the user is not logged, but the state wants it
-            if (!logged && toState.data.access.logged == StateRule.MUST) {
-
-                // Redirect to login
-                event.preventDefault();
-                $state.go('login');
-                return;
-            }
-
-            if (!logged && toState.data.access.logged == StateRule.MUST_NOT) {
-                return;
-            }
-
-            // If the client is ready but the state doesn't want it
-            if (GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST_NOT) {
-
-                // Redirect to the home
-                event.preventDefault();
-                $state.go('home.files');
-                return;
-            }
-
-            // If the client is not ready, but the next state wants it
-            if (!GoBoxClient.isReady()) {
-
-                // Save this state if is not the loading, so when the client is connected
-                // the user see the state that he want now
-                if (toState.name != 'loading') {
-                    lastWantedState.name = toState.name;
-                    lastWantedState.params = toState.params;
-                }
-
-                var init = function() {
-                    GoBoxClient.init().then(function() {
-
-                        // Connected! go to the home
-                        $state.go(lastWantedState.name, lastWantedState.params);
-                    }, function() {
-
-                        // Not ready... retry soon
-                        $timeout(function() {
-                            console.log("retry");
-                            init();
-                        }, 5000);
-                    });
-                };
-
-                // Try to connect
-                init();
-
-                if (toState.data.access.clientReady == StateRule.MUST) {
-                    // Go to the loading state
-                    event.preventDefault();
-                    $state.go('loading');
-                }
-
-                return;
-            }
+        GoBoxClient.setOnDisconnectListener(function() {
+            $state.go('loading');
         });
 
+        var lastWantedState = {
+            name: 'home.files',
+            params: {
+                id: 1
+            }
+        };
+
+        // Configure routing policy
+        $rootScope.$on('$stateChangeStart', function(event, toState, toStateParams) {
+
+
+            // If the login doesn't matter, let the user to the next state
+            if (toState.data.access.logged == StateRule.CAN) {
+                return;
+            }
+
+            GoBoxAuth.isLogged().then(function(logged) {
+
+                // If the user is logged but the next state doesn't want it
+                if (logged && toState.data.access.logged == StateRule.MUST_NOT) {
+
+                    // Go to the root file list
+                    event.preventDefault();
+                    $state.go('home.files');
+                    return;
+                }
+
+                // If the user is not logged, but the state wants it
+                if (!logged && toState.data.access.logged == StateRule.MUST) {
+
+                    // Redirect to login
+                    event.preventDefault();
+                    $state.go('login');
+                    return;
+                }
+
+                if (!logged && toState.data.access.logged == StateRule.MUST_NOT) {
+                    return;
+                }
+
+                // If the client is ready but the state doesn't want it
+                if (GoBoxClient.isReady() && toState.data.access.clientReady == StateRule.MUST_NOT) {
+
+                    // Redirect to the home
+                    event.preventDefault();
+                    $state.go('home.files');
+                    return;
+                }
+
+                // If the client is not ready, but the next state wants it
+                if (!GoBoxClient.isReady()) {
+
+                    // Save this state if is not the loading, so when the client is connected
+                    // the user see the state that he want now
+                    if (toState.name != 'loading') {
+                        lastWantedState.name = toState.name;
+                        lastWantedState.params = toState.params;
+                    }
+
+                    var init = function() {
+                        GoBoxClient.init().then(function() {
+
+                            // Connected! go to the home
+                            $state.go(lastWantedState.name, lastWantedState.params);
+                        }, function() {
+
+                            // Not ready... retry soon
+                            $timeout(function() {
+                                console.log("retry");
+                                init();
+                            }, 5000);
+                        });
+                    };
+
+                    // Try to connect
+                    init();
+
+                    if (toState.data.access.clientReady == StateRule.MUST) {
+                        // Go to the loading state
+                        event.preventDefault();
+                        $state.go('loading');
+                    }
+
+                }
+            });
+
+        });
+    })
+    .config(function(ngClipProvider) {
+        ngClipProvider.setPath("bower_components/zeroclipboard/dist/ZeroClipboard.swf");
     });
-})
-.config(['ngClipProvider', function(ngClipProvider) {
-    ngClipProvider.setPath("bower_components/zeroclipboard/dist/ZeroClipboard.swf");
-}]);

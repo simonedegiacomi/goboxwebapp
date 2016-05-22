@@ -1,13 +1,15 @@
 angular.module('goboxWebapp')
 
-.controller('TrashCtrl', function($scope, GoBoxClient, $mdToast, $mdDialog, Toolbar) {
+.controller('TrashCtrl', function(GoBoxClient, $mdToast, $mdDialog, Toolbar) {
+
+    var TrashCtrl = this;
 
     // Request the files
     GoBoxClient.getTrashedFiles().then(function(files) {
-        $scope.files = files;
+        TrashCtrl.files = files;
     });
 
-    $scope.recover = function(fileToRecover) {
+    this.recover = function(fileToRecover) {
 
         // Call the method of the client
         GoBoxClient.trash(fileToRecover, true).then(function() {
@@ -17,7 +19,7 @@ angular.module('goboxWebapp')
         });
     };
 
-    $scope.delete = function(filetoDelete) {
+    this.delete = function(filetoDelete) {
 
         var dialog = $mdDialog.prompt()
             .title("Remove file")
@@ -35,7 +37,7 @@ angular.module('goboxWebapp')
         });
     };
 
-    $scope.emptyTrash = function() {
+    this.emptyTrash = function() {
         var dialog = $mdDialog.confirm()
             .title("Empty trash")
             .textContent("You can't undo this action")

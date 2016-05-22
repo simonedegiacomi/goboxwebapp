@@ -5,11 +5,33 @@
 .no-padding {
     padding: 0px !important;
 }
-    
+
+.sort-box {
+    outline: none;
+}
+
 .sort:after {
     content: '\25b2';
 }
-    
+
 .sort.reverse:after {
     content: '\25bc';
+}
+
+.file-tile {
+    display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    max-height: 100%;
+    background-position: center center;
+    background-size: cover;
+}
+
+.selected-tile {
+    background-color: blue !important;
+    color: white;
+}
+
+.grid-background {
+    background-color: #EEEEEE;
 }

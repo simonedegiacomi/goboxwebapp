@@ -1,6 +1,6 @@
 <md-content layout="column">
 
-    <md-content ng-show="share.files.length <= 0">
+    <md-content ng-show="ShareCtrl.share.files.length <= 0">
 
         <md-card>
             <md-toolbar>
@@ -14,7 +14,7 @@
 
     </md-content>
 
-    <md-subheader ng-hide="share.files.length <= 0" class="md-primary" style="background-color: #eee;">
+    <md-subheader ng-hide="ShareCtrl.share.files.length <= 0" class="md-primary" style="background-color: #eee;">
         <div layout="row">
             <div flex="10"></div>
             <div flex="grow">
@@ -33,25 +33,25 @@
     </md-subheader>
     <md-content>
         <md-list>
-            <md-list-item layout-padding ng-repeat="file in share.files" layout="row">
+            <md-list-item layout-padding ng-repeat="file in ShareCtrl.share.files" layout="row">
                 <div flex="10">
-                    <md-icon>{{file | iconFilter}}</md-icon>
+                    <md-icon>{{::file | iconFilter}}</md-icon>
                 </div>
-                <span flex="grow" class="short-text">{{file.name}}</span>
+                <span flex="grow" class="short-text">{{::file.name}}</span>
                 <div flex="10">
-                    <md-button ng-click="getPublicLink(file)" class="md-icon-button">
+                    <md-button ng-click="ShareCtrl.getPublicLink(file)" class="md-icon-button">
                         <md-icon>share</md-icon>
                         <md-tooltip>Share</md-tooltip>
                     </md-button>
                 </div>
                 <div flex="10" hide show-gt-sm>
-                    <md-button ng-click="unshare(file, $event)" class="md-icon-button">
+                    <md-button ng-click="ShareCtrl.unshare(file, $event)" class="md-icon-button">
                         <md-icon>lock</md-icon>
                         <md-tooltip>Unshare</md-tooltip>
                     </md-button>
                 </div>
                 <div flex="10" hide show-gt-sm>
-                    <md-button ng-click="show(file)" class="md-icon-button">
+                    <md-button ng-click="ShareCtrl.show(file)" class="md-icon-button">
                         <md-icon>pageview</md-icon>
                         <md-tooltip>Show file</md-tooltip>
                     </md-button>

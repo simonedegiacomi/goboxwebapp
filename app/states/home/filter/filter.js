@@ -9,17 +9,17 @@
  */
 angular.module('goboxWebapp')
 
-.controller('FilterCtrl', function($state, $scope, $stateParams, GoBoxClient, Toolbar) {
+.controller('FilterCtrl', function($state, $stateParams, GoBoxClient, Toolbar) {
 
-    $scope.closeSidenav();
+    //$scope.closeSidenav();
 
-    var search = $scope.search = {
+    this.search = {
         kind: $stateParams.kind,
         keyword: $stateParams.keyword
     };
 
-    $scope.go = function() {
-        $state.go('home.filter', search);
+    this.go = function() {
+        $state.go('home.filter', this.search);
     };
 
     var result = {
@@ -27,8 +27,10 @@ angular.module('goboxWebapp')
         end: 0
     };
 
-    GoBoxClient.search(search.keyword, search.kind, 0, 50).then(function(res) {
-        $scope.res = res;
+    var FilterCtrl = this;
+
+    GoBoxClient.search(this.search.keyword, this.kind, 0, 50).then(function(res) {
+        FilterCtrl.res = res;
         result.end = res.length;
         result.start = 0;
     });
@@ -39,15 +41,14 @@ angular.module('goboxWebapp')
     Toolbar.buttons.switchView.visible = true;
     Toolbar.buttons.search.visible = false;
 
-    $scope.fullScroll = function() {
-        console.log(result.end);
-        GoBoxClient.search(search.keyword, search.kind, result.end, 50).then(function(res) {
-            Array.prototype.push.apply($scope.res, res);
+    this.fullScroll = function() {
+        GoBoxClient.search(this.search.keyword, this.search.kind, result.end, 50).then(function(res) {
+            Array.prototype.push.apply(FilterCtrl.res, res);
             result.end += res.length;
         });
     };
     
-    $scope.fileListConfig = {
+    this.fileListConfig = {
         mode: 'grid'
     };
 

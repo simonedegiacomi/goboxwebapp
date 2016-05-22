@@ -1,12 +1,11 @@
 <md-content layout="column" layout-fill>
 
     <!-- Toolbar -->
-    <my-toolbar config="toolbar"></my-toolbar>
     <md-subheader class="md-primary">
-        <form layout-padding layout="row" ng-submit="go()">
+        <form layout-padding layout="row" ng-submit="FilterCtrl.go()">
             <md-input-container class="md-block">
                 <label>Kind</label>
-                <md-select ng-model="search.kind" ng-change="go()">
+                <md-select ng-model="FilterCtrl.search.kind" ng-change="FilterCtrl.go()">
                     <md-option value="any">All</md-option>
                     <md-option value="audio">Songs</md-option>
                     <md-option value="image">Images</md-option>
@@ -17,21 +16,21 @@
 
             <md-input-container flex>
                 <label>Search</label>
-                <input ng-model="search.keyword">
+                <input ng-model="FilterCtrl.search.keyword">
             </md-input-container>
 
-            <md-button ng-click="go()" class="md-icon-button">
+            <md-button ng-click="FilterCtrl.go()" class="md-icon-button">
                 <md-tooltip>Go!</md-tooltip>
                 <md-icon>search</md-icon>
             </md-button>
         </form>
-        <md-title ng-show="res.length > 0">Results ({{res.length}})</md-title>
+        <md-title ng-show="FilterCtrl.res.length > 0">Results ({{res.length}})</md-title>
     </md-subheader>
 
-    <file-list ng-if="res.length > 0" files="res" clipboard="clipboard" config="fileListConfig"></file-list>
+    <file-list ng-if="FilterCtrl.res.length > 0" files="res" clipboard="clipboard" config="fileListConfig"></file-list>
 
 
-    <md-card ng-if="res.length <= 0">
+    <md-card ng-if="FilterCtrl.res.length <= 0">
         <md-toolbar class="md-toolbar-tools">
             <md-title>I'm sorry but...</md-title>
         </md-toolbar>

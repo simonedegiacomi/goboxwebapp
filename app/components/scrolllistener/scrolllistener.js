@@ -5,24 +5,23 @@
  */
 angular.module('goboxWebapp')
 
-.directive('scrollListener', function() {
+.directive('onScrollEnd', function() {
     return {
         restrict: 'A',
-        link: function($scope, elements, attrs) {
+        link: function($scope, $elements, $attrs) {
             // Get the first element
-            var element = elements[0];
+            var element = $elements[0];
             
             // Bind the scroll event
-            elements.bind('scroll', function() {
+            $elements.bind('scroll', function() {
                 
                 // If the user reach the end of the page, call the listener
                 if (element.scrollTop + element.offsetHeight >= element.scrollHeight) {
-                    $scope.listener();
+                    $scope.$apply(function () {
+                        $scope.$eval($attrs.onScrollEnd);
+                    });
                 }
             });
-        },
-        scope: {
-            listener: "=onScrollEnd"
         }
     };
 });

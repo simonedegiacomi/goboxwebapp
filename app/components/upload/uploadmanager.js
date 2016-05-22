@@ -14,7 +14,7 @@ angular.module('goboxWebapp')
     this.upload = function(files) {
 
         // Get the current folder, the father of the new files
-        var currentFolder = Clipboard.getCurrenFather();
+        var currentFolder = Clipboard.currentFather;
 
         // If is a file instead of an array
         if (!angular.isArray(files)) {
@@ -38,7 +38,7 @@ angular.module('goboxWebapp')
             // Add the upload to the list
             self._uploads.push(upload);
             
-            GoBoxClient.uploadFile(file, currentFolder.getId()).then(function() {
+            GoBoxClient.uploadFile(file, currentFolder.ID).then(function() {
 
                 upload.pending = false;
                 upload.uploaded = true;

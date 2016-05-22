@@ -2,14 +2,18 @@
     .dir-active {
         font-weight: bold;
     }
+    
+    .my-link {
+        outline: none;
+    }
 </style>
 
 <div class="short-text">
 
-    <a ng-href="#/files/1" ng-class="{'dir-active': path.length <= 0}">Storage</a>
+    <a ng-href="#/files/1" class="my-link" ng-class="{'dir-active': path.length <= 0}">Storage</a>
 
     <span ng-repeat="node in path">
-    <a ng-hide="$first" ng-href="{{::getLink(node)}}" ng-class="{'dir-active': $last}"> {{::node.name}} </a>
+    <a ng-hide="$first" ng-href="{{::getLink(node)}}" class="my-link" ng-class="{'dir-active': $last}"> {{::node.name}} </a>
     <span ng-if="!$last">&gt;</span>
     </span>
 </div>

@@ -2,13 +2,13 @@
 
 angular.module('goboxWebapp')
 
-.controller('ToolbarCtrl', function($scope, $timeout, Clipboard, Toolbar, Preferences) {
+.controller('ToolbarCtrl', function(Clipboard, Toolbar, Preferences) {
 
     Toolbar.buttons.switchView.icon = Preferences.listView == 'list' ? 'view_module' : 'list';
-    $scope.conf = Toolbar;
-    $scope.Clipboard = Clipboard;
+    this.conf = Toolbar;
+    this.Clipboard = Clipboard;
 
-    $scope.switchListView = function() {
+    this.switchListView = function() {
         Preferences.listView = Preferences.listView == 'list' ? 'grid' : 'list';
         Toolbar.buttons.switchView.icon = Preferences.listView == 'list' ? 'view_module' : 'list'; 
     };

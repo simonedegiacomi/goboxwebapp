@@ -5,26 +5,28 @@
  */
 angular.module('goboxWebapp')
 
-.factory('GoBoxAuth', function($http, $q, Env) {
+.factory('GoBoxAuth', function($http, $q) {
 
-    // constructor
-    var GoBoxAuth = function() {
-        this._valid = false;
-    };
+    var valid = false;
+    
+    this.username = undefined;
+    this.id = undefined;
+    this.email = undefined;
+    this.token = undefined;
 
-    GoBoxAuth.prototype.setUsername = function(username) {
+    this.setUsername = function(username) {
         this.username = username;
     };
 
-    GoBoxAuth.prototype.getUsername = function() {
+    this.getUsername = function() {
         return this.username;
     };
 
-    GoBoxAuth.prototype.setEmail = function(email) {
+    this.setEmail = function(email) {
         this.email = email;
     };
 
-    GoBoxAuth.prototype.getEmail = function() {
+    this.getEmail = function() {
         return this.email;
     };
 
@@ -32,7 +34,7 @@ angular.module('goboxWebapp')
      * Query the server and try to login. If the informations are correct
      * a new token is saved in this object. This function return a new promise.
      */
-    GoBoxAuth.prototype.login = function(password, keepLogged) {
+    this.login = function(password, keepLogged) {
 
         // Create the new promise
         var future = $q.defer();
@@ -49,22 +51,22 @@ angular.module('goboxWebapp')
         var self = this;
 
         // Make the http request
-        $http.post(Env.base + 'api/user/login', request).then(function(response) {
+        $http.post('/api/user/login', request).then(function(response) {
 
             if (response.data.result == 'logged in') {
 
-                self._valid = true;
-                self._id = response.data.id;
+                valid = true;
+                self.id = response.data.id;
                 future.resolve(true);
             }
             else {
                 
-                self._valid = false;
+                valid = false;
                 future.reject(response.data.result);
             }
         }, function(error) {
             
-            self._valid = false;
+            valid = false;
             future.reject(error.data);
         });
 
@@ -76,21 +78,20 @@ angular.module('goboxWebapp')
      * Delete any informations from this object and from the cookie. Then
      * tell invalidate the session.
      */
-    GoBoxAuth.prototype.logout = function() {
+    this.logout = function() {
 
-        this._valid = false;
-        delete this._token;
-        delete this.username;
-        delete this._password;
+        valid = false;
+        this.token = undefined;
+        this.username = undefined;
 
         // Tell the server to invalidate the session
-        $http.post(Env.base + 'api/user/logout');
+        $http.post('/api/user/logout');
     };
 
     /**
      * Create a new user
      */
-    GoBoxAuth.prototype.register = function(password, reCaptcha) {
+    this.register = function(password, reCaptcha) {
 
         // Create a ne wpromise
         var future = $q.defer();
@@ -99,12 +100,12 @@ angular.module('goboxWebapp')
         var request = {
             username: this.username,
             password: password,
-            email: this._email,
+            email: this.email,
             reCaptcha: reCaptcha
         };
 
         // Make the request
-        $http.post(Env.base + 'api/user/signup', request).then(function(response) {
+        $http.post('/api/user/signup', request).then(function(response) {
             future.resolve(true);
         }, function(error) {
             future.reject(error.data);
@@ -117,13 +118,13 @@ angular.module('goboxWebapp')
     /**
      * Check if a the session is still valid
      */
-    GoBoxAuth.prototype.isLogged = function() {
+    this.isLogged = function() {
         
         // Prepare the promise
         var future = $q.defer();
         
         // If the auth is already verified
-        if (this._valid) {
+        if (valid) {
             
             // Resolve immediately the promise
             future.resolve(true);
@@ -133,7 +134,7 @@ angular.module('goboxWebapp')
         // Prepare the request
         var request = {
             method: 'POST',
-            url: Env.base + 'api/user/check'
+            url: '/api/user/check'
         };
 
         var self = this;
@@ -141,9 +142,9 @@ angular.module('goboxWebapp')
         // Make the request
         $http(request).then(function(response) {
             
-            self._valid = true;
+            valid = true;
             self.username = response.data.username;
-            self._id = response.data.id;
+            self.id = response.data.id;
             future.resolve(true);
         }, function(error) {
             
@@ -156,7 +157,10 @@ angular.module('goboxWebapp')
     /**
      * Check if a user with this name already exists
      */
-    GoBoxAuth.existUser = function(username) {
+    this.existUser = function(username) {
+        
+        // Change valid flag
+        valid = false;
         
         // Prepare the promise
         var future = $q.defer();
@@ -169,7 +173,7 @@ angular.module('goboxWebapp')
         };
 
         // Make the request
-        $http.get(Env.base + 'api/user/exist', config).then(function(response) {
+        $http.get('/api/user/exist', config).then(function(response) {
 
             future.resolve(response.data.exist);
         }, function(response) {
@@ -183,13 +187,13 @@ angular.module('goboxWebapp')
     /**
      * Change the password of the user
      */
-    GoBoxAuth.prototype.changePassword = function(old, newPassword) {
+    this.changePassword = function(old, newPassword) {
         
         // Prepare the promise
         var future = $q.defer();
         
         // Make the request;
-        $http.post(Env.base + 'api/user/changePassword', {
+        $http.post('/api/user/changePassword', {
             'old': old,
             'new': newPassword
         }).then(function(response) {
@@ -204,5 +208,5 @@ angular.module('goboxWebapp')
     };
 
     // Return the API Object
-    return GoBoxAuth;
+    return this;
 });

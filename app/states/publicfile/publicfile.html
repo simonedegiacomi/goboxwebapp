@@ -1,36 +1,36 @@
 <md-container layout-fill layout="row" layout-align="center center">
     
     <!-- Loading card -->
-    <md-card ng-show="fileState == 'loading'">
+    <md-card ng-show="PublicFileCtrl.fileState == 'loading'">
         <md-card-content>
             Loading
         </md-card-content>
     </md-card>
     
     <!-- File card -->
-    <md-card ng-if="fileState == 'available'" flex="60">
+    <md-card ng-if="PublicFileCtrl.fileState == 'available'" flex="60">
         
         <!-- Toolbar of the card -->
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2>{{hostName}} - {{file.name}}</h2>
+                <h2>{{PublicFileCtrl.hostName}} - {{PublicFileCtrl.file.name}}</h2>
             </div>
         </md-toolbar>
         
         <!-- Content of the card -->
         <md-card-content>
             <!-- Preview -->
-            <preview file="file" links="links"></preview>
+            <preview file="PublicFileCtrl.file" links="PublicFileCtrl.links"></preview>
         </md-card-content>
         
         <md-card-actions layout="row">
-            <md-button class="md-primary md-raised">Download</md-button>
+            <md-button class="md-primary md-raised" ng-src="PublicFileCtrl.links.raw">Download</md-button>
         </md-card-actions>
         
     </md-card>
     
     <!-- Not available -->
-    <md-card ng-show="fileState == 'notAvailable'">
+    <md-card ng-show="PublicFileCtrl.fileState == 'notAvailable'">
         <md-card-content>
             File not available
         </md-card-content>

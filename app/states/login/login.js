@@ -5,28 +5,28 @@
  */
 angular.module('goboxWebapp')
 
-.controller('LoginCtrl', function(GoBoxAuth, $scope, $state, $mdToast, $timeout, GoBoxClient) {
+.controller('LoginCtrl', function(GoBoxAuth, $state, $mdToast, $timeout) {
 
     // Load an hypotetical old session
-    var auth = GoBoxClient.getAuth();
+    var auth = GoBoxAuth;
 
-    $scope.state = 'welcome';
+    this.state = 'welcome';
+    
+    var self = this;
 
     /**
      * Call this function to show the login or register card
      */
-    $scope.show = function(nextState, user) {
+    this.show = function(nextState, user) {
 
-        $scope.loading = true;
-
-        $scope.name = user.name;
+        this.loading = true;
 
         // Check if the user exist or not
         GoBoxAuth.existUser(user.name).then(function(exist) {
 
             $timeout(function() {
                 //Stop the spinner
-                $scope.loading = false;
+                self.loading = false;
 
                 // If it doesn't exist and the user want to log ...
                 //if (!exist && nextState == 'login') {
@@ -39,8 +39,9 @@ angular.module('goboxWebapp')
                 }
 
                 // If the user existency is corret for the selected action
-                else
-                    $scope.state = nextState;
+                else {
+                    self.state = nextState;
+                }
             });
 
         });
@@ -49,10 +50,10 @@ angular.module('goboxWebapp')
     /**
      * Login contatting the server trough http
      */
-    $scope.login = function(user) {
+    this.login = function(user, firstTime) {
 
         // Show loading spinner
-        $scope.loading = true;
+        this.loading = true;
 
         // Prepare the auth object
         auth.setUsername(user.name);
@@ -60,16 +61,16 @@ angular.module('goboxWebapp')
         // Login using the API
         auth.login(user.password, user.keepLogged).then(function(logged) {
             //Stop the spinner
-            $scope.loading = false;
+            self.loading = false;
 
             // Ok, logged.
-            $state.go('home.files', {
-                id: 1
+            $state.go('loading', {
+                first: firstTime
             });
         }, function(error) {
 
             // Mmm an error
-            $scope.loading = false;
+            self.loading = false;
 
             // And the error
             $mdToast.showSimple("Sorry, wrong Username or Password");
@@ -79,39 +80,37 @@ angular.module('goboxWebapp')
     /**
      * Register with inserted information in the form
      */
-    $scope.register = function(user) {
+    this.register = function(user) {
 
         // Show loading spinner
-        $scope.loading = true;
+        this.loading = true;
 
         // Prepare auth object
         auth.setUsername(user.name);
         auth.setEmail(user.email);
 
-        var self = this;
-
         // Register
-        auth.register(user.password, $scope.reCaptcha.response).then(function(registered) {
+        auth.register(user.password, this.reCaptcha.response).then(function(registered) {
 
             // Registered, now login
-            self.login(user);
+            self.login(user, true);
         }, function(error) {
 
-            $scope.loading = false;
+            self.loading = false;
             $mdToast.showSimple(error.data);
         });
     };
 
-    $scope.reCaptcha = {
+    this.reCaptcha = {
         setResponse: function(response) {
-            $scope.reCaptcha.response = response;
+            self.reCaptcha.response = response;
         },
         expire: function() {
-            $scope.reCaptcha.response = null;
+            self.reCaptcha.response = null;
         }
     };
 
-    $scope.reset = function() {
-        $scope.state = 'welcome';
+    this.reset = function() {
+        self.state = 'welcome';
     };
 });

@@ -45,6 +45,8 @@ angular.module('goboxWebapp')
      */
     this.setCurrentFather = function(father) {
         this.currentFather = father;
+        files = father.children;
+        this.clear();
     };
 
     /**
@@ -67,11 +69,11 @@ angular.module('goboxWebapp')
     };
     
     this.toggle = function (file) {
-        console.log("Toggle");
-        if (files.indexOf(file) < 0) {
-            files.push(file);
-        }
         file.selected = !file.selected;
+        this.selectedFiles += file.selected ? 1 : -1;
+    };
+    
+    this.update = function (file) {
         this.selectedFiles += file.selected ? 1 : -1;
     };
 
@@ -124,7 +126,7 @@ angular.module('goboxWebapp')
             }); 
         });
         this.canPaste = false;
-        $this.clear();
+        this.clear();
     };
 
 

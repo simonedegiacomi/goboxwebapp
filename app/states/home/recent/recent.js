@@ -1,32 +1,34 @@
 angular.module('goboxWebapp')
 
-.controller('RecentCtrl', function ($scope, GoBoxClient, $state, Toolbar) {
+.controller('RecentCtrl', function(GoBoxClient, $state, Toolbar) {
+
+    this.events = [];
     
+    var RecentCtrl = this;
+
     // Request the files
-    GoBoxClient.getRecentFiles().then(function(events) {
-        $scope.events = events;
-    });
-    
-    $scope.show = function (file) {
-        $state.go('home.files', {
-            id: file.getId()
+    this.getEvents = function () {
+        GoBoxClient.getRecentFiles(this.events.length).then(function(events) {
+            Array.prototype.push.apply(RecentCtrl.events, events);
         });
     };
     
-     // Config toolbar
+    this.getEvents();
+
+    // Config toolbar
     Toolbar.title.mode = 'title';
     Toolbar.title.str = 'Recent Files';
     Toolbar.buttons.switchView.visible = false;
     Toolbar.buttons.search.visible = true;
-    
-    $scope.show = function(file) {
-        
+
+    this.show = function(file) {
+
         $state.go('home.files', {
-            id: file.getId()
+            id: file.ID
         });
     };
-    
-    $scope.alias = {
+
+    this.alias = {
         NEW_FILE: {
             name: "Create",
             icon: "add_circle_outline"
@@ -68,5 +70,5 @@ angular.module('goboxWebapp')
             icon: "stop_screen_share"
         }
     };
-    
+
 });

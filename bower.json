@@ -5,14 +5,24 @@
     "angular": "^1.4.0",
     "angular-animate": "^1.4.0",
     "angular-cookies": "^1.4.0",
-    "angular-sanitize": "~1.4.9",
+    "angular-sanitize": "^1.5.5",
     "angular-ui-router": "~0.2.16",
     "angular-material": "master",
     "ng-file-upload": "~11.2.3",
     "angular-recaptcha": "~2.4.1",
     "ng-img-crop": "ngImgCrop#^0.3.2",
     "zeroclipboard": "^2.2.0",
-    "ng-clip": "^0.2.6"
+    "ng-clip": "^0.2.6",
+    "videogular": "^1.4.3",
+    "videogular-themes-default": "^1.4.3",
+    "videogular-controls": "^1.4.3",
+    "videogular-buffering": "^1.4.3",
+    "videogular-poster": "^1.4.3",
+    "videogular-overlay-play": "^1.4.3",
+    "angular-drag-and-drop-lists": "^1.4.0",
+    "angular-pintura": "^0.2.0",
+    "konva": "^0.12.4",
+    "quick-ng-repeat": "quick-ngrepeat#*"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

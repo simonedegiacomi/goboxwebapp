@@ -1,8 +1,8 @@
 <md-toolbar class="md-toolbar-tools md-tall my-sidenav">
     <div layout="column">
-        <img ng-src="{{ ::'/api/user/image/' + user.username }}" class="avatar">
+        <img ng-src="{{ ::'/api/user/image/' + SidenavCtrl.user.username }}" class="avatar">
         <div layout="row">
-            <p>{{::user.username}}</p>
+            <p>{{::sidenav.user.username}}</p>
         </div>
     </div>
     <md-menu>
@@ -10,7 +10,7 @@
             <md-icon md-menu-origin>more_vert</md-icon>
         </md-button>
         <md-menu-content width="3">
-            <md-menu-item ng-repeat="item in ::menuItems">
+            <md-menu-item ng-repeat="item in ::SidenavCtrl.menuItems">
                 <md-button ng-click="item.action($event)">
                     <md-icon>{{::item.icon}}</md-icon>
                     {{::item.name}}
@@ -21,7 +21,7 @@
 </md-toolbar>
 <md-content>
     <md-list>
-        <md-list-item ng-repeat="link in ::links" ui-sref-active='active' ui-sref="{{::link.state}}">
+        <md-list-item ng-repeat="link in ::SidenavCtrl.links" ui-sref-active='active' ui-sref="{{::link.state}}">
             <md-icon>{{::link.icon}}</md-icon>
             <p>{{::link.name}}</p>
             <md-divider ng-if="::link.divider"></md-divider>

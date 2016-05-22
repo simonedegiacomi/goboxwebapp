@@ -9,14 +9,14 @@
  */
 angular.module('goboxWebapp')
 
-.controller('SidenavCtrl', function($rootScope, $scope, $mdSidenav, $state, GoBoxClient, ConnectionInfoDialog) {
+.controller('SidenavCtrl', function($rootScope, $mdSidenav, $state, GoBoxAuth, ConnectionInfoDialog) {
     
     // Get the user from the client
-    $scope.user = GoBoxClient.getAuth();
+    this.user = GoBoxAuth;
     
     // Set the static links
     // TODO: maybe move these links to angular contant?
-    $scope.links = [{
+    this.links = [{
         name: 'My Files',
         icon: 'cloud',
         state: 'home.files({id:1})',
@@ -34,10 +34,6 @@ angular.module('goboxWebapp')
         icon: 'delete',
         state: 'home.trash',
         divider: true
-    // }, {
-    //     name: 'Search',
-    //     icon: 'search',
-    //     state: "home.filter({kind: 'any'})",
     }, {
         name: 'Music',
         icon: 'library_music',
@@ -55,20 +51,13 @@ angular.module('goboxWebapp')
         icon: 'video_library',
         state: "home.filter({kind: 'video'})",
         divider: true
-    // }, {
-    //     name: 'Settings',
-    //     icon: 'settings',
-    //     state: 'home.settings'
     }];
     
     // Item on the menu at the top of the sidenav
-    $scope.menuItems = [{
+    this.menuItems = [{
         name: 'Connection Info',
         icon: 'info',
         action: function($event) {
-            
-            // Hide sidenav is small display
-            $scope.closeSidenav();
             
             // Open a dialog
             ConnectionInfoDialog.open($event);
