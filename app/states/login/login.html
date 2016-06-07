@@ -21,7 +21,7 @@
             <form flex ng-if="LoginCtrl.state == 'welcome'" ng-submit="loginForm.$valid && LoginCtrl.login(LoginCtrl.user)" name="loginForm" layout="column" novalidate>
                 
                 <!-- User image -->
-                <img ng-show="LoginCtrl.user.name.length >= 4" ng-src="{{ '/api/user/image/' + user.name }}" class="login-avatar">
+                <img ng-src="{{ LoginCtrl.getAvatar(LoginCtrl.user) }}" class="login-avatar">
                 
                 <!-- Username -->
                 <md-input-container>

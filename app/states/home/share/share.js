@@ -23,7 +23,7 @@ angular.module('goboxWebapp')
         $mdDialog.show($mdDialog.confirm()
                 .targetEvent(evt)
                 .ariaLabel("Unshare file")
-                .title("Unashare " + file.getName() + " ?")
+                .title("Unashare " + file.name + " ?")
                 .textContent("If you unshare this file the other people can't download it anymore")
                 .ok("Unshare File")
                 .cancel("Keep this file public")
@@ -42,8 +42,8 @@ angular.module('goboxWebapp')
     this.show = function(file) {
         
         $state.go('home.files', {
-            id: file.getId()
-        });
+            id: file.ID
+            });
     };
     
     this.getPublicLink = function (file) {

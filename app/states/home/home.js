@@ -6,7 +6,6 @@ angular.module('goboxWebapp')
 
     this.clientReady = GoBoxClient.isReady();
 
-
     GoBoxClient.addSyncListener(function() {
         $timeout(function() {
             // just refresh

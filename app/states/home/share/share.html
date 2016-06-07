@@ -1,6 +1,6 @@
 <md-content layout="column">
 
-    <md-content ng-show="ShareCtrl.share.files.length <= 0">
+    <md-content ng-if="ShareCtrl.share.files.length <= 0">
 
         <md-card>
             <md-toolbar>
@@ -14,24 +14,28 @@
 
     </md-content>
 
-    <md-subheader ng-hide="ShareCtrl.share.files.length <= 0" class="md-primary" style="background-color: #eee;">
-        <div layout="row">
-            <div flex="10"></div>
-            <div flex="grow">
-                <span>File Name</span>
+    <md-content flex ng-if="!ShareCtrl.share.files" layout="row" layout-align="center center">
+        <md-progress-circular md-mode="indeterminate" md-diameter="64"></md-progress-circular>
+    </md-content>
+
+    <md-content ng-if="ShareCtrl.share.files.length > 0">
+        <md-subheader class="md-primary" style="background-color: #eee;">
+            <div layout="row">
+                <div flex="10"></div>
+                <div flex="grow">
+                    <span>File Name</span>
+                </div>
+                <div flex="10">
+                    <span>Link</span>
+                </div>
+                <div flex="10" hide show-gt-sm>
+                    <span>Unshare</span>
+                </div>
+                <div flex="10" hide show-gt-sm>
+                    <span>Find</span>
+                </div>
             </div>
-            <div flex="10">
-                <span>Link</span>
-            </div>
-            <div flex="10" hide show-gt-sm>
-                <span>Unshare</span>
-            </div>
-            <div flex="10" hide show-gt-sm>
-                <span>Find</span>
-            </div>
-        </div>
-    </md-subheader>
-    <md-content>
+        </md-subheader>
         <md-list>
             <md-list-item layout-padding ng-repeat="file in ShareCtrl.share.files" layout="row">
                 <div flex="10">

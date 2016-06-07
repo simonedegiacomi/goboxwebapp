@@ -5,7 +5,7 @@
  */
 angular.module('goboxWebapp')
 
-.controller('LoginCtrl', function(GoBoxAuth, $state, $mdToast, $timeout) {
+.controller('LoginCtrl', function(GoBoxAuth, Env, $state, $mdToast, $timeout) {
 
     // Load an hypotetical old session
     var auth = GoBoxAuth;
@@ -97,7 +97,7 @@ angular.module('goboxWebapp')
         }, function(error) {
 
             self.loading = false;
-            $mdToast.showSimple(error.data);
+            $mdToast.showSimple("Error, cannot register");
         });
     };
 
@@ -113,4 +113,8 @@ angular.module('goboxWebapp')
     this.reset = function() {
         self.state = 'welcome';
     };
+    
+    this.getAvatar = function (user) {
+        return Env.base + '/api/user/image/' + user.name;
+    }
 });

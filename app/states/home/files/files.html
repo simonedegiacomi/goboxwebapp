@@ -22,7 +22,7 @@
         <md-button class="md-icon-button" ng-click="FileListCtrl.Clipboard.cut()">
             <md-icon>content_cut</md-icon>
         </md-button>
-        <md-button class="md-icon-button" ng-click="Clipboard.trash()">
+        <md-button class="md-icon-button" ng-click="FileListCtrl.Clipboard.trashFiles()">
             <md-icon>delete</md-icon>
         </md-button>
         <md-button class="md-icon-button" ng-if="FileListCtrl.Clipboard.selectedFiles == 1" ng-click="FileListCtrl.Clipboard.renameFile()">
@@ -31,7 +31,7 @@
     </md-toolbar>
 
     <!-- Button to paste -->
-    <md-button ng-if="FileListCtrl.Clipboard.canPaste" ng-click="paste()" aria-label="menu" class="md-fab md - warn">
+    <md-button ng-if="FileListCtrl.Clipboard.canPaste" ng-click="FileListCtrl.Clipboard.paste()" aria-label="menu" class="md-fab md - warn">
         <md-tooltip md-direction="left">Paste</md-tooltip>
         <md-icon>content_paste</md-icon>
     </md-button>

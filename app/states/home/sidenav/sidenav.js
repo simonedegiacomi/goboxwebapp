@@ -9,7 +9,7 @@
  */
 angular.module('goboxWebapp')
 
-.controller('SidenavCtrl', function($rootScope, $mdSidenav, $state, GoBoxAuth, ConnectionInfoDialog) {
+.controller('SidenavCtrl', function($mdSidenav, $state, GoBoxAuth, ConnectionInfoDialog) {
     
     // Get the user from the client
     this.user = GoBoxAuth;
@@ -82,12 +82,4 @@ angular.module('goboxWebapp')
             $state.go('login');
         }
     }];
-    
-    // Expose in every scope the method that toggle the sidenav
-    $rootScope.toggleSidenav = function () {
-        
-        // Just toggle the sidenav
-        $mdSidenav('sidenav').toggle();
-    };
-    
 });

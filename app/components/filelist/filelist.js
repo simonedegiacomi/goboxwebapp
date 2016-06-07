@@ -42,8 +42,8 @@ angular.module('goboxWebapp')
 
         // List order config
         $scope.order = {
-            what: 'name',
-            reverse: false,
+            what: 'isDirectory',
+            reverse: true,
             toggle: function(newWhat) {
                 this.reverse = this.what == newWhat ? !this.reverse : false;
                 this.what = newWhat;

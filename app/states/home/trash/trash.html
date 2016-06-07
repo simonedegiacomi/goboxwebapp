@@ -1,7 +1,11 @@
+<md-content flex ng-if="!TrashCtrl.files" layout="row" layout-align="center center">
+    <md-progress-circular md-mode="indeterminate" md-diameter="64"></md-progress-circular>
+</md-content>
+
 <md-content ng-if="TrashCtrl.files.length <= 0">
     <md-card>
         <md-toolbar>
-            <md-title class="md-toolbar-tools">Nofile in the trash</md-title>
+            <md-title class="md-toolbar-tools">No file in the trash</md-title>
         </md-toolbar>
 
         <md-card-content>
@@ -9,8 +13,7 @@
         </md-card-content>
     </md-card>
 </md-content>
-
-<md-content layout="column" ng-if="TrashCtrl.files.length > 0" layout-fill>
+<md-content layout="column" ng-if="TrashCtrl.files.length > 0" flex>
     <md-subheader class="md-primary" style="background-color: #eee;">
         <div layout="row">
             <div flex="80">File Name</div>
@@ -18,25 +21,27 @@
             <div flex="10">Delete</div>
         </div>
     </md-subheader>
-    <md-content layout-padding>
-        <md-list>
-            <md-list-item ng-repeat="file in TrashCtrl.files">
-                <span flex>{{::file.name}}</span>
+    <md-list>
+        <md-list-item ng-repeat="file in TrashCtrl.files">
+            <div flex="80" class="short-text" style="padding-left: 16px;">{{::file.name}}</div>
+            <div flex="10">
                 <md-button ng-click="TrashCtrl.recover(file)" class="md-icon-button">
                     <md-icon>undo</md-icon>
                     <md-tooltip>Recover</md-tooltip>
                 </md-button>
+            </div>
+            <div flex="10">
                 <md-button ng-click="TrashCtrl.delete(file)" class="md-icon-button">
                     <md-icon>delete_forever</md-icon>
                     <md-tooltip>Delete File</md-tooltip>
                 </md-button>
-            </md-list-item>
-        </md-list>
-    </md-content>
+            </div>
+        </md-list-item>
+    </md-list>
 </md-content>
 
 <!-- Fab box -->
-<div class="fab-box">
+<div class="fab-box" layout="column" layout-align="end end">
     <md-button aria-label="menu" class="md-fab md-warn" ng-click="TrashCtrl.emptyTrash()">
         <md-tooltip md-direction="down">Empty trash</md-tooltip>
         <md-icon>delete_sweep</md-icon>

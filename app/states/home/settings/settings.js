@@ -9,6 +9,9 @@ angular.module('goboxWebapp')
     Toolbar.title.str = 'Settings';
     Toolbar.buttons.switchView.visible = false;
     Toolbar.buttons.search.visible = false;
+    
+    // Check if the client is ready
+    $scope.clientReady = GoBoxClient.isReady();
 
     // This object contains the functions for the password change
     var password = $scope.password = {};

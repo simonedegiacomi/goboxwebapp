@@ -1,7 +1,7 @@
 <md-content div layout="column" layout-align="center center" flex>
     <md-content style="max-width: 800px;">
         <!-- Card to alert the user if the Storage is not connected -->
-        <md-card ng-hide="clientReady">
+        <md-card ng-if="!clientReady">
             <md-toolbar class="md-toolbar-tools md-warn">
                 <md-title>Storage not connected</md-title>
             </md-toolbar>
@@ -72,31 +72,27 @@
 
             <md-card-content>
                 <p>This the list of all the active session of your account</p>
-                <md-content style="max-height: 500px;">
+
+                <md-virtual-repeat-container style="height: 480px;">
                     <md-subheader class="md-primary" style="background-color: #eee;">
                         <div layout="row">
                             <div flex="90"><span flex>Device Agent</span></div>
                             <div flex="10"><span>Unauthorize</span></div>
                         </div>
                     </md-subheader>
-
-                    <md-list>
-                        <md-list-item ng-repeat="session in account.sessions">
-                            <div layout="row" flex>
-                                <div flex="90">
-                                    <span flex>{{session.userAgent}} - {{session.lastUse}}</span>
-                                </div>
-                                <div flex="10">
-                                    <md-button class="md-icon-button" ng-click="account.disableSession(session)">
-                                        <md-tooltip>Delete</md-tooltip>
-                                        <md-icon>delete</md-icon>
-                                    </md-button>
-                                </div>
-                            </div>
-                        </md-list-item>
-                        <md-divider></md-divider>
-                    </md-list>
-                </md-content>
+                    <md-list-item style="height: 48px;" md-virtual-repeat="session in account.sessions" layout="row">
+                        <div flex="85">
+                            <span flex class="short-te" style="padding-left: 16px;">{{session.userAgent}} - {{session.lastUse}}</span>
+                        </div>
+                        <div flex="15">
+                            <md-button class="md-icon-button" ng-click="account.disableSession(session)">
+                                <md-tooltip>Delete</md-tooltip>
+                                <md-icon>delete</md-icon>
+                            </md-button>
+                        </div>
+                        </div>
+                    </md-list-item>
+                </md-virtual-repeat-container>
             </md-card-content>
         </md-card>
     </md-content>

@@ -67,7 +67,7 @@ angular.module('goboxWebapp')
     MyWS.prototype.query = function (query, data) {
         var future = $q.defer();
         
-        var id = '' + (new Date().getTime());
+        var id = '' + Math.floor(Math.random() * 10000);
         this._queryListeners[id] = future;
         this.send(query, data, false, id);
         

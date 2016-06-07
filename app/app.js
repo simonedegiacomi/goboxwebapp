@@ -154,7 +154,7 @@ angular
             'main@home': {
                 templateUrl: 'states/home/trash/trash.html',
                 controller: 'TrashCtrl',
-                controllerAs: 'T'
+                controllerAs: 'TrashCtrl'
             }
         }
     })
@@ -193,7 +193,10 @@ angular
     $urlRouterProvider.otherwise("/login");
 })
 
-.run(function($rootScope, GoBoxClient, GoBoxAuth,  GoBoxState, $state, $timeout, StateRule) {
+.run(function($rootScope, GoBoxClient, Preferences, GoBoxAuth,  GoBoxState, $state, $timeout, StateRule) {
+
+        localStorage.setItem('listView', 'list');
+        console.log(localStorage);
 
         GoBoxClient.setOnDisconnectListener(function() {
             $state.go('loading');
@@ -255,7 +258,7 @@ angular
                     // the user see the state that he want now
                     if (toState.name != 'loading') {
                         lastWantedState.name = toState.name;
-                        lastWantedState.params = toState.params;
+                        lastWantedState.params = toStateParams;
                     }
 
                     var init = function() {

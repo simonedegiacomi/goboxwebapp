@@ -2,7 +2,7 @@
 
 angular.module('goboxWebapp')
 
-.controller('ToolbarCtrl', function(Clipboard, Toolbar, Preferences) {
+.controller('ToolbarCtrl', function($mdSidenav, Clipboard, Toolbar, Preferences) {
 
     Toolbar.buttons.switchView.icon = Preferences.listView == 'list' ? 'view_module' : 'list';
     this.conf = Toolbar;
@@ -11,5 +11,9 @@ angular.module('goboxWebapp')
     this.switchListView = function() {
         Preferences.listView = Preferences.listView == 'list' ? 'grid' : 'list';
         Toolbar.buttons.switchView.icon = Preferences.listView == 'list' ? 'view_module' : 'list'; 
+    };
+    
+    this.toggleSidenav = function () {
+        $mdSidenav('sidenav').toggle();  
     };
 });

@@ -28,9 +28,11 @@ angular.module('goboxWebapp')
     };
 
     var FilterCtrl = this;
+    
+    this.res = [];
 
-    GoBoxClient.search(this.search.keyword, this.kind, 0, 50).then(function(res) {
-        FilterCtrl.res = res;
+    GoBoxClient.search(this.search.keyword, this.search.kind, 0, 50).then(function(res) {
+        Array.prototype.push.apply(FilterCtrl.res, res);
         result.end = res.length;
         result.start = 0;
     });

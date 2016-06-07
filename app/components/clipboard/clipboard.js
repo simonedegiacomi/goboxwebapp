@@ -134,7 +134,7 @@ angular.module('goboxWebapp')
      * Ask the user and then trash the specified file.
      * TODO: separe logic from view
      */
-    this.tashFiles = function() {
+    this.trashFiles = function() {
 
         var filesToTrash = this.getSelectedFiles();
 
@@ -152,10 +152,10 @@ angular.module('goboxWebapp')
             // Delete each file
             filesToTrash.forEach(function(fileToDelete) {
                 GoBoxClient.trash(fileToDelete).then(function() {
-                    $mdToast.showSimple("File " + fileToDelete.getName() + " deleted!");
+                    $mdToast.showSimple("File " + fileToDelete.name + " deleted!");
                 }, function() {
 
-                    $mdToast.showSimple("Sorry, can't delete " + fileToDelete.getName());
+                    $mdToast.showSimple("Sorry, can't delete " + fileToDelete.name);
                 });
             });
         });
@@ -176,20 +176,20 @@ angular.module('goboxWebapp')
         var dialog = $mdDialog.prompt()
             .title("Rename File")
             .textContent("Choose the new name of the file")
-            .placeholder(fileToRename.getName())
+            .placeholder(fileToRename.name)
             .ariaLabel("Rename File")
             .ok("Rename")
             .cancel("Cancel");
 
         // Show the dialog
         $mdDialog.show(dialog).then(function(newName) {
-
+            console.log("In clipboard, file to rename:", fileToRename);
             GoBoxClient.rename(fileToRename, newName).then(function() {
 
                 $mdToast.showSimple("File updated");
             }, function() {
 
-                $mdToast.showSimple(("Canot rename the file"));
+                $mdToast.showSimple(("Cannot rename the file"));
             });
         });
         
@@ -211,7 +211,7 @@ angular.module('goboxWebapp')
             // Show an alert with the link to the shared file
             LinkDialog.show(file);
         }, function() {
-            $mdToast.showSimple("Sorry, can't share " + file.getName());
+            $mdToast.showSimple("Sorry, can't share " + file.name);
         });
         
         this.clear();

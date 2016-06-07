@@ -29,43 +29,43 @@ angular.module('goboxWebapp')
     };
 
     this.alias = {
-        NEW_FILE: {
+        FILE_CREATED: {
             name: "Create",
             icon: "add_circle_outline"
         },
-        OPEN_FILE: {
+        FILE_OPENED: {
             name: "Open",
             icon: "mouse"
         },
-        EDIT_FILE: {
+        FILE_MODIFIED: {
             name: "Edit",
             icon: "border_color"
         },
-        COPY_FILE: {
+        FILE_COPIED: {
             name: "Copy",
             icon: "content_copy"
         },
-        CUT_FILE: {
+        FILE_MOVED: {
             name: "Cut",
             icon: "content_cut"
         },
-        TRASH_FILE: {
+        FILE_TRASHED: {
             name: "Trash",
             icon: "delete"
         },
-        RECOVER_FILE: {
+        FILE_RECOVERED: {
             name: "Recover",
             icon: "undo"
         },
-        REMOVE_FILE: {
+        FILE_DELETED: {
             name: "Remove",
             icon: "delete_forever"
         },
-        SHARE_FILE: {
+        FILE_SHARED: {
             name: "Share",
             icon: "screen_share"
         },
-        UNSHARE_FILE: {
+        FILE_UNSHARED: {
             name: "Unshare",
             icon: "stop_screen_share"
         }

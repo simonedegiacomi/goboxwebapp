@@ -8,7 +8,7 @@
  */
 angular.module('goboxWebapp')
 
-.service('GoBoxClient', function($http, $q, $cacheFactory, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, GoBoxMode, Upload, SyncEventKind) {
+.service('GoBoxClient', function($http, $q, $cacheFactory, $mdToast, MyWS, GoBoxState, GoBoxFile, Env, GoBoxAuth, GoBoxMode, Upload, SyncEventKind) {
 
     // State of the client
     this._state = GoBoxState.NOT_INITIALIZED;
@@ -95,37 +95,59 @@ angular.module('goboxWebapp')
             
             // Wrap the changed file
             var changedFile = GoBoxFile.wrap(data.file);
+            var cachedFather = self._caches.get(changedFile.fatherID);
             
             switch (data.kind) {
+                
                 // Appear new file
                 case SyncEventKind.FILE_CREATED:
+                case SyncEventKind.FILE_COPIED:
                 case SyncEventKind.FILE_RECOVERED:
-                    self._caches.get(changedFile.fatherID).children.push(changedFile);
+                    
+                    // Add the new file if the father is cached
+                    if(cachedFather) {
+                        cachedFather.children.push(changedFile);
+                    }
                     break;
                 
                 // File moved
-                case SyncEventKind.FILE_MOVED:
                 case SyncEventKind.FILE_MODIFIED:
-                    var children = self._caches.get(changedFile.fatherID).children;
-                    for (var i in children) {
-                       if (children[i].ID == data.before.ID) {
-                           children[i] = changedFile;
-                           break;
-                       }
+                case SyncEventKind.FILE_MOVED:
+                    
+                    if (!cachedFather)
+                        break;
+                        
+                    // Remove the file from the old father
+                    var oldFather = self._caches.get(data.before.fatherID);
+                    if (oldFather) {
+                        var oldChildren = oldFather.children;
+                        for (var i in oldChildren) {
+                            if (oldChildren[i].ID == data.before.ID) {
+                                oldChildren.splice(i, 1);
+                                break;
+                            }
+                        }
                     }
+                    
+                    // Update the new father with the new child
+                    var cachedChildren = cachedFather.children;
+                    cachedChildren.push(changedFile);
                     break;
                 
                 // Disappear file
                 case SyncEventKind.FILE_TRASHED:
                 case SyncEventKind.FILE_DELETED:
-                    var children = self._caches.get(changedFile.fatherID).children;
-                    for (var i in children) {
-                        if (children[i].ID == changedFile.ID) {
-                            children.splice(i, 1);
-                            break;
+                    if (cachedFather) {
+                        var children = cachedFather.children;
+                        for (var i in children) {
+                            if (children[i].ID == changedFile.ID) {
+                                children.splice(i, 1);
+                                break;
+                            }
                         }
                     }
                     break;
+                    
             }
             
             // Call the sync listener
@@ -167,6 +189,8 @@ angular.module('goboxWebapp')
             future.resolve();
             return future.promise;
         }
+        
+        var self = this;
 
         // Make the request to get the token and the address
         $http.get(Env.base + 'api/directConnection').then(function(response) {
@@ -183,8 +207,6 @@ angular.module('goboxWebapp')
             var req = {
                 temporaryToken: data.temporaryToken
             };
-            
-            var self = this;
 
             // Make the requst
             $http({
@@ -411,6 +433,9 @@ angular.module('goboxWebapp')
             }
             var events = res.events;
             events.forEach(function(event) {
+                if (!event.file)
+                    return;
+                
                 var poorFile = event.file;
                 event.file = GoBoxFile.wrap(poorFile);
             });
@@ -428,12 +453,8 @@ angular.module('goboxWebapp')
         // Prepare the promise
         var future = $q.defer();
 
-        var req = {
-            from: start || 0,
-            size: size || 50
-        };
 
-        this._ws.query('trashedFiles', req).then(function(res) {
+        this._ws.query('trashedFiles').then(function(res) {
             if (res.success) {
                 future.resolve(GoBoxFile.wrap(res.files));
                 return;
@@ -453,7 +474,8 @@ angular.module('goboxWebapp')
 
         var req = {
             fatherID: file.fatherID,
-            name: file.name
+            name: file.name,
+            isDirectory: true
         };
 
         // Make the query
@@ -555,7 +577,7 @@ angular.module('goboxWebapp')
         var future = $q.defer();
         console.log("Making query for", file);
         // Make the query
-        this._ws.query('copyOrCutFile', {
+        this._ws.query('move', {
             src: {
                 ID: file.ID
             },
@@ -597,26 +619,27 @@ angular.module('goboxWebapp')
      * to update the 'real' file.
      */
     this.rename = function(file, newName) {
-
-        // Prepare the promise
+        
         var future = $q.defer();
 
-        // Prepare the query
-        var query = {
-            file: {
-                ID: file.ID
+        this._ws.query('move', {
+            src: {
+                ID: file.ID,
+                fatherID: file.fatherID
             },
-            newName: newName
-        };
-
-        this._ws.query('rename', query).then(function(res) {
-
+            dst: {
+                ID: file.ID,
+                fatherID: file.fatherID,
+                name: newName
+            },
+            copy:false
+        }).then(function(res) {
             if (res.success) {
                 future.resolve();
-                return;
-            }
+            }    
             future.reject();
         });
+        
         return future.promise;
     };
 
@@ -711,14 +734,9 @@ angular.module('goboxWebapp')
         // Prepare the promise
         var future = $q.defer();
 
-        // Create the logic representation of the new file
-        var gbFile = new GoBoxFile(file.name);
-
         var req = {
             name: file.name,
-            father: {
-                ID: fatherId
-            }
+            fatherID: fatherId
         };
 
         // Make the request
